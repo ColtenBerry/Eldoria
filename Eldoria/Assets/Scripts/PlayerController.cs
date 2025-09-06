@@ -7,16 +7,18 @@ public class PlayerController : MonoBehaviour
     private Vector3 targetPosition;
     private bool isMoving = false;
 
+    private void OnEnable()
+    {
+        InputEvents.OnInputPosition += SetTargetPosition;
+    }
+
+    private void OnDisable()
+    {
+        InputEvents.OnInputPosition -= SetTargetPosition;
+    }
+
     void Update()
     {
-        // Detect mouse click
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            targetPosition = new Vector3(mouseWorldPos.x, mouseWorldPos.y, transform.position.z);
-            isMoving = true;
-        }
-
         // Move toward target
         if (isMoving)
         {
@@ -28,6 +30,12 @@ public class PlayerController : MonoBehaviour
                 isMoving = false;
             }
         }
+    }
+
+    private void SetTargetPosition(Vector2 selectedPos)
+    {
+        isMoving = true;
+        targetPosition = selectedPos;
     }
 }
 
