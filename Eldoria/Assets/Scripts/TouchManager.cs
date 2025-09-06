@@ -29,9 +29,6 @@ public class TouchManager : MonoBehaviour
 
         if (inputDetected)
         {
-            // no matter what, i want to head over here. 
-            InputEvents.OnLocationSelected(inputPos);
-
             // Check if object is interactable 
             RaycastHit2D hit = Physics2D.Raycast(inputPos, Vector2.zero);
             if (hit.collider != null)
@@ -41,11 +38,10 @@ public class TouchManager : MonoBehaviour
                 var interactable = hit.collider.GetComponent<IInteractable>();
                 if (interactable != null)
                 {
-                    InteractionManager.RequestInteraction(interactable);
+                    InputEvents.SelectInteractable(interactable);
                 }
             }
-
-
+            InputEvents.OnLocationSelected(inputPos);
         }
     }
 
@@ -59,5 +55,10 @@ public static class InputEvents
     {
         // Debug.Log("invoked the input position action");
         OnInputPosition?.Invoke(position);
+    }
+    public static event Action<IInteractable> onInteractableSelected;
+    public static void SelectInteractable(IInteractable interactable)
+    {
+        onInteractableSelected?.Invoke(interactable);
     }
 }
