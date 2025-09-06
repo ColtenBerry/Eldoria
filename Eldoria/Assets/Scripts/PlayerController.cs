@@ -4,7 +4,7 @@ public class PlayerController : MonoBehaviour
 {
 
     public float moveSpeed = 5f;
-    private Vector3 targetPosition;
+    private Vector2 targetPosition;
     private bool isMoving = false;
 
     private void OnEnable()
@@ -25,10 +25,11 @@ public class PlayerController : MonoBehaviour
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
 
             // Stop when close enough
-            if (Vector3.Distance(transform.position, targetPosition) < 0.05f)
+            if (Vector2.Distance(transform.position, targetPosition) < 0.01f)
             {
                 isMoving = false;
             }
+            InteractionManager.TryInteract(transform.position);
         }
     }
 

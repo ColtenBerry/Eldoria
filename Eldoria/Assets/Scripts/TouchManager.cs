@@ -16,7 +16,7 @@ public class TouchManager : MonoBehaviour
         {
             inputPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             inputDetected = true;
-            Debug.Log("detected click: " + inputPos);
+            // Debug.Log("detected click: " + inputPos);
         }
 
         // Touch input (Mobile)
@@ -29,16 +29,23 @@ public class TouchManager : MonoBehaviour
 
         if (inputDetected)
         {
-            // Check if nearby object should be alerted? 
+            // no matter what, i want to head over here. 
+            InputEvents.OnLocationSelected(inputPos);
+
+            // Check if object is interactable 
             RaycastHit2D hit = Physics2D.Raycast(inputPos, Vector2.zero);
             if (hit.collider != null)
             {
                 Debug.Log($"Clicked or touched: {hit.collider.name}");
                 // You can call a method or interface here
+                var interactable = hit.collider.GetComponent<IInteractable>();
+                if (interactable != null)
+                {
+                    InteractionManager.RequestInteraction(interactable);
+                }
             }
 
-            // if nothing else should be alerted, raise the input? 
-            else InputEvents.OnLocationSelected(inputPos);
+
         }
     }
 
@@ -50,7 +57,7 @@ public static class InputEvents
     public static event Action<Vector2> OnInputPosition;
     public static void OnLocationSelected(Vector2 position)
     {
-        Debug.Log("invoked the input position action");
+        // Debug.Log("invoked the input position action");
         OnInputPosition?.Invoke(position);
     }
 }
