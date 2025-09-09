@@ -7,6 +7,8 @@ public class TouchManager : MonoBehaviour
 
     void Update()
     {
+        if (InputGate.IsUIBlockingGameInput) return;
+
         // Detect an input
 
         bool inputDetected = false;
@@ -47,6 +49,19 @@ public class TouchManager : MonoBehaviour
 
 }
 
+public static class InputGate
+{
+    public static bool IsUIBlockingGameInput { get; private set; }
+
+    public static Action OnMenuOpened;
+    public static Action OnMenuClosed;
+
+    static InputGate()
+    {
+        OnMenuOpened += () => IsUIBlockingGameInput = true;
+        OnMenuClosed += () => IsUIBlockingGameInput = false;
+    }
+}
 
 public static class InputEvents
 {

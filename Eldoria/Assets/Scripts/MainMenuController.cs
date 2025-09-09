@@ -18,6 +18,7 @@ public abstract class MenuController : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
+
 }
 
 public class MainMenuController : MenuController
@@ -33,6 +34,17 @@ public class MainMenuController : MenuController
             HandleClose();
             OnCloseSubPanels.Invoke();
         });
+    }
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        InputGate.OnMenuOpened?.Invoke(); // to allow / disallow game actions
+    }
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        InputGate.OnMenuClosed?.Invoke();
     }
 
 }
