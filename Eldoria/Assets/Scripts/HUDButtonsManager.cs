@@ -7,7 +7,7 @@ public class HUDButtonsManager : MonoBehaviour
 
     // Exists to combine buttons and their menu panel
     [System.Serializable]
-    public class MenuBUttonBinding
+    public class MenuButtonBinding
     {
         public Button button;
         public GameObject menuPanel;
@@ -16,8 +16,17 @@ public class HUDButtonsManager : MonoBehaviour
     [SerializeField]
     private GameObject mainPanel;
     [SerializeField]
-    private List<MenuBUttonBinding> bindings = new();
+    private List<MenuButtonBinding> bindings = new();
     private GameObject activePanel = null;
+
+    void OnEnable()
+    {
+        InputGate.OnMenuClosed += CloseActivePanel;
+    }
+    void OnDisable()
+    {
+        // InputGate.OnMenuClosed -= CloseActivePanel;
+    }
 
     void Awake()
     {
@@ -45,10 +54,10 @@ public class HUDButtonsManager : MonoBehaviour
     }
     private void CloseActivePanel()
     {
+        Debug.Log("closing panel");
         if (activePanel != null)
         {
             activePanel.SetActive(false);
-            InputGate.OnMenuClosed?.Invoke();
             activePanel = null;
             SetButtonsInteractable(true);
         }
@@ -57,7 +66,8 @@ public class HUDButtonsManager : MonoBehaviour
     {
         foreach (var binding in bindings)
         {
-            binding.button.interactable = state;
+            //binding.button.interactable = state;
+            gameObject.SetActive(state);
         }
     }
 }

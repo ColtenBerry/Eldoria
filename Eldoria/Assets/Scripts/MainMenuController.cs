@@ -7,16 +7,18 @@ public abstract class MenuController : MonoBehaviour
 {
     protected virtual void OnEnable()
     {
-        MainMenuController.OnCloseSubPanels += HandleClose;
+        InputGate.OnMenuClosed += HandleClose;
     }
     protected virtual void OnDisable()
     {
-        MainMenuController.OnCloseSubPanels -= HandleClose;
+        InputGate.OnMenuClosed -= HandleClose;
+
     }
 
     protected virtual void HandleClose()
     {
         gameObject.SetActive(false);
+        InputGate.OnMenuClosed?.Invoke();
     }
 
 }
@@ -25,26 +27,24 @@ public class MainMenuController : MenuController
 {
     [SerializeField]
     private Button closeButton;
-    public static event Action OnCloseSubPanels;
     private void Awake()
     {
 
         closeButton.onClick.AddListener(() =>
         {
             HandleClose();
-            OnCloseSubPanels.Invoke();
         });
     }
 
     protected override void OnEnable()
     {
         base.OnEnable();
-        InputGate.OnMenuOpened?.Invoke(); // to allow / disallow game actions
+        //InputGate.OnMenuOpened?.Invoke(); // to allow / disallow game actions
     }
     protected override void OnDisable()
     {
         base.OnDisable();
-        InputGate.OnMenuClosed?.Invoke();
+        //InputGate.OnMenuClosed?.Invoke();
     }
 
 }

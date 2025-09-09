@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class TouchManager : MonoBehaviour
 {
@@ -16,14 +17,16 @@ public class TouchManager : MonoBehaviour
         // Mouse input (Editor/Desktop)
         if (Input.GetMouseButtonDown(0))
         {
+            if (EventSystem.current.IsPointerOverGameObject()) return;
             inputPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             inputDetected = true;
-            // Debug.Log("detected click: " + inputPos);
+            Debug.Log("detected click: " + inputPos);
         }
 
         // Touch input (Mobile)
         else if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
+            if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId)) return;
             inputPos = Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
             inputDetected = true;
         }

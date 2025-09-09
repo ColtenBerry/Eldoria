@@ -62,6 +62,7 @@ public class PlayerController : MonoBehaviour
 
     private void SetTargetPosition(Vector2 selectedPos)
     {
+        isFolowingInteractable = false;
         isMoving = true;
         targetPosition = selectedPos;
     }
