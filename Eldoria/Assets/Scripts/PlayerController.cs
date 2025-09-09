@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public InventoryItem bread;
+    public Inventory inventory;
+    [SerializeField]
+    private PlayerInventoryManager playerInventoryManager;
 
     public float moveSpeed = 5f;
     private Vector2 targetPosition;
@@ -22,6 +26,13 @@ public class PlayerController : MonoBehaviour
         InputEvents.onInteractableSelected -= SetTargetInteractable;
     }
 
+    private void Awake()
+    {
+        inventory = new Inventory();
+        playerInventoryManager.Initialize(inventory);
+        playerInventoryManager.AddItem(bread);
+    }
+
     void Update()
     {
         // Move toward target
@@ -37,6 +48,8 @@ public class PlayerController : MonoBehaviour
             if (Vector2.Distance(transform.position, targetPosition) < 0.01f)
             {
                 isMoving = false;
+
+                // Attempt interaction if necessary
                 if (isFolowingInteractable)
                 {
                     isFolowingInteractable = false;

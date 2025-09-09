@@ -11,7 +11,7 @@ public enum ItemCategory
 public abstract class InventoryItem : ScriptableObject
 {
     public string itemName;
-    //public Sprite icon;
+    public Sprite icon;
     public ItemCategory category;
     public int value;
     public string description;

@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class Inventory
 {
+    public event Action<List<ItemStack>> OnInventoryChanged;
     private List<ItemStack> itemStacks = new();
 
     public void AddItem(InventoryItem item, int amount = 1)
@@ -31,6 +33,7 @@ public class Inventory
             for (int i = 0; i < amount; i++)
                 itemStacks.Add(new ItemStack(item, 1));
         }
+        OnInventoryChanged.Invoke(itemStacks);
     }
 
     public void RemoveItem(InventoryItem item, int amount = 1)
@@ -48,7 +51,10 @@ public class Inventory
                     itemStacks.RemoveAt(i);
             }
         }
+        OnInventoryChanged?.Invoke(itemStacks);
     }
+
+    public List<ItemStack> GetAllItems() => new(itemStacks);
 }
 
 
