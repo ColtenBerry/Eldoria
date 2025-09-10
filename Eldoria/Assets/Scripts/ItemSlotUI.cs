@@ -9,6 +9,8 @@ public class ItemSlotUI : MonoBehaviour
     private Image icon;
     [SerializeField]
     private TextMeshProUGUI quantityText;
+    [SerializeField]
+    private TextMeshProUGUI itemNameText;
 
     private ItemStack stack;
 
@@ -17,6 +19,8 @@ public class ItemSlotUI : MonoBehaviour
         this.stack = stack;
         //icon.sprite = stack.item.icon;
         quantityText.text = stack.quantity >= 1 ? stack.quantity.ToString() : "";
+        itemNameText.text = stack.item.itemName;
+
     }
 
 }
