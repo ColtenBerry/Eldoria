@@ -69,6 +69,7 @@ public class PlayerController : MonoBehaviour
     private void SetTargetInteractable(IInteractable interactable)
     {
         isFolowingInteractable = true;
+        isMoving = true;
         pendingInteraction = interactable;
         targetInteractable = (interactable as MonoBehaviour)?.transform;
     }

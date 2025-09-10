@@ -36,15 +36,4 @@ public class MainMenuController : MenuController
         });
     }
 
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        //InputGate.OnMenuOpened?.Invoke(); // to allow / disallow game actions
-    }
-    protected override void OnDisable()
-    {
-        base.OnDisable();
-        //InputGate.OnMenuClosed?.Invoke();
-    }
-
 }

@@ -46,7 +46,7 @@ public class TouchManager : MonoBehaviour
                     InputEvents.SelectInteractable(interactable);
                 }
             }
-            InputEvents.OnLocationSelected(inputPos);
+            else InputEvents.OnLocationSelected(inputPos);
         }
     }
 
