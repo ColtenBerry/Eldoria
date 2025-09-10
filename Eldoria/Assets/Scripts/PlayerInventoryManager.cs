@@ -58,4 +58,15 @@ public class PlayerInventoryManager : MenuController
     {
         uiController.gameObject.SetActive(false);
     }
+
+
+    // TODO: 
+    /*
+        - Have this listen for a button to be pressed (to drop an item). At which point, the item will be dropped
+            - I am assuming that we can pass the item through the action. 
+        - Our current action, OnInventoryChanged, will not function for other inventories. Inventory should be reusable for each 
+        - Perhaps this can be generalized to be used for any inventory? and can be initialized on the player? and each other inventory? 
+        
+
+    */
 }
