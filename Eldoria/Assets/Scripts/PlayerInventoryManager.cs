@@ -33,12 +33,14 @@ public class PlayerInventoryManager : MenuController
 
     public void AddItem(InventoryItem item, int amount = 1)
     {
+        // if (playerInventory == null) return;
         playerInventory.AddItem(item, amount);
         // Inventory will trigger OnInventoryChanged automatically
     }
 
     public void RemoveItem(InventoryItem item, int amount = 1)
     {
+        if (playerInventory == null) return;
         playerInventory.RemoveItem(item, amount);
         // Inventory will trigger OnInventoryChanged automatically
     }
@@ -65,8 +67,11 @@ public class PlayerInventoryManager : MenuController
         - Have this listen for a button to be pressed (to drop an item). At which point, the item will be dropped
             - I am assuming that we can pass the item through the action. 
         - Our current action, OnInventoryChanged, will not function for other inventories. Inventory should be reusable for each 
-        - Perhaps this can be generalized to be used for any inventory? and can be initialized on the player? and each other inventory? 
-        
+        - Perhaps this class can be generalized to be used for any inventory? and can be initialized on the player? and each other inventory?
+            - This can just be a script on anything that may find use for it. probably just settlments for now. and the player, obviously 
+
+        - Are changes even needed? I can use some other logic to keep track of inventories... this doesn't have to be an in depth game. Just sell food
+        some random weapons, armor, etc? maybe lets wait till later. 
 
     */
 }

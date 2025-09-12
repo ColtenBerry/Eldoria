@@ -4,7 +4,14 @@ using UnityEngine;
 public class InventoryUIController : MonoBehaviour
 {
     public Transform itemGridParent;
-    public GameObject itemSlotPrefab;
+    public ItemSlotUI itemSlotPrefab;
+    private ItemSlotUI currentSelected;
+
+    public void OnDisable()
+    {
+        if (currentSelected != null) currentSelected.Deselect();
+        currentSelected = null;
+    }
 
     public void RefreshUI(List<ItemStack> stacks)
     {
@@ -16,6 +23,13 @@ public class InventoryUIController : MonoBehaviour
             var slot = Instantiate(itemSlotPrefab, itemGridParent);
             slot.GetComponent<ItemSlotUI>().Setup(stack);
         }
+    }
+
+    public void SelectSlot(ItemSlotUI selected)
+    {
+        if (currentSelected != null) currentSelected.Deselect();
+        currentSelected = selected;
+        currentSelected.Select();
     }
 }
 

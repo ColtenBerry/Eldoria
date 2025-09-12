@@ -1,6 +1,7 @@
 using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public abstract class MenuController : MonoBehaviour
@@ -18,7 +19,6 @@ public abstract class MenuController : MonoBehaviour
     protected virtual void HandleClose()
     {
         gameObject.SetActive(false);
-        InputGate.OnMenuClosed?.Invoke();
     }
 
 }
@@ -32,8 +32,13 @@ public class MainMenuController : MenuController
 
         closeButton.onClick.AddListener(() =>
         {
-            HandleClose();
+            CloseAllMenus();
         });
+    }
+
+    private void CloseAllMenus()
+    {
+        InputGate.OnMenuClosed?.Invoke();
     }
 
 }

@@ -229,6 +229,7 @@ MonoBehaviour:
   icon: {fileID: 0}
   quantityText: {fileID: 6523919468972106975}
   itemNameText: {fileID: 7937275313014202406}
+  highlightImage: {fileID: 0}
 --- !u!1 &9102859373638357099
 GameObject:
   m_ObjectHideFlags: 0

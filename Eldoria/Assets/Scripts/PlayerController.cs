@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
     public InventoryItem bread;
+    public InventoryItem ham;
     public Inventory inventory;
     [SerializeField]
     private PlayerInventoryManager playerInventoryManager;
@@ -31,6 +33,7 @@ public class PlayerController : MonoBehaviour
         inventory = new Inventory();
         playerInventoryManager.Initialize(inventory);
         playerInventoryManager.AddItem(bread);
+        playerInventoryManager.AddItem(ham, 5);
     }
 
     void Update()
