@@ -21,7 +21,12 @@ public class ItemSlotUI : MonoBehaviour, IPointerClickHandler
 
     public void Awake()
     {
-        controller = transform.parent.parent.GetComponent<InventoryUIController>();
+        controller = transform.parent?.parent?.GetComponent<InventoryUIController>();
+        if (controller == null)
+        {
+            Debug.LogError($"InventoryUIController not found on grandparent of {gameObject.name}. Check hierarchy and component assignment.");
+            return;
+        }
     }
 
     public void Setup(ItemStack stack)
@@ -47,5 +52,9 @@ public class ItemSlotUI : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         controller.SelectSlot(this);
+    }
+    public ItemStack GetStack()
+    {
+        return stack;
     }
 }

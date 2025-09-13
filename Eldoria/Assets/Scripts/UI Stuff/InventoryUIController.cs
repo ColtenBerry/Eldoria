@@ -1,11 +1,27 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InventoryUIController : MonoBehaviour
 {
     public Transform itemGridParent;
     public ItemSlotUI itemSlotPrefab;
     private ItemSlotUI currentSelected;
+    [SerializeField]
+    private Button dropStackButton;
+
+    public static event Action<InventoryItem, int> OnItemStackDropped;
+
+    private void Awake()
+    {
+        dropStackButton.onClick.AddListener(() =>
+        {
+            if (currentSelected == null) return;
+            Debug.Log("Drop Stack button clicked");
+            OnItemStackDropped?.Invoke(currentSelected.GetStack().item, currentSelected.GetStack().quantity);
+        });
+    }
 
     public void OnDisable()
     {
@@ -15,6 +31,7 @@ public class InventoryUIController : MonoBehaviour
 
     public void RefreshUI(List<ItemStack> stacks)
     {
+        Debug.Log("Refreshing UI");
         foreach (Transform child in itemGridParent)
             Destroy(child.gameObject);
 

@@ -74,9 +74,9 @@ public static class InputEvents
         // Debug.Log("invoked the input position action");
         OnInputPosition?.Invoke(position);
     }
-    public static event Action<IInteractable> onInteractableSelected;
+    public static event Action<IInteractable> OnInteractableSelected;
     public static void SelectInteractable(IInteractable interactable)
     {
-        onInteractableSelected?.Invoke(interactable);
+        OnInteractableSelected?.Invoke(interactable);
     }
 }

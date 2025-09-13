@@ -19,13 +19,13 @@ public class PlayerController : MonoBehaviour
     private void OnEnable()
     {
         InputEvents.OnInputPosition += SetTargetPosition;
-        InputEvents.onInteractableSelected += SetTargetInteractable;
+        InputEvents.OnInteractableSelected += SetTargetInteractable;
     }
 
     private void OnDisable()
     {
         InputEvents.OnInputPosition -= SetTargetPosition;
-        InputEvents.onInteractableSelected -= SetTargetInteractable;
+        InputEvents.OnInteractableSelected -= SetTargetInteractable;
     }
 
     private void Awake()

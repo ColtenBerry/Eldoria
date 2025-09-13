@@ -17,6 +17,11 @@ public class PlayerInventoryManager : MenuController
         HandleInventoryChanged(inventory.GetAllItems());
     }
 
+    public void Awake()
+    {
+        InventoryUIController.OnItemStackDropped += RemoveItem;
+    }
+
 
     protected override void OnDisable()
     {
@@ -40,6 +45,7 @@ public class PlayerInventoryManager : MenuController
 
     public void RemoveItem(InventoryItem item, int amount = 1)
     {
+        Debug.Log("Attempting to remove: " + item.name);
         if (playerInventory == null) return;
         playerInventory.RemoveItem(item, amount);
         // Inventory will trigger OnInventoryChanged automatically
