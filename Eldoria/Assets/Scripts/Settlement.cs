@@ -1,16 +1,14 @@
 using UnityEngine;
 
-public class Settlement : MonoBehaviour, IInteractable
+public abstract class Settlement : MonoBehaviour, IInteractable
 {
     [SerializeField]
-    private string faction;
+    protected string faction;
     [SerializeField]
-    private string settlementName;
+    protected string settlementName;
     [SerializeField]
-    private int prosperity;
+    protected int prosperity;
 
-    public void Interact()
-    {
-        Debug.Log("Attempt interaction with " + settlementName);
-    }
+    public abstract void Interact();
+
 }

@@ -9,15 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34712ae230bac1b45a2547a11bb52c15, type: 3}
-  m_Name: Bread
+  m_Script: {fileID: 11500000, guid: 37df71987e15abe41b4e136ad2482ce6, type: 3}
+  m_Name: TestLord
   m_EditorClassIdentifier: 
-  itemName: Bread
-  icon: {fileID: 0}
-  category: 2
-  value: 10
-  description: For Eating
-  isStackable: 1
-  maxStackSize: 60
-  restoreAmount: 0
-  affectsMorale: 0
+  unitName: Colten
+  powerStat: 10
