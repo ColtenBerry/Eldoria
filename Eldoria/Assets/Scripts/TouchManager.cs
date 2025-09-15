@@ -20,7 +20,7 @@ public class TouchManager : MonoBehaviour
             if (EventSystem.current.IsPointerOverGameObject()) return;
             inputPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             inputDetected = true;
-            Debug.Log("detected click: " + inputPos);
+            // Debug.Log("detected click: " + inputPos);
         }
 
         // Touch input (Mobile)
