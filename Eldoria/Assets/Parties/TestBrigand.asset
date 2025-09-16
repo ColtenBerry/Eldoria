@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6cae264309d562b42904a10fcc7065a3, type: 3}
-  m_Name: TestBrigandParty
+  m_Name: TestBrigand
   m_EditorClassIdentifier: 
   type: 0
-  faction: Looter
+  Lord: {fileID: 11400000, guid: 807c224b3d40d584e9bc9db6771058d3, type: 2}
+  faction: Brigand
   startingUnits:
   - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
   - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}

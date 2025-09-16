@@ -5,12 +5,13 @@ using UnityEngine;
 public class PartyController : MonoBehaviour
 {
     [Header("Lord Settings")]
-    public UnitData lordData;
-    public PartyMember Lord { get; private set; }
 
     [Header("Party Settings")]
-    public List<UnitData> startingUnits;
-    public List<PartyMember> PartyMembers { get; private set; } = new();
+    // public List<UnitData> startingUnits;
+    [SerializeField]
+    private List<PartyMember> partyMembers = new();
+
+    public List<PartyMember> PartyMembers => partyMembers;
 
     public delegate void PartyChanged(); //This fcrces any listener to only activate void events? 
     public event PartyChanged OnPartyUpdated;
@@ -27,16 +28,7 @@ public class PartyController : MonoBehaviour
 
     private void InitializeParty()
     {
-        Lord = new PartyMember(lordData);
-
         PartyMembers.Clear(); //probably not necessary
-        foreach (var unit in startingUnits)
-        {
-            PartyMembers.Add(new PartyMember(unit));
-            //test
-            Prisoners.Add(new PartyMember(unit));
-        }
-        OnPartyUpdated?.Invoke();
     }
 
     public void AddUnit(UnitData unit)
@@ -52,7 +44,7 @@ public class PartyController : MonoBehaviour
     }
     public int GetTotalPower()
     {
-        int total = Lord.currentPower;
+        int total = 0;
         foreach (PartyMember member in PartyMembers)
         {
             total += member.currentPower;

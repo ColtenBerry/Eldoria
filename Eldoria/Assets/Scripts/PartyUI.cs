@@ -32,8 +32,8 @@ public class PartyUI : MonoBehaviour
         // activeUIElements.Clear();
 
         // Add Lord
-        var lordUI = Instantiate(partyMemberUIPrefab, partyParent);
-        lordUI.GetComponent<PartyMemberUI>().Setup(partyController.Lord);
+        //var lordUI = Instantiate(partyMemberUIPrefab, partyParent);
+        //lordUI.GetComponent<PartyMemberUI>().Setup(partyController.Lord);
         //  activeUIElements.Add(lordUI);
 
         // Add Party Members

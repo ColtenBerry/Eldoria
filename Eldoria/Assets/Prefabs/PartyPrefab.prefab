@@ -103,7 +103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 342d0cd5affb9584dae2f430588fa3e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  partyProfile: {fileID: 11400000, guid: 0fcee18ecee595e488edbcf9434d4a93, type: 2}
+  partyProfile: {fileID: 0}
 --- !u!114 &3995047506523111344
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,6 +133,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lordData: {fileID: 11400000, guid: 807c224b3d40d584e9bc9db6771058d3, type: 2}
   startingUnits: []
+  partyMembers: []
 --- !u!58 &8291331738855288918
 CircleCollider2D:
   m_ObjectHideFlags: 0

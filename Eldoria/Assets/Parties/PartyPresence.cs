@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class PartyPresence : MonoBehaviour, IInteractable
@@ -5,12 +6,23 @@ public class PartyPresence : MonoBehaviour, IInteractable
     public PartyProfile partyProfile;
     private PartyController partyController;
 
+    [SerializeField] UnitData lord;
+    public UnitData Lord
+    {
+        get
+        {
+            return lord;
+        }
+    }
+
     void Awake()
     {
         partyController = GetComponent<PartyController>();
         if (partyController == null) Debug.LogError("PartyController not found on PartyPresence GameObject");
         InitializeParty();
         ApplyVisuals();
+
+        lord = partyProfile.Lord;
     }
 
     private void InitializeParty()
@@ -28,6 +40,6 @@ public class PartyPresence : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        Debug.Log("Attempting interaction with " + partyController.lordData.unitName);
+        Debug.Log("Attempting interaction with " + lord.unitName);
     }
 }

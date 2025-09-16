@@ -1478,11 +1478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ddc52e735894034abacf6565ccf310c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lordData: {fileID: 11400000, guid: 2906516881c464d4c981d0e5e33e9608, type: 2}
-  startingUnits:
-  - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
-  - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
-  - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
+  partyMembers: []
 --- !u!1 &766281388
 GameObject:
   m_ObjectHideFlags: 0
@@ -3155,6 +3151,14 @@ PrefabInstance:
       propertyPath: moveSpeed
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 7551585776252368353, guid: e94a4bb33eb678c4da30a4a16a23b19c, type: 3}
+      propertyPath: partyMembers.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8255052441302732649, guid: e94a4bb33eb678c4da30a4a16a23b19c, type: 3}
+      propertyPath: partyProfile
+      value: 
+      objectReference: {fileID: 11400000, guid: 7ee436b3b0767ac40827e39e0b0d59eb, type: 2}
     - target: {fileID: 8688783460291531531, guid: e94a4bb33eb678c4da30a4a16a23b19c, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.95
