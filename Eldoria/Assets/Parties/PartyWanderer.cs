@@ -42,6 +42,6 @@ public class PartyWanderer : MonoBehaviour
 
     void PickNewDirection()
     {
-        targetDirection = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f)).normalized;
+        targetDirection = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0).normalized;
     }
 }
