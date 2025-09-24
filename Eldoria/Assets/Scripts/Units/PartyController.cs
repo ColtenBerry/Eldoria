@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PartyController : MonoBehaviour
+{
+    [Header("Lord Settings")]
+
+    [Header("Party Settings")]
+    // public List<UnitData> startingUnits;
+    [SerializeField]
+    private List<PartyMember> partyMembers = new();
+
+    public List<PartyMember> PartyMembers => partyMembers;
+
+    public delegate void PartyChanged(); //This fcrces any listener to only activate void events? 
+    public event PartyChanged OnPartyUpdated;
+
+
+    [Header("Prisoner Section")]
+    public List<PartyMember> Prisoners { get; private set; } = new();
+    public event Action OnPrisonersUpdated;
+
+    private void Awake()
+    {
+        InitializeParty();
+    }
+
+    private void InitializeParty()
+    {
+        //PartyMembers.Clear(); //probably not necessary
+    }
+
+    public void AddUnit(UnitData unit)
+    {
+        Debug.Log("adding unit: controller");
+        PartyMembers.Add(new PartyMember(unit));
+        OnPartyUpdated?.Invoke();
+    }
+
+    public void RemoveUnit(PartyMember member)
+    {
+        PartyMembers.Remove(member);
+        OnPartyUpdated?.Invoke();
+    }
+    public int GetTotalPower()
+    {
+        int total = 0;
+        foreach (PartyMember member in PartyMembers)
+        {
+            total += member.currentPower;
+        }
+        return total;
+    }
+    public void AddPrisoner(UnitData unitData)
+    {
+        var prisoner = new PartyMember(unitData);
+        Prisoners.Add(prisoner);
+        OnPrisonersUpdated?.Invoke();
+    }
+
+    public void ReleasePrisoner(PartyMember prisoner)
+    {
+        if (Prisoners.Remove(prisoner))
+            OnPrisonersUpdated?.Invoke();
+    }
+
+}
