@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 8688783460291531531}
   - component: {fileID: 7709987450633738135}
   - component: {fileID: 8255052441302732649}
-  - component: {fileID: 3995047506523111344}
   - component: {fileID: 7551585776252368353}
   - component: {fileID: 8291331738855288918}
+  - component: {fileID: 3829685204394496096}
+  - component: {fileID: 1251759580682807051}
   m_Layer: 0
   m_Name: PartyPrefab
   m_TagString: Untagged
@@ -104,21 +105,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   partyProfile: {fileID: 0}
---- !u!114 &3995047506523111344
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3056824623419625540}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 216e779b82bc80b4ba8ccd3258d58b94, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 2
-  wanderRadius: 10
-  directionChangeInterval: 3
+  lord: {fileID: 0}
 --- !u!114 &7551585776252368353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,8 +118,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ddc52e735894034abacf6565ccf310c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lordData: {fileID: 11400000, guid: 807c224b3d40d584e9bc9db6771058d3, type: 2}
-  startingUnits: []
   partyMembers: []
 --- !u!58 &8291331738855288918
 CircleCollider2D:
@@ -170,3 +155,31 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &3829685204394496096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3056824623419625540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66b2622803c25b3489cff3bb607eb6b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 1
+--- !u!114 &1251759580682807051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3056824623419625540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44815c1cf1e585b498978034929d60c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentState: 0
+  directionChangeInterval: 5
+  wanderRadius: 10

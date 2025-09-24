@@ -9,12 +9,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private PlayerInventoryManager playerInventoryManager;
 
-    public float moveSpeed = 5f;
+    // public float moveSpeed = 5f;
     private Vector2 targetPosition;
     private bool isMoving = false;
     private bool isFolowingInteractable = false;
     private Transform targetInteractable;
     private IInteractable pendingInteraction;
+    private MovementController movementController;
 
     private void OnEnable()
     {
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        movementController = GetComponent<MovementController>();
         inventory = new Inventory();
         playerInventoryManager.Initialize(inventory);
         playerInventoryManager.AddItem(bread);
@@ -45,7 +47,8 @@ public class PlayerController : MonoBehaviour
             {
                 targetPosition = targetInteractable.position;
             }
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+            // transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+            RequestMove(targetPosition);
 
             // Stop when close enough
             if (Vector2.Distance(transform.position, targetPosition) < 0.01f)
@@ -75,6 +78,11 @@ public class PlayerController : MonoBehaviour
         isMoving = true;
         pendingInteraction = interactable;
         targetInteractable = (interactable as MonoBehaviour)?.transform;
+    }
+
+    private void RequestMove(Vector3 targetPosition)
+    {
+        movementController.MoveTowards(targetPosition);
     }
 }
 

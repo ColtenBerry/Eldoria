@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37df71987e15abe41b4e136ad2482ce6, type: 3}
   m_Name: TestLord
   m_EditorClassIdentifier: 
-  unitName: Colten
+  unitName: Test Lord
   powerStat: 10

@@ -29,6 +29,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
     {
         foreach (UnitData unit in partyProfile.startingUnits)
         {
+            Debug.Log("adding unit: presence");
             partyController.AddUnit(unit);
         }
     }

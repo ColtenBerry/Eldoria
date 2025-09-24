@@ -28,11 +28,12 @@ public class PartyController : MonoBehaviour
 
     private void InitializeParty()
     {
-        PartyMembers.Clear(); //probably not necessary
+        //PartyMembers.Clear(); //probably not necessary
     }
 
     public void AddUnit(UnitData unit)
     {
+        Debug.Log("adding unit: controller");
         PartyMembers.Add(new PartyMember(unit));
         OnPartyUpdated?.Invoke();
     }
