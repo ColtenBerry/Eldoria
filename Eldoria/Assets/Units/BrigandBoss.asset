@@ -9,8 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37df71987e15abe41b4e136ad2482ce6, type: 3}
-  m_Name: TestLord
+  m_Script: {fileID: 11500000, guid: 937cf62c1b05fbd4289096b87d4e3b9c, type: 3}
+  m_Name: BrigandBoss
   m_EditorClassIdentifier: 
-  unitName: Test Lord
-  powerStat: 10
+  unitName: Luke
+  powerStat: 5
+  level: 1
+  experience: 0
+  experienceToNextLevel: 100
+  strength: 1
+  agility: 1
+  intelligence: 1
+  charisma: 1
+  endurance: 1

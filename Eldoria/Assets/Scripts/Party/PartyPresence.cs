@@ -6,8 +6,8 @@ public class PartyPresence : MonoBehaviour, IInteractable
     public PartyProfile partyProfile;
     private PartyController partyController;
 
-    [SerializeField] UnitData lord;
-    public UnitData Lord
+    [SerializeField] CharacterInstance lord;
+    public CharacterInstance Lord
     {
         get
         {
@@ -22,7 +22,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
         InitializeParty();
         ApplyVisuals();
 
-        lord = partyProfile.Lord;
+        lord = new CharacterInstance(partyProfile.Lord);
     }
 
     private void InitializeParty()
@@ -41,6 +41,6 @@ public class PartyPresence : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        Debug.Log("Attempting interaction with " + lord.unitName);
+        Debug.Log("Attempting interaction with " + lord.UnitName);
     }
 }

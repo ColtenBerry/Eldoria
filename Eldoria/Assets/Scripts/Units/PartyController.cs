@@ -9,16 +9,16 @@ public class PartyController : MonoBehaviour
     [Header("Party Settings")]
     // public List<UnitData> startingUnits;
     [SerializeField]
-    private List<PartyMember> partyMembers = new();
+    private List<UnitInstance> partyMembers = new();
 
-    public List<PartyMember> PartyMembers => partyMembers;
+    public List<UnitInstance> PartyMembers => partyMembers;
 
     public delegate void PartyChanged(); //This fcrces any listener to only activate void events? 
     public event PartyChanged OnPartyUpdated;
 
 
     [Header("Prisoner Section")]
-    public List<PartyMember> Prisoners { get; private set; } = new();
+    public List<UnitInstance> Prisoners { get; private set; } = new();
     public event Action OnPrisonersUpdated;
 
     private void Awake()
@@ -34,11 +34,11 @@ public class PartyController : MonoBehaviour
     public void AddUnit(UnitData unit)
     {
         Debug.Log("adding unit: controller");
-        PartyMembers.Add(new PartyMember(unit));
+        PartyMembers.Add(new UnitInstance(unit));
         OnPartyUpdated?.Invoke();
     }
 
-    public void RemoveUnit(PartyMember member)
+    public void RemoveUnit(UnitInstance member)
     {
         PartyMembers.Remove(member);
         OnPartyUpdated?.Invoke();
@@ -46,20 +46,20 @@ public class PartyController : MonoBehaviour
     public int GetTotalPower()
     {
         int total = 0;
-        foreach (PartyMember member in PartyMembers)
+        foreach (UnitInstance member in PartyMembers)
         {
-            total += member.currentPower;
+            total += member.PowerStat;
         }
         return total;
     }
     public void AddPrisoner(UnitData unitData)
     {
-        var prisoner = new PartyMember(unitData);
+        var prisoner = new UnitInstance(unitData);
         Prisoners.Add(prisoner);
         OnPrisonersUpdated?.Invoke();
     }
 
-    public void ReleasePrisoner(PartyMember prisoner)
+    public void ReleasePrisoner(UnitInstance prisoner)
     {
         if (Prisoners.Remove(prisoner))
             OnPrisonersUpdated?.Invoke();

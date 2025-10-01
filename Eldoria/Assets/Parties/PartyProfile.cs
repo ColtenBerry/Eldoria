@@ -7,7 +7,7 @@ public enum PartyType { Brigand, Lord, Caravan }
 public class PartyProfile : ScriptableObject
 {
     public PartyType type;
-    public UnitData Lord;
+    public CharacterData Lord;
     public string faction;
     public List<UnitData> startingUnits;
 }

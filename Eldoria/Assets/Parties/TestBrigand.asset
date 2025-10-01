@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestBrigand
   m_EditorClassIdentifier: 
   type: 0
-  Lord: {fileID: 11400000, guid: 807c224b3d40d584e9bc9db6771058d3, type: 2}
+  Lord: {fileID: 11400000, guid: 9fcda054b7a82854a8d5fa9a4b35a306, type: 2}
   faction: Brigand
   startingUnits:
   - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
