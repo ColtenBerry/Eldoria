@@ -14,6 +14,12 @@ public class CharacterInstance : UnitInstance
     [SerializeField]
     private int endurance;
 
+    public int Strength => strength;
+    public int Agility => agility;
+    public int Intelligence => intelligence;
+    public int Charisma => charisma;
+    public int Endurance => endurance;
+
     public CharacterInstance(CharacterData data) : base(data)
     {
         strength = data.strength;

@@ -22,7 +22,9 @@ public class UnitInstance
     public string UnitName => unitName; // effectively makes this readonly but public? 
     public int CurrentLevel => currentLevel;
     public int CurrentExperience => currentExperience;
+    public int ExperienceToNextLevel => experienceToNextLevel;
     public int PowerStat => powerStat;
+
 
 
     public UnitInstance(UnitData data)
