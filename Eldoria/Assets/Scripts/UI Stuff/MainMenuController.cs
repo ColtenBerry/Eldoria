@@ -53,14 +53,21 @@ public class MainMenuController : MenuController
         InputGate.OnMenuClosed?.Invoke();
     }
 
-    public void OpenSubMenu(string id)
+    public void OpenSubMenu(string id, IInteractable source)
     {
         foreach (GameObject panel in subMenus.Values)
         {
             panel.SetActive(false);
         }
 
-        if (subMenus.TryGetValue(id, out var panel2)) { panel2.SetActive(true); gameObject.SetActive(true); }
+        if (subMenus.TryGetValue(id, out var panel2))
+        {
+            if (panel2.TryGetComponent<IMenuWithSource>(out var menuWithSource))
+            {
+                panel2.SetActive(true);
+                menuWithSource.OpenMenu(source);
+            }
+        }
         else Debug.LogWarning($"Submenu '{id}' not found");
     }
 

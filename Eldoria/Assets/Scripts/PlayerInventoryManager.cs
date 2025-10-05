@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInventoryManager : MenuController
+public class PlayerInventoryManager : MonoBehaviour
 {
     [Header("References")]
     private Inventory playerInventory; // Your runtime inventory system
@@ -23,9 +23,9 @@ public class PlayerInventoryManager : MenuController
     }
 
 
-    protected override void OnDisable()
+    protected void OnDisable()
     {
-        base.OnDisable();
+        // base.OnDisable();
         if (playerInventory != null)
             playerInventory.OnInventoryChanged -= HandleInventoryChanged;
     }

@@ -65,7 +65,7 @@ public class PlayerController : MonoBehaviour
                     // pendingInteraction.Interact();
                     List<InteractionOption> options = pendingInteraction.GetInteractionOptions();
                     // display the options
-                    menuUI.ShowOptions(options);
+                    menuUI.ShowOptions(options, pendingInteraction);
                 }
             }
 

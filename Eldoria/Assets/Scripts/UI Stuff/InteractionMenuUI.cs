@@ -18,7 +18,7 @@ public class InteractionMenuUI : MonoBehaviour
         // disable hud buttons?
     }
 
-    public void ShowOptions(List<InteractionOption> options)
+    public void ShowOptions(List<InteractionOption> options, IInteractable source)
     {
         InputGate.OnMenuOpened?.Invoke();
 
@@ -38,12 +38,20 @@ public class InteractionMenuUI : MonoBehaviour
                 option.callback.Invoke();
                 if (option.subMenuName != null)
                 {
-
-                    mainMenuController.OpenSubMenu(option.subMenuName);
-                    gameObject.SetActive(false); // close this panel
+                    mainMenuController.gameObject.SetActive(true);
+                    mainMenuController.OpenSubMenu(option.subMenuName, source);
+                    gameObject.SetActive(false);
                 }
+                else
+                    CloseMenu(); // close this panel
 
             });
         }
+    }
+
+    void CloseMenu()
+    {
+        InputGate.OnMenuClosed?.Invoke();
+        gameObject.SetActive(false);
     }
 }
