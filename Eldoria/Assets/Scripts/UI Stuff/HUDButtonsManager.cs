@@ -62,6 +62,7 @@ public class HUDButtonsManager : MonoBehaviour
             SetButtonsInteractable(true);
         }
     }
+
     private void SetButtonsInteractable(bool state)
     {
         foreach (var binding in bindings)

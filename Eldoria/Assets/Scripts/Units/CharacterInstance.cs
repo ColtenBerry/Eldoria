@@ -3,6 +3,7 @@ using UnityEngine;
 [System.Serializable]
 public class CharacterInstance : UnitInstance
 {
+    [Header("Stats")]
     [SerializeField]
     private int strength;
     [SerializeField]
@@ -20,6 +21,12 @@ public class CharacterInstance : UnitInstance
     public int Charisma => charisma;
     public int Endurance => endurance;
 
+
+    [Header("Faction")]
+    private string faction;
+
+    public string Faction => faction;
+
     public CharacterInstance(CharacterData data) : base(data)
     {
         strength = data.strength;
@@ -27,6 +34,8 @@ public class CharacterInstance : UnitInstance
         intelligence = data.intelligence;
         charisma = data.charisma;
         endurance = data.endurance;
+
+        faction = data.faction;
     }
 
     protected override void LevelUp()

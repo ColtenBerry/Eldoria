@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -8,6 +9,8 @@ public class PlayerController : MonoBehaviour
     public Inventory inventory;
     [SerializeField]
     private PlayerInventoryManager playerInventoryManager;
+
+    public InteractionMenuUI menuUI;
 
     // public float moveSpeed = 5f;
     private Vector2 targetPosition;
@@ -59,7 +62,10 @@ public class PlayerController : MonoBehaviour
                 if (isFolowingInteractable)
                 {
                     isFolowingInteractable = false;
-                    pendingInteraction.Interact();
+                    // pendingInteraction.Interact();
+                    List<InteractionOption> options = pendingInteraction.GetInteractionOptions();
+                    // display the options
+                    menuUI.ShowOptions(options);
                 }
             }
 

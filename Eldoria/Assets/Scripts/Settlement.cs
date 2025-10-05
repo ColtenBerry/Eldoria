@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Settlement : MonoBehaviour, IInteractable
@@ -8,6 +9,8 @@ public abstract class Settlement : MonoBehaviour, IInteractable
     protected string settlementName;
     [SerializeField]
     protected int prosperity;
+
+    public abstract List<InteractionOption> GetInteractionOptions();
 
     public abstract void Interact();
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -42,5 +43,17 @@ public class PartyPresence : MonoBehaviour, IInteractable
     public void Interact()
     {
         Debug.Log("Attempting interaction with " + lord.UnitName);
+    }
+
+    public List<InteractionOption> GetInteractionOptions()
+    {
+        List<InteractionOption> options = new();
+
+        if (lord.Faction != "Player") options.Add(new InteractionOption("Attack Party", () => Debug.Log("Attempting to Attack")));
+        options.Add(new InteractionOption("Talk to Leader", () => Debug.Log("Attempting to spaek")));
+        options.Add(new InteractionOption("Leave", () => Debug.Log("Attempting to Leave")));
+
+
+        return options;
     }
 }

@@ -10,5 +10,7 @@ public class CharacterData : UnitData
     public int charisma;
     public int endurance;
 
+    [Header("Faction")]
+    public string faction;
 
 }

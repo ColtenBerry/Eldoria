@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -27,6 +28,9 @@ public class MainMenuController : MenuController
 {
     [SerializeField]
     private Button closeButton;
+
+    [SerializeField] private List<SubMenuEntry> subMenuEntries;
+    private Dictionary<string, GameObject> subMenus; // dictionary mapping submenu names to approprate menu
     private void Awake()
     {
 
@@ -34,6 +38,14 @@ public class MainMenuController : MenuController
         {
             CloseAllMenus();
         });
+
+        subMenus = new Dictionary<string, GameObject>();
+        foreach (SubMenuEntry entry in subMenuEntries)
+        {
+            print("reached");
+            if (!subMenus.ContainsKey(entry.id))
+                subMenus.Add(entry.id, entry.panel);
+        }
     }
 
     private void CloseAllMenus()
@@ -41,4 +53,23 @@ public class MainMenuController : MenuController
         InputGate.OnMenuClosed?.Invoke();
     }
 
+    public void OpenSubMenu(string id)
+    {
+        foreach (GameObject panel in subMenus.Values)
+        {
+            panel.SetActive(false);
+        }
+
+        if (subMenus.TryGetValue(id, out var panel2)) { panel2.SetActive(true); gameObject.SetActive(true); }
+        else Debug.LogWarning($"Submenu '{id}' not found");
+    }
+
+}
+
+
+[System.Serializable]
+public class SubMenuEntry
+{
+    public string id;
+    public GameObject panel;
 }
