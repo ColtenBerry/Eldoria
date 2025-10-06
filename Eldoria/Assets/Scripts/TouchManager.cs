@@ -36,7 +36,7 @@ public class TouchManager : MonoBehaviour
         {
             // Check if object is interactable 
             RaycastHit2D hit = Physics2D.Raycast(inputPos, Vector2.zero);
-            if (hit.collider != null)
+            if (hit.collider != null && hit.collider.name != "Player")
             {
                 Debug.Log($"Clicked or touched: {hit.collider.name}");
                 // You can call a method or interface here

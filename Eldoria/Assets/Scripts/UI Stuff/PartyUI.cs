@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class PartyUI : MonoBehaviour
+public class PartyUI : MonoBehaviour, ICardHandler
 {
     public PartyController partyController;
     public Transform partyParent; // e.g. a Vertical Layout Group
@@ -40,7 +40,7 @@ public class PartyUI : MonoBehaviour
         foreach (var member in partyController.PartyMembers)
         {
             var ui = Instantiate(partyMemberUIPrefab, partyParent);
-            ui.GetComponent<PartyMemberUI>().Setup(member);
+            ui.GetComponent<PartyMemberUI>().Setup(member, this);
             //      activeUIElements.Add(ui);
         }
     }
@@ -54,8 +54,13 @@ public class PartyUI : MonoBehaviour
         foreach (var prisoner in partyController.Prisoners)
         {
             var ui = Instantiate(partyMemberUIPrefab, prisonerParent);
-            ui.GetComponent<PartyMemberUI>().Setup(prisoner);
+            ui.GetComponent<PartyMemberUI>().Setup(prisoner, this);
             // Optional: visually tag as prisoner
         }
+    }
+
+    public void OnCardClicked(UnitInstance unit)
+    {
+
     }
 }

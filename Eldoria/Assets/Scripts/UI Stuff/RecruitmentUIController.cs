@@ -1,15 +1,40 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class RecruitmentUIController : MonoBehaviour, IMenuWithSource
+public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHandler
 {
     [SerializeField] private Transform recruitOptionsParent;
     [SerializeField] private Transform potentialRecruitParent;
     [SerializeField] private GameObject recruitPrefab;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [SerializeField] private PartyController playerParty;
 
+    [SerializeField] private Button confirmButton;
+
+    private List<UnitInstance> recruitOptions = new();
+    private List<UnitInstance> potentialRecruits = new();
+    private RecruitmentSource recruitmentSource;
+
+    void Awake()
+    {
+        confirmButton.onClick.AddListener(() =>
+        {
+            // add troops to party
+            foreach (UnitInstance unit in potentialRecruits)
+            {
+                playerParty.AddUnit(unit);
+                recruitmentSource.recruitUnit(unit);
+            }
+            potentialRecruits.Clear();
+            GetRecruits();
+            PopulateGrids();
+        });
+
+    }
     public void OpenMenu(object source)
     {
+        potentialRecruits.Clear();
+
         // Step 1: Cast the interface back to a Component
         var component = source as Component;
         if (component == null)
@@ -19,28 +44,77 @@ public class RecruitmentUIController : MonoBehaviour, IMenuWithSource
         }
 
         // Step 2: Get the RecruitmentSource from the same GameObject
-        var recruitmentSource = component.GetComponent<RecruitmentSource>();
+        recruitmentSource = component.GetComponent<RecruitmentSource>();
         if (recruitmentSource == null)
         {
             Debug.LogWarning("RecruitmentSource not found on source GameObject");
             return;
         }
 
-        List<UnitInstance> potentialRecruits = recruitmentSource.GetRecruitableUnits();
-        PopulateGrid(potentialRecruits);
+        GetRecruits();
+
+        PopulateGrids();
+
     }
 
-    private void PopulateGrid(List<UnitInstance> recruits)
+    private void PopulateGrids()
     {
+        // clear recruitoptions
         foreach (Transform child in recruitOptionsParent)
             Destroy(child.gameObject);
 
-        foreach (UnitInstance recruit in recruits)
+        // populate recruitoptions
+        foreach (UnitInstance recruit in recruitOptions)
         {
             var card = Instantiate(recruitPrefab, recruitOptionsParent);
 
-            card.GetComponent<PartyMemberUI>().Setup(recruit);
+            card.GetComponent<PartyMemberUI>().Setup(recruit, this);
         }
+
+        // clear potential recruits
+        foreach (Transform recruit in potentialRecruitParent)
+        {
+            Destroy(recruit.gameObject);
+        }
+
+        foreach (UnitInstance recruit in potentialRecruits)
+        {
+            var card = Instantiate(recruitPrefab, potentialRecruitParent);
+
+            card.GetComponent<PartyMemberUI>().Setup(recruit, this);
+        }
+
+
+    }
+
+    private void GetRecruits()
+    {
+        recruitOptions.Clear();
+        foreach (var item in recruitmentSource.GetRecruitableUnits())
+        {
+            recruitOptions.Add(item);
+        }
+    }
+
+    public void OnCardClicked(UnitInstance unit)
+    {
+        if (potentialRecruits.Contains(unit))
+        {
+            potentialRecruits.Remove(unit);
+            recruitOptions.Add(unit);
+        }
+        else if (recruitOptions.Contains(unit))
+        {
+            potentialRecruits.Add(unit);
+            recruitOptions.Remove(unit);
+        }
+        else
+        {
+            Debug.Log("Seemingly impossible result reached...");
+        }
+
+        PopulateGrids();
+
     }
 
 

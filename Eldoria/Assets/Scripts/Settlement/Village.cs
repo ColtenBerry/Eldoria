@@ -26,7 +26,7 @@ public class Village : Settlement
     public override void Interact()
     {
         Debug.Log("Attempting interaction with " + settlementName);
-        controller.AddUnit(militiaTroop);
+        // controller.AddUnit(militiaTroop);
 
     }
 }
