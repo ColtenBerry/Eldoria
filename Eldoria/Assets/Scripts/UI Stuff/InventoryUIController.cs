@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InventoryUIController : MonoBehaviour
+public class InventoryUIController : MonoBehaviour, ICardHandler<ItemStack>
 {
     public Transform itemGridParent;
     public ItemSlotUI itemSlotPrefab;
-    private ItemSlotUI currentSelected;
+    private ItemStack currentSelected;
     [SerializeField]
     private Button dropStackButton;
 
-    [SerializeField] private PlayerInventoryManager inventory;
+    [SerializeField] private InventoryManager inventory;
 
     private void Awake()
     {
@@ -19,17 +19,22 @@ public class InventoryUIController : MonoBehaviour
         {
             if (currentSelected == null) return;
             Debug.Log("Drop Stack button clicked");
-            inventory.RemoveItem(currentSelected.GetStack().item, currentSelected.GetStack().quantity);
+            inventory.RemoveItem(currentSelected.item, currentSelected.quantity);
             RefreshUI(inventory.Inventory.GetAllItems());
         });
 
         RefreshUI(inventory.Inventory.GetAllItems());
     }
 
+    public void OnEnable()
+    {
+        RefreshUI(inventory.Inventory.GetAllItems());
+    }
+
     public void OnDisable()
     {
-        if (currentSelected != null) currentSelected.Deselect();
         currentSelected = null;
+        Debug.Log("current selected is now null");
     }
 
     public void RefreshUI(List<ItemStack> stacks)
@@ -41,15 +46,16 @@ public class InventoryUIController : MonoBehaviour
         foreach (var stack in stacks)
         {
             var slot = Instantiate(itemSlotPrefab, itemGridParent);
-            slot.GetComponent<ItemSlotUI>().Setup(stack);
+            if (currentSelected != null && stack.item == currentSelected.item && stack.quantity == currentSelected.quantity) slot.Select();
+            slot.GetComponent<ItemSlotUI>().Setup(stack, this);
         }
     }
 
-    public void SelectSlot(ItemSlotUI selected)
+
+    public void OnCardClicked(ItemStack data)
     {
-        if (currentSelected != null) currentSelected.Deselect();
-        currentSelected = selected;
-        currentSelected.Select();
+        currentSelected = data;
+        RefreshUI(inventory.Inventory.GetAllItems());
     }
 }
 

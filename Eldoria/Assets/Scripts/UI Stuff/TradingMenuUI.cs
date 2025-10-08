@@ -12,7 +12,7 @@ public class TradingMenuUI : MonoBehaviour, ICardHandler<ItemStack>, IMenuWithSo
 
     private List<ItemStack> traderItems;
     private List<ItemStack> playerItems;
-    private Inventory traderInventory;
+    private InventoryManager traderInventory;
     [SerializeField] private Inventory playerInventory;
 
     void Awake()
@@ -37,12 +37,12 @@ public class TradingMenuUI : MonoBehaviour, ICardHandler<ItemStack>, IMenuWithSo
         var component = source as Component;
         if (component == null)
         {
-            Debug.LogWarning("RecruitmentScreen expected a Component-based interface");
+            Debug.LogWarning("Trader Inventory expected a Component-based interface");
             return;
         }
 
         // Step 2: Get the TraderItems from the same GameObject
-        traderInventory = component.GetComponent<Inventory>();
+        traderInventory = component.GetComponent<InventoryManager>();
         if (traderInventory == null)
         {
             Debug.LogWarning("TraderInventory not found on source GameObject");

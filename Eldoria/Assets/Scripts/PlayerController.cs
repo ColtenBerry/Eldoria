@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     public InventoryItem ham;
     public Inventory inventory;
     [SerializeField]
-    private PlayerInventoryManager playerInventoryManager;
+    private InventoryManager playerInventoryManager;
 
     public InteractionMenuUI menuUI;
 

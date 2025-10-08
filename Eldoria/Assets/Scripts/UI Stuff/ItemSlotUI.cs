@@ -17,24 +17,16 @@ public class ItemSlotUI : MonoBehaviour, IPointerClickHandler
     [SerializeField]
     //private Image highlightImage; // maybe used later. 
 
-    private InventoryUIController controller;
+    private ICardHandler<ItemStack> controller;
 
-    public void Awake()
-    {
-        controller = transform.parent?.parent?.GetComponent<InventoryUIController>();
-        if (controller == null)
-        {
-            Debug.LogError($"InventoryUIController not found on grandparent of {gameObject.name}. Check hierarchy and component assignment.");
-            return;
-        }
-    }
 
-    public void Setup(ItemStack stack)
+    public void Setup(ItemStack stack, ICardHandler<ItemStack> handler)
     {
         this.stack = stack;
         //icon.sprite = stack.item.icon;
         quantityText.text = stack.quantity >= 1 ? stack.quantity.ToString() : "";
         itemNameText.text = stack.item.itemName;
+        controller = handler;
 
     }
     public void Select()
@@ -51,7 +43,8 @@ public class ItemSlotUI : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        controller.SelectSlot(this);
+        controller.OnCardClicked(stack);
+        Select();
     }
     public ItemStack GetStack()
     {
