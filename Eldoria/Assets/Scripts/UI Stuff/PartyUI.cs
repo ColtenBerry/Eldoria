@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class PartyUI : MonoBehaviour, ICardHandler
+public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
 {
     public PartyController partyController;
     public Transform partyParent; // e.g. a Vertical Layout Group

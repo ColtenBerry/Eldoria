@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHandler
+public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHandler<UnitInstance>
 {
     [SerializeField] private Transform recruitOptionsParent;
     [SerializeField] private Transform potentialRecruitParent;
@@ -98,6 +98,7 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
 
     public void OnCardClicked(UnitInstance unit)
     {
+
         if (potentialRecruits.Contains(unit))
         {
             potentialRecruits.Remove(unit);

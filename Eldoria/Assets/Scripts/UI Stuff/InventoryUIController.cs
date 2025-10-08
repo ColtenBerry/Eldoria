@@ -11,7 +11,7 @@ public class InventoryUIController : MonoBehaviour
     [SerializeField]
     private Button dropStackButton;
 
-    public static event Action<InventoryItem, int> OnItemStackDropped;
+    [SerializeField] private PlayerInventoryManager inventory;
 
     private void Awake()
     {
@@ -19,8 +19,11 @@ public class InventoryUIController : MonoBehaviour
         {
             if (currentSelected == null) return;
             Debug.Log("Drop Stack button clicked");
-            OnItemStackDropped?.Invoke(currentSelected.GetStack().item, currentSelected.GetStack().quantity);
+            inventory.RemoveItem(currentSelected.GetStack().item, currentSelected.GetStack().quantity);
+            RefreshUI(inventory.Inventory.GetAllItems());
         });
+
+        RefreshUI(inventory.Inventory.GetAllItems());
     }
 
     public void OnDisable()

@@ -36,7 +36,6 @@ public class PlayerController : MonoBehaviour
     {
         movementController = GetComponent<MovementController>();
         inventory = new Inventory();
-        playerInventoryManager.Initialize(inventory);
         playerInventoryManager.AddItem(bread);
         playerInventoryManager.AddItem(ham, 5);
     }

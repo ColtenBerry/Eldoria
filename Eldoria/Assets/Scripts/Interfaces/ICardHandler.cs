@@ -3,7 +3,7 @@ using UnityEngine;
 
 // This exists just so i can handle clicking on a card. Unit, inventory item, etc. Honestly kind of a pain but this
 // is the best solution I can think up. 
-public interface ICardHandler
+public interface ICardHandler<T>
 {
-    void OnCardClicked(UnitInstance unit);
+    void OnCardClicked(T data);
 }

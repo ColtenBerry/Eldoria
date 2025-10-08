@@ -6,8 +6,16 @@ public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
 {
     public TMP_Text nameText;
     public TMP_Text powerText;
-    private ICardHandler handler;
+    private ICardHandler<UnitInstance> handler;
     private UnitInstance unit;
+
+    public void Setup(UnitInstance member, ICardHandler<UnitInstance> handler)
+    {
+        this.handler = handler;
+        nameText.text = member.UnitName;
+        unit = member;
+        powerText.text = $"Power: {member.PowerStat}";
+    }
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -15,13 +23,6 @@ public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
         handler.OnCardClicked(unit);
     }
 
-    public void Setup(UnitInstance member, ICardHandler handler)
-    {
-        this.handler = handler;
-        nameText.text = member.UnitName;
-        unit = member;
-        powerText.text = $"Power: {member.PowerStat}";
-    }
 
 
 }
