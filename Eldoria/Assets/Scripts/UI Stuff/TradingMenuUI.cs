@@ -1,39 +1,53 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class TradingMenuUI : MonoBehaviour, ICardHandler<ItemStack>, IMenuWithSource
+public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithSource
 {
     [SerializeField] private Transform traderItemsPanel;
     [SerializeField] private Transform playerItemsPanel;
     [SerializeField] private TMP_Text traderText;
     [SerializeField] private GameObject itemPrefab;
 
+    [SerializeField] private Button confirmButton;
 
-    private List<ItemStack> traderItems;
-    private List<ItemStack> playerItems;
+
+    private List<ItemStack> traderItems = new();
+    private List<ItemStack> playerItems = new();
     private InventoryManager traderInventory;
-    [SerializeField] private Inventory playerInventory;
+    [SerializeField] private InventoryManager playerInventory;
 
     void Awake()
     {
+        confirmButton.onClick.AddListener(() =>
+        {
+            // add stuff to trader inventory
+            foreach (ItemStack stack in traderItems)
+            {
+                if (playerInventory.Inventory.GetAllItems().Contains(stack))
+                {
+                    // sell item
+                    playerInventory.RemoveItem(stack.item, stack.quantity);
+                    traderInventory.AddItem(stack.item, stack.quantity);
+                }
+            }
 
+            // add stuff to player inventory
+            foreach (ItemStack stack in playerItems)
+            {
+                if (traderInventory.Inventory.GetAllItems().Contains(stack))
+                {
+                    // buy item
+                    traderInventory.RemoveItem(stack.item, stack.quantity);
+                    playerInventory.AddItem(stack.item, stack.quantity);
+                }
+            }
+        });
     }
-    /*
-        I would love to make IMenuWithSource<Inventory>. That way i can know exactly what i am getting here and 
-        I don't have to go through the whole process of getting the Inventory script. But then I have to pass in the correct
-        source when i use my interaction menu to make my main menu open the correct submenu. 
-        How does the interaction menu know the source? Only if the interaction option knows the source
-        How does the interaction option know the source? only if there is some Source object that is defined when constructed
-        This can be done when defining interaction options
-
-
-        Nope, Unity does not support the necessary opterations for this. 
-    */
 
     public void OpenMenu(object source)
     {
-        traderItems.Clear();
         var component = source as Component;
         if (component == null)
         {
@@ -41,13 +55,30 @@ public class TradingMenuUI : MonoBehaviour, ICardHandler<ItemStack>, IMenuWithSo
             return;
         }
 
-        // Step 2: Get the TraderItems from the same GameObject
         traderInventory = component.GetComponent<InventoryManager>();
         if (traderInventory == null)
         {
             Debug.LogWarning("TraderInventory not found on source GameObject");
             return;
         }
+
+        // get lists
+        GetTraderItems();
+        GetPlayerItems();
+        PopulateGrid(traderItemsPanel, traderItems);
+        PopulateGrid(playerItemsPanel, playerItems);
+    }
+
+    void GetTraderItems()
+    {
+        traderItems.Clear();
+        traderItems = traderInventory.Inventory.GetAllItems();
+    }
+
+    void GetPlayerItems()
+    {
+        playerItems.Clear();
+        playerItems = playerInventory.Inventory.GetAllItems();
     }
 
     public void PopulateGrid(Transform grid, List<ItemStack> list)
@@ -63,7 +94,7 @@ public class TradingMenuUI : MonoBehaviour, ICardHandler<ItemStack>, IMenuWithSo
         {
             var thing = Instantiate(itemPrefab, grid);
             // setup thing
-
+            thing.GetComponent<ItemSlotUI>().Setup(stack, this);
 
         }
     }
