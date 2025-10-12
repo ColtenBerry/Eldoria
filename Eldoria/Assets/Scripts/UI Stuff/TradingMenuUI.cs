@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,8 +14,10 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
     [SerializeField] private Button confirmButton;
 
 
-    private List<ItemStack> traderItems = new();
-    private List<ItemStack> playerItems = new();
+    [SerializeField] private List<ItemStack> traderDisplayItems = new();
+    [SerializeField] private List<ItemStack> playerDisplayItems = new();
+    [SerializeField] private List<ItemStack> playerPendingPurchase = new();
+    [SerializeField] private List<ItemStack> playerPendingSale = new();
     private InventoryManager traderInventory;
     [SerializeField] private InventoryManager playerInventory;
 
@@ -23,26 +26,36 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
         confirmButton.onClick.AddListener(() =>
         {
             // add stuff to trader inventory
-            foreach (ItemStack stack in traderItems)
+            foreach (ItemStack stack in playerPendingSale)
             {
-                if (playerInventory.Inventory.GetAllItems().Contains(stack))
+                if (PlayerHas(stack))
                 {
+                    Debug.Log("attempting sale: " + stack.item + ", " + stack.quantity);
+                    int tradeAmount = stack.quantity;
                     // sell item
-                    playerInventory.RemoveItem(stack.item, stack.quantity);
-                    traderInventory.AddItem(stack.item, stack.quantity);
+                    playerInventory.RemoveItem(stack.item, tradeAmount);
+                    traderInventory.AddItem(stack.item, tradeAmount);
                 }
             }
 
             // add stuff to player inventory
-            foreach (ItemStack stack in playerItems)
+            foreach (ItemStack stack in playerPendingPurchase)
             {
-                if (traderInventory.Inventory.GetAllItems().Contains(stack))
+                if (TraderHas(stack))
                 {
+                    int tradeAmount = stack.quantity;
+                    Debug.Log("attempting purchase: " + stack.item + ", " + stack.quantity);
                     // buy item
-                    traderInventory.RemoveItem(stack.item, stack.quantity);
-                    playerInventory.AddItem(stack.item, stack.quantity);
+                    traderInventory.RemoveItem(stack.item, tradeAmount);
+                    playerInventory.AddItem(stack.item, tradeAmount);
                 }
             }
+            playerPendingPurchase.Clear();
+            playerPendingSale.Clear();
+            GetTraderItems();
+            GetPlayerItems();
+            PopulateGrid(traderItemsPanel, traderDisplayItems);
+            PopulateGrid(playerItemsPanel, playerDisplayItems);
         });
     }
 
@@ -65,20 +78,26 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
         // get lists
         GetTraderItems();
         GetPlayerItems();
-        PopulateGrid(traderItemsPanel, traderItems);
-        PopulateGrid(playerItemsPanel, playerItems);
+        PopulateGrid(traderItemsPanel, traderDisplayItems);
+        PopulateGrid(playerItemsPanel, playerDisplayItems);
     }
 
     void GetTraderItems()
     {
-        traderItems.Clear();
-        traderItems = traderInventory.Inventory.GetAllItems();
+        traderDisplayItems.Clear();
+        foreach (ItemStack item in traderInventory.Inventory.GetAllItems())
+        {
+            traderDisplayItems.Add(item);
+        }
     }
 
     void GetPlayerItems()
     {
-        playerItems.Clear();
-        playerItems = playerInventory.Inventory.GetAllItems();
+        playerDisplayItems.Clear();
+        foreach (ItemStack item in playerInventory.Inventory.GetAllItems())
+        {
+            playerDisplayItems.Add(item);
+        }
     }
 
     public void PopulateGrid(Transform grid, List<ItemStack> list)
@@ -101,21 +120,70 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
 
     public void OnCardClicked(ItemStack stack)
     {
-        if (playerItems.Contains(stack))
+        // Check if the clicked stack is in the player's display
+        if (playerDisplayItems.Contains(stack))
         {
-            playerItems.Remove(stack);
-            traderItems.Add(stack);
-        }
-        else if (traderItems.Contains(stack))
-        {
-            traderItems.Remove(stack);
-            playerItems.Add(stack);
-        }
-        else Debug.LogWarning("Something is wrong. Idk how this could have even happened");
+            // Remove one matching stack from pending purchase if it exists
+            var match = playerPendingPurchase.FirstOrDefault(s => s.item == stack.item && s.quantity == stack.quantity);
+            if (match != null) playerPendingPurchase.Remove(match);
+            else playerPendingSale.Add(new ItemStack(stack.item, stack.quantity));
 
-        // update grids
-        PopulateGrid(traderItemsPanel, traderItems);
-        PopulateGrid(playerItemsPanel, playerItems);
+            // Move the stack visually
+            playerDisplayItems.Remove(stack);
+            traderDisplayItems.Add(new ItemStack(stack.item, stack.quantity));
+
+            Debug.Log($"{stack.item.name}, {stack.quantity} was removed from player items and added to trader items");
+        }
+        // Check if the clicked stack is in the trader's display
+        else if (traderDisplayItems.Contains(stack))
+        {
+            // Remove one matching stack from pending sale if it exists
+            var match = playerPendingSale.FirstOrDefault(s => s.item == stack.item && s.quantity == stack.quantity);
+            if (match != null) playerPendingSale.Remove(match);
+            else playerPendingPurchase.Add(new ItemStack(stack.item, stack.quantity));
+
+            // Move the stack visually
+            traderDisplayItems.Remove(stack);
+            playerDisplayItems.Add(new ItemStack(stack.item, stack.quantity));
+
+            Debug.Log($"{stack.item.name}, {stack.quantity} was removed from trader items and added to player items");
+        }
+        else
+        {
+            Debug.LogWarning("Clicked item not found in either display list");
+        }
+
+        // Refresh UI
+        PopulateGrid(traderItemsPanel, traderDisplayItems);
+        PopulateGrid(playerItemsPanel, playerDisplayItems);
+        // if (playerDisplayItems.Contains(stack))
+        // {
+        //     if (playerPendingPurchase.Contains(stack)) playerPendingPurchase.Remove(stack);
+        //     else playerPendingSale.Add(stack);
+        //     playerDisplayItems.Remove(stack);
+        //     traderDisplayItems.Add(stack);
+        //     Debug.Log(stack.item + ", " + stack.quantity + " was removed from player items and added to trader items");
+        // }
+        // else if (traderDisplayItems.Contains(stack))
+        // {
+        //     if (playerPendingSale.Contains(stack)) playerPendingSale.Remove(stack);
+        //     else playerPendingPurchase.Add(stack);
+        //     traderDisplayItems.Remove(stack);
+        //     playerDisplayItems.Add(stack);
+        //     Debug.Log(stack.item + ", " + stack.quantity + " was removed from trader items and added to trader items");
+
+        // }
+        // else Debug.LogWarning("Something is wrong. Idk how this could have even happened");
+
+        // // update grids
+        // PopulateGrid(traderItemsPanel, traderDisplayItems);
+        // PopulateGrid(playerItemsPanel, playerDisplayItems);
     }
+
+    bool PlayerHas(ItemStack stack) =>
+    playerInventory.Inventory.GetAllItems().Any(s => s.item == stack.item && s.quantity == stack.quantity);
+    bool TraderHas(ItemStack stack) =>
+        traderInventory.Inventory.GetAllItems().Any(s => s.item == stack.item && s.quantity == stack.quantity);
+
 
 }

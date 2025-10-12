@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+[System.Serializable]
 public class Inventory
 {
     // public event Action<List<ItemStack>> OnInventoryChanged;
-    private List<ItemStack> itemStacks = new();
+    [SerializeField] private List<ItemStack> itemStacks = new();
 
     public void AddItem(InventoryItem item, int amount = 1)
     {
@@ -25,6 +26,7 @@ public class Inventory
             {
                 int toAdd = Mathf.Min(item.maxStackSize, amount);
                 itemStacks.Add(new ItemStack(item, toAdd));
+                Debug.Log("Stack added");
                 amount -= toAdd;
             }
         }
@@ -58,6 +60,7 @@ public class Inventory
 }
 
 
+[System.Serializable]
 public class ItemStack
 {
     public InventoryItem item; // Reference to the ScriptableObject
