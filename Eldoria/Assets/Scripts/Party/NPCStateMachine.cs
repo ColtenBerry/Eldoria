@@ -22,6 +22,7 @@ public class NPCStateMachine : MonoBehaviour
     GameObject target;
     void FixedUpdate()
     {
+        if (InputGate.IsUIBlockingGameInput) return;
         switch (currentState)
         {
             case NPCState.Wandering:

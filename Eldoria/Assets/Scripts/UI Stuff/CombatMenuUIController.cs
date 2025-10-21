@@ -30,9 +30,17 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
             PopulateGrid(enemyUnitsGrid, result.DefenderParty);
 
             // apply results
-            // CombatOutCombeProcessor.ApplyCombatResult(result, playerPartyController, enemyPartyController);
+            CombatOutCombeProcessor.ApplyCombatResult(result, playerPartyController, enemyPartyController);
 
-            // progress to prisoner allotment / loot screen
+            confirmButton.GetComponent<Text>().text = "Continue";
+            confirmButton.onClick.RemoveAllListeners();
+            confirmButton.onClick.AddListener(() =>
+            {
+                // progress to prisoner allotment / loot screen
+
+
+            });
+
 
         });
 

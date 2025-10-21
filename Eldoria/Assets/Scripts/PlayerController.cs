@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (InputGate.IsUIBlockingGameInput) return;
         // Move toward target
         if (isMoving)
         {
