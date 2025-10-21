@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
+using Microsoft.Unity.VisualStudio.Editor;
 
 public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
 {
@@ -15,6 +16,11 @@ public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
         nameText.text = member.UnitName;
         unit = member;
         powerText.text = $"Health: {member.Health} / {member.MaxHealth}";
+
+        if (unit.Health == 0)
+        {
+            gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.red;
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)

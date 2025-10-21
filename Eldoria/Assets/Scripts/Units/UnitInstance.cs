@@ -37,6 +37,8 @@ public class UnitInstance
     public int Defence => defence;
     public int Moral => moral;
 
+    public Guid ID { get; private set; } = Guid.NewGuid();
+
 
 
     public UnitInstance(UnitData data)
@@ -67,8 +69,18 @@ public class UnitInstance
         if (damageAmount < 0) return; // prevents odd scenarios where taking damage actually restores health
         health = health - damageAmount;
         if (health < 0) health = 0;
+    }
 
-        // kill unit? 
+    public virtual void SetHealth(int value)
+    {
+        health = value;
+    }
+
+    public virtual void Heal(int amount)
+    {
+        if (amount < 0) return; // prevents any edge cases
+        health = health + amount;
+        if (health > maxHealth) health = maxHealth;
     }
 
     protected virtual void LevelUp()

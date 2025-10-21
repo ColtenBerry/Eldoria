@@ -15,6 +15,8 @@ public static class CombatSimulator
             ActiveParty2 = new List<UnitInstance>(party2),
             InjuredParty1 = new List<UnitInstance>(),
             InjuredParty2 = new List<UnitInstance>(),
+            DeadParty1 = new(),
+            DeadParty2 = new()
         };
 
 
@@ -26,6 +28,7 @@ public static class CombatSimulator
         }
 
         result.Party1Wins = result.ActiveParty1.Count > 0;
+
         return result;
     }
 
@@ -102,6 +105,20 @@ public static class CombatSimulator
         }
     }
 
+    // private static void DecideDeathOrInjured(UnitInstance unit, CombatResult result)
+    // {
+    //     System.Random rng = new System.Random();
+
+    //     if (rng.Next(2) == 0)
+    //     {
+    //         if (!result.InjuredParty1.Remove(unit)) Debug.LogWarning("attempting to kill unit not injured?");
+    //         result.DeadParty1.Add(unit);
+    //     }
+    //     else
+    //     {
+    //         unit.Heal(1); // give 1 point of health.
+    //     }
+    // }
 
 
 }
@@ -112,5 +129,7 @@ public class CombatResult
     public List<UnitInstance> ActiveParty2;
     public List<UnitInstance> InjuredParty1;
     public List<UnitInstance> InjuredParty2;
+    public List<UnitInstance> DeadParty1;
+    public List<UnitInstance> DeadParty2;
     public bool Party1Wins;
 }
