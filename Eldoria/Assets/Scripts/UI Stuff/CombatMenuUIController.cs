@@ -26,11 +26,11 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
             CombatResult result = CombatSimulator.SimulateBattle(playerPartyController.PartyMembers, enemyPartyController.PartyMembers);
 
             // show results
-            PopulateGrid(playerUnitsGrid, result.ActiveParty1);
-            PopulateGrid(enemyUnitsGrid, result.ActiveParty2);
+            PopulateGrid(playerUnitsGrid, result.AttackerParty);
+            PopulateGrid(enemyUnitsGrid, result.DefenderParty);
 
             // apply results
-            CombatOutCombeProcessor.ApplyCombatResult(result, playerPartyController, enemyPartyController);
+            // CombatOutCombeProcessor.ApplyCombatResult(result, playerPartyController, enemyPartyController);
 
             // progress to prisoner allotment / loot screen
 

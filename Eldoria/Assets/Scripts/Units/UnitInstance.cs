@@ -37,12 +37,21 @@ public class UnitInstance
     public int Defence => defence;
     public int Moral => moral;
 
-    public Guid ID { get; private set; } = Guid.NewGuid();
+    [SerializeField] private string idString;
+
+    public Guid ID
+    {
+        get => Guid.Parse(idString);
+        private set => idString = value.ToString();
+    }
+
+    // public Guid ID { get; private set; } = Guid.NewGuid();
 
 
 
     public UnitInstance(UnitData data)
     {
+        ID = Guid.NewGuid();
         baseData = data;
         unitName = data.unitName;
         currentLevel = data.level;
@@ -54,6 +63,25 @@ public class UnitInstance
         defence = data.defence;
         moral = data.moral;
     }
+
+    public UnitInstance Clone()
+    {
+        return new UnitInstance(baseData)
+        {
+            unitName = unitName,
+            currentLevel = currentLevel,
+            currentExperience = currentExperience,
+            experienceToNextLevel = experienceToNextLevel,
+            health = health,
+            maxHealth = maxHealth,
+            attack = attack,
+            defence = defence,
+            moral = moral,
+            ID = ID
+        };
+    }
+
+
 
     public virtual void GainExperience(int amount)
     {

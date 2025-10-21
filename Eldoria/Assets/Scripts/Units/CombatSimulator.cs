@@ -11,33 +11,58 @@ public static class CombatSimulator
     {
         CombatResult result = new CombatResult
         {
-            ActiveParty1 = new List<UnitInstance>(party1),
-            ActiveParty2 = new List<UnitInstance>(party2),
-            InjuredParty1 = new List<UnitInstance>(),
-            InjuredParty2 = new List<UnitInstance>(),
-            DeadParty1 = new(),
-            DeadParty2 = new()
+            AttackerParty = party1.Select(u => u.Clone()).ToList(),
+            DefenderParty = party2.Select(u => u.Clone()).ToList()
         };
 
 
         int safetyCounter = 0;
-        while (result.ActiveParty1.Count > 0 && result.ActiveParty2.Count > 0 && safetyCounter < 1000)
+        while (result.AttackerParty.Count > 0 && result.DefenderParty.Count > 0 && safetyCounter < 1000)
         {
             SimulateRound(result);
             safetyCounter++;
         }
 
-        result.Party1Wins = result.ActiveParty1.Count > 0;
+        result.Party1Wins = result.AttackerParty.Count > 0;
+
+
+        // rewrite the combat result lists so that i get same order units with updated stats
+        var simulatedAttackers = result.AttackerParty;
+        var simulatedDefenders = result.DefenderParty;
+
+        result.AttackerParty = party1.Select(original =>
+        {
+            var simulated = simulatedAttackers.FirstOrDefault(sim => sim.ID == original.ID);
+            if (simulated != null)
+                return simulated;
+
+            var clone = original.Clone();
+            clone.SetHealth(0);
+            return clone;
+        }).ToList();
+
+        result.DefenderParty = party2.Select(original =>
+        {
+            var simulated = simulatedDefenders.FirstOrDefault(sim => sim.ID == original.ID);
+            if (simulated != null)
+                return simulated;
+
+            var clone = original.Clone();
+            clone.SetHealth(0);
+            return clone;
+        }).ToList();
+
 
         return result;
     }
 
     private static void SimulateRound(CombatResult result)
     {
-        List<UnitInstance> attackers = new List<UnitInstance>(result.ActiveParty1);
-        List<UnitInstance> defenders = new List<UnitInstance>(result.ActiveParty2);
-        ShuffleList<UnitInstance>(attackers);
-        ShuffleList<UnitInstance>(defenders);
+        List<UnitInstance> attackers = new(result.AttackerParty);
+        List<UnitInstance> defenders = new(result.DefenderParty);
+        ShuffleList(attackers);
+        ShuffleList(defenders);
+        Debug.Log("round called");
 
         // attackers attack
         for (int i = 0; i < attackers.Count; i++)
@@ -45,9 +70,11 @@ public static class CombatSimulator
             if (defenders.Count == 0) continue;
             int index = i % defenders.Count;
             SimulateAttack(attackers[index], defenders[index]);
-            if (defenders[index].Health <= 0) defenders.Remove(defenders[index]);
 
         }
+        result.AttackerParty.RemoveAll(u => u.Health <= 0);
+        result.DefenderParty.RemoveAll(u => u.Health <= 0);
+
 
         // defenders attack
         for (int i = 0; i < defenders.Count; i++)
@@ -55,19 +82,13 @@ public static class CombatSimulator
             if (attackers.Count == 0) continue;
             int index = i % attackers.Count;
             SimulateAttack(defenders[index], attackers[index]);
-            if (attackers[index].Health <= 0) attackers.Remove(attackers[index]);
 
         }
-        PurgeDeadUnits(result);
 
-    }
-    private static void PurgeDeadUnits(CombatResult result)
-    {
-        result.InjuredParty1.AddRange(result.ActiveParty1.Where(u => u.Health <= 0));
-        result.InjuredParty2.AddRange(result.ActiveParty2.Where(u => u.Health <= 0));
+        result.AttackerParty.RemoveAll(u => u.Health <= 0);
+        result.DefenderParty.RemoveAll(u => u.Health <= 0);
 
-        result.ActiveParty1.RemoveAll(u => u.Health <= 0);
-        result.ActiveParty2.RemoveAll(u => u.Health <= 0);
+
     }
 
 
@@ -125,11 +146,7 @@ public static class CombatSimulator
 
 public class CombatResult
 {
-    public List<UnitInstance> ActiveParty1;
-    public List<UnitInstance> ActiveParty2;
-    public List<UnitInstance> InjuredParty1;
-    public List<UnitInstance> InjuredParty2;
-    public List<UnitInstance> DeadParty1;
-    public List<UnitInstance> DeadParty2;
+    public List<UnitInstance> AttackerParty;
+    public List<UnitInstance> DefenderParty;
     public bool Party1Wins;
 }
