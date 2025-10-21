@@ -14,6 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Colten
   powerStat: 10
+  health: 50
+  attack: 2
+  defence: 2
+  moral: 75
   level: 1
   experience: 0
   experienceToNextLevel: 100
@@ -22,3 +26,4 @@ MonoBehaviour:
   intelligence: 1
   charisma: 1
   endurance: 1
+  faction: 
