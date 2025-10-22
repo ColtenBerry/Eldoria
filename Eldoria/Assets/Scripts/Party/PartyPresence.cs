@@ -1,13 +1,15 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using TMPro;
 using UnityEngine;
 
 public class PartyPresence : MonoBehaviour, IInteractable
 {
     public PartyProfile partyProfile;
     public PartyController partyController;
+    public bool isPlayer;
 
-    [SerializeField] CharacterInstance lord;
+    [SerializeField] private CharacterInstance lord;
     public CharacterInstance Lord
     {
         get
@@ -20,10 +22,12 @@ public class PartyPresence : MonoBehaviour, IInteractable
     {
         partyController = GetComponent<PartyController>();
         if (partyController == null) Debug.LogError("PartyController not found on PartyPresence GameObject");
+        lord = new CharacterInstance(partyProfile.Lord);
+        Debug.Log("lord: " + lord);
+
         InitializeParty();
         ApplyVisuals();
 
-        lord = new CharacterInstance(partyProfile.Lord);
     }
 
     private void InitializeParty()
@@ -38,6 +42,16 @@ public class PartyPresence : MonoBehaviour, IInteractable
     private void ApplyVisuals()
     {
         // set icon, color, etc.
+
+        if (!isPlayer)
+        {
+            TextMeshProUGUI lordNameText = transform.Find("NameTag/Canvas/NameTagText").GetComponent<TextMeshProUGUI>();
+            lordNameText.text = lord.UnitName;
+
+            SpriteRenderer spriteRenderer = transform.Find("NameTag").GetComponent<SpriteRenderer>();
+            spriteRenderer.color = Color.green;
+        }
+
     }
 
     public void Interact()
