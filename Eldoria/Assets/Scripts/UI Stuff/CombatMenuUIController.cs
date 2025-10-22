@@ -13,6 +13,7 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
     [SerializeField] private Button confirmButton;
 
     private PartyController enemyPartyController;
+    private PartyPresence enemyPartyPresence;
 
     [SerializeField] private PartyController playerPartyController;
 
@@ -20,6 +21,27 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
     public void Awake()
     {
+
+    }
+
+    public void OpenMenu(object source)
+    {
+        var component = source as Component;
+        if (component == null)
+        {
+            Debug.LogWarning("Combat Menu expected a Component-based interface");
+            return;
+        }
+        enemyPartyPresence = component.GetComponent<PartyPresence>();
+
+        enemyPartyController = enemyPartyPresence.partyController;
+        if (enemyPartyController == null)
+        {
+            Debug.LogWarning("PartyController not found on source GameObject");
+            return;
+        }
+        confirmButton.onClick.RemoveAllListeners();
+
         confirmButton.onClick.AddListener(() =>
         {
             // do stuff
@@ -32,11 +54,38 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
             // apply results
             CombatOutCombeProcessor.ApplyCombatResult(result, playerPartyController, enemyPartyController);
 
-            confirmButton.GetComponent<Text>().text = "Continue";
+            confirmButton.GetComponentInChildren<TextMeshProUGUI>().text = "Continue";
             confirmButton.onClick.RemoveAllListeners();
             confirmButton.onClick.AddListener(() =>
             {
-                // progress to prisoner allotment / loot screen
+                if (result.Party1Wins)
+                {
+                    List<UnitInstance> prisoners = CombatOutCombeProcessor.ReturnPrisoners(enemyPartyController);
+                    // progress to prisoner allotment / loot screen
+                    MainMenuController menu = gameObject.transform.parent?.GetComponent<MainMenuController>();
+                    if (menu == null)
+                    {
+                        Debug.LogWarning("Main menu not found");
+                        return;
+                    }
+
+                    // destroy the enemy party? 
+                    if (enemyPartyPresence.Lord.Faction == "Brigand")
+                    {
+                        Destroy(enemyPartyController.gameObject);
+                    }
+                    else
+                    {
+                        // it is a faction, a faction manager should handle this
+                        // probably destroy it, then let the faction manager respawn if the lord is free
+                    }
+                    menu.OpenSubMenu("prisoners", prisoners);
+
+                }
+                else
+                {
+                    // destruction of player party?
+                }
 
 
             });
@@ -44,23 +93,6 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
         });
 
-    }
-
-    public void OpenMenu(object source)
-    {
-        var component = source as Component;
-        if (component == null)
-        {
-            Debug.LogWarning("Combat Menu expected a Component-based interface");
-            return;
-        }
-
-        enemyPartyController = component.GetComponent<PartyController>();
-        if (enemyPartyController == null)
-        {
-            Debug.LogWarning("PartyController not found on source GameObject");
-            return;
-        }
 
         // populate grids
         PopulateGrid(playerUnitsGrid, playerPartyController.PartyMembers);

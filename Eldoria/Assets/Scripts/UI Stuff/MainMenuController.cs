@@ -53,7 +53,7 @@ public class MainMenuController : MenuController
         InputGate.OnMenuClosed?.Invoke();
     }
 
-    public void OpenSubMenu(string id, IInteractable source)
+    public void OpenSubMenu(string id, object source)
     {
         foreach (GameObject panel in subMenus.Values)
         {

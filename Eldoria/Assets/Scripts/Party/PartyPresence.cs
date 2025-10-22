@@ -5,7 +5,7 @@ using UnityEngine;
 public class PartyPresence : MonoBehaviour, IInteractable
 {
     public PartyProfile partyProfile;
-    private PartyController partyController;
+    public PartyController partyController;
 
     [SerializeField] CharacterInstance lord;
     public CharacterInstance Lord

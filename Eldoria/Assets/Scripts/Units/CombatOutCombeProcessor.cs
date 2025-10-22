@@ -9,7 +9,11 @@ public static class CombatOutCombeProcessor
         double SURVIVE_CHANCE = .5;
         ApplyDamage(result.AttackerParty, party1, SURVIVE_CHANCE);
         ApplyDamage(result.DefenderParty, party2, SURVIVE_CHANCE);
+    }
 
+    public static List<UnitInstance> ReturnPrisoners(PartyController losingParty)
+    {
+        return losingParty.PartyMembers;
     }
 
     private static void ApplyDamage(List<UnitInstance> simulatedUnits, PartyController party, double surviveChance)
@@ -48,4 +52,5 @@ public static class CombatOutCombeProcessor
         }
 
     }
+
 }
