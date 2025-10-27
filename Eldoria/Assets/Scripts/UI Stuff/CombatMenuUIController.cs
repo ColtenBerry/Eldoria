@@ -73,6 +73,7 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
                     if (enemyPartyPresence.Lord.Faction == "Brigand")
                     {
                         Destroy(enemyPartyController.gameObject);
+                        Debug.Log("attempting party destruction");
                     }
                     else
                     {

@@ -55,6 +55,10 @@ public class Inventory
         }
         //  OnInventoryChanged?.Invoke(itemStacks);
     }
+    public void ClearAllItems()
+    {
+        itemStacks.Clear();
+    }
 
     public List<ItemStack> GetAllItems() => new(itemStacks);
 }

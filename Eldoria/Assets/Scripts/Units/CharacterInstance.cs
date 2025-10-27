@@ -21,7 +21,6 @@ public class CharacterInstance : UnitInstance
     public int Charisma => charisma;
     public int Endurance => endurance;
 
-
     [Header("Faction")]
     private string faction;
 

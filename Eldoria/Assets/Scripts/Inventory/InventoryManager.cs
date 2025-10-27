@@ -42,5 +42,15 @@ public class InventoryManager : MonoBehaviour
         inventory.RemoveItem(item, amount);
     }
 
+    public List<ItemStack> GetAllItems()
+    {
+        return Inventory.GetAllItems();
+    }
+
+    public void ClearAllItems()
+    {
+        inventory.ClearAllItems();
+    }
+
 
 }

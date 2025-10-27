@@ -43,9 +43,8 @@ public class PartyController : MonoBehaviour
         PartyMembers.Remove(member);
         OnPartyUpdated?.Invoke();
     }
-    public void AddPrisoner(UnitData unitData)
+    public void AddPrisoner(UnitInstance prisoner)
     {
-        var prisoner = new UnitInstance(unitData);
         Prisoners.Add(prisoner);
         OnPrisonersUpdated?.Invoke();
     }
@@ -54,6 +53,11 @@ public class PartyController : MonoBehaviour
     {
         if (Prisoners.Remove(prisoner))
             OnPrisonersUpdated?.Invoke();
+    }
+
+    public void ClearPrisoners()
+    {
+        Prisoners.Clear();
     }
 
 }
