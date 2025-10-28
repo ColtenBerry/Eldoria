@@ -16,6 +16,7 @@ public class NPCStateMachine : MonoBehaviour
         currentState = NPCState.Wandering;
         movementController = GetComponent<MovementController>();
         if (movementController == null) Debug.LogError("Movement Controller not found on " + gameObject.name);
+        origin = transform.position;
     }
 
     GameObject enemy;

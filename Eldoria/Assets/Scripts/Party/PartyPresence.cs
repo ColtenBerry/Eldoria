@@ -18,6 +18,8 @@ public class PartyPresence : MonoBehaviour, IInteractable
         }
     }
 
+    private SpawnerManager spawner;
+
     void Awake()
     {
         partyController = GetComponent<PartyController>();
@@ -70,4 +72,18 @@ public class PartyPresence : MonoBehaviour, IInteractable
 
         return options;
     }
+
+    public void SetSpawnerManager(SpawnerManager manager)
+    {
+        spawner = manager;
+    }
+
+    void OnDestroy()
+    {
+        if (spawner != null)
+        {
+            spawner.UnregisterParty(this);
+        }
+    }
+
 }
