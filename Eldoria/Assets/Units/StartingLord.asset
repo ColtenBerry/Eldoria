@@ -26,4 +26,4 @@ MonoBehaviour:
   intelligence: 1
   charisma: 1
   endurance: 1
-  faction: Player
+  faction: {fileID: 11400000, guid: 82f46177cf8179d418809ad76e055954, type: 2}

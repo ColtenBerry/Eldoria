@@ -11,6 +11,6 @@ public class CharacterData : UnitData
     public int endurance;
 
     [Header("Faction")]
-    public string faction;
+    public Faction faction;
 
 }

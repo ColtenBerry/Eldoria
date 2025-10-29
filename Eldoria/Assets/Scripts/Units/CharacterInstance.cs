@@ -22,9 +22,9 @@ public class CharacterInstance : UnitInstance
     public int Endurance => endurance;
 
     [Header("Faction")]
-    private string faction;
+    private Faction faction;
 
-    public string Faction => faction;
+    public Faction Faction => faction;
 
     public CharacterInstance(CharacterData data) : base(data)
     {
@@ -47,4 +47,5 @@ public class CharacterInstance : UnitInstance
         charisma += 1;
         endurance += 1;
     }
+
 }

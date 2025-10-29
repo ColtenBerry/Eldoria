@@ -26,4 +26,4 @@ MonoBehaviour:
   intelligence: 1
   charisma: 1
   endurance: 1
-  faction: Brigand
+  faction: {fileID: 11400000, guid: d4a74ec008e1ed34192f5777acb8c380, type: 2}

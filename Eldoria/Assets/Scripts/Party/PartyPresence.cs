@@ -39,6 +39,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
             Debug.Log("adding unit: presence");
             partyController.AddUnit(new UnitInstance(unit));
         }
+        FactionsManager.Instance.RegisterParty(this);
     }
 
     private void ApplyVisuals()
@@ -51,7 +52,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
             lordNameText.text = lord.UnitName;
 
             SpriteRenderer spriteRenderer = transform.Find("NameTag").GetComponent<SpriteRenderer>();
-            spriteRenderer.color = Color.green;
+            spriteRenderer.color = lord.Faction.factionColor;
         }
 
     }
@@ -65,7 +66,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
     {
         List<InteractionOption> options = new();
 
-        if (lord.Faction != "Player") options.Add(new InteractionOption("Attack Party", () => Debug.Log("Attempting to Attack"), "combat"));
+        if (lord.Faction.name != "Player") options.Add(new InteractionOption("Attack Party", () => Debug.Log("Attempting to Attack"), "combat"));
         options.Add(new InteractionOption("Talk to Leader", () => Debug.Log("Attempting to spaek")));
         options.Add(new InteractionOption("Leave", () => Debug.Log("Attempting to Leave")));
 
@@ -84,6 +85,17 @@ public class PartyPresence : MonoBehaviour, IInteractable
         {
             spawner.UnregisterParty(this);
         }
+        FactionsManager.Instance.UnregisterParty(this);
+    }
+
+    public int GetStrengthEstimate()
+    {
+        int strength = 0;
+        foreach (UnitInstance unit in partyController.PartyMembers)
+        {
+            strength += ((unit.Attack + unit.Defence) * unit.Health);
+        }
+        return strength;
     }
 
 }
