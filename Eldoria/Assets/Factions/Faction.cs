@@ -8,12 +8,4 @@ public class Faction : ScriptableObject
     public Sprite icon;
     public Color factionColor;
 
-    [Tooltip("Factions this one considers allies")]
-    public List<Faction> initialAllies;
-
-    [Tooltip("Factions this one considers enemies")]
-    public List<Faction> initialEnemies;
-
-    public bool IsAlliedWith(Faction other) => initialAllies.Contains(other);
-    public bool IsEnemyOf(Faction other) => initialEnemies.Contains(other);
 }

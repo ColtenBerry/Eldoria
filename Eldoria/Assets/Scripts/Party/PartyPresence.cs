@@ -66,7 +66,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
     {
         List<InteractionOption> options = new();
 
-        if (lord.Faction.name != "Player") options.Add(new InteractionOption("Attack Party", () => Debug.Log("Attempting to Attack"), "combat"));
+        if (FactionsManager.Instance.AreEnemies(lord.Faction, FactionsManager.Instance.GetFactionByName("Player"))) options.Add(new InteractionOption("Attack Party", () => Debug.Log("Attempting to Attack"), "combat"));
         options.Add(new InteractionOption("Talk to Leader", () => Debug.Log("Attempting to spaek")));
         options.Add(new InteractionOption("Leave", () => Debug.Log("Attempting to Leave")));
 

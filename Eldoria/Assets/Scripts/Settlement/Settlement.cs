@@ -4,8 +4,8 @@ using UnityEngine;
 public abstract class Settlement : MonoBehaviour, IInteractable
 {
     [SerializeField]
-    protected string faction;
-    public string GetFaction() => faction;
+    protected Faction faction;
+    public Faction GetFaction() => faction;
     [SerializeField]
     protected string settlementName;
     public string GetSettlementName() => settlementName;
