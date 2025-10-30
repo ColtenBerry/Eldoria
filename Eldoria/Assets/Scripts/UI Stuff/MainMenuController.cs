@@ -46,6 +46,20 @@ public class MainMenuController : MenuController
             if (!subMenus.ContainsKey(entry.id))
                 subMenus.Add(entry.id, entry.panel);
         }
+        Debug.Log("subscribing to combatsimulator.oncombatmenurequested");
+        CombatSimulator.OnCombatMenuRequested += HandleCombatMenu;
+
+    }
+
+    private void Start()
+    {
+    }
+
+    private void HandleCombatMenu(PartyController enemyParty, bool isPlayerAttacking)
+    {
+        Debug.Log("attempting to open combat menu");
+        gameObject.SetActive(true);
+        OpenSubMenu("CombatMenu", new CombatMenuContext(enemyParty, isPlayerAttacking));
     }
 
     private void CloseAllMenus()
@@ -55,6 +69,7 @@ public class MainMenuController : MenuController
 
     public void OpenSubMenu(string id, object source)
     {
+        InputGate.OnMenuOpened?.Invoke();
         foreach (GameObject panel in subMenus.Values)
         {
             panel.SetActive(false);

@@ -5,19 +5,25 @@ using UnityEngine.UI;
 
 public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHandler<UnitInstance>
 {
-    [SerializeField] private Transform playerUnitsGrid;
-    [SerializeField] private Transform enemyUnitsGrid;
-    [SerializeField] private TMP_Text enemyText;
+    [SerializeField] private Transform attackingUnitsGrid;
+    [SerializeField] private Transform defendingUnitsGrid;
+    [SerializeField] private TMP_Text attackingText;
+    [SerializeField] private TMP_Text defendingText;
     [SerializeField] private GameObject unitPrefab;
 
     [SerializeField] private Button confirmButton;
-
-    private PartyController enemyPartyController;
-    private PartyPresence enemyPartyPresence;
-
     [SerializeField] private PartyController playerPartyController;
 
+    // private PartyController enemyPartyController;
+    // private PartyPresence enemyPartyPresence;
 
+    // [SerializeField] private PartyController playerPartyController;
+
+    private PartyController attackingPartyController;
+    private PartyController defendingPartyController;
+    private PartyPresence attackingPartyPresence;
+    private PartyPresence defendingPartyPresence;
+    private bool isPlayerAttacking;
 
     public void Awake()
     {
@@ -26,62 +32,60 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
     public void OpenMenu(object source)
     {
-        var component = source as Component;
-        if (component == null)
+        if (source is CombatMenuContext ctx)
         {
-            Debug.LogWarning("Combat Menu expected a Component-based interface");
-            return;
-        }
-        enemyPartyPresence = component.GetComponent<PartyPresence>();
+            isPlayerAttacking = ctx.isPlayerAttacking;
+            if (isPlayerAttacking)
+            {
+                attackingText.text = "Player";
+                defendingText.text = defendingPartyPresence.Lord.UnitName;
+                attackingPartyController = playerPartyController;
+                defendingPartyController = ctx.enemyParty;
+                attackingPartyPresence = attackingPartyController.GetComponent<PartyPresence>();
+                defendingPartyPresence = defendingPartyController.GetComponent<PartyPresence>();
 
-        enemyPartyController = enemyPartyPresence.partyController;
-        if (enemyPartyController == null)
-        {
-            Debug.LogWarning("PartyController not found on source GameObject");
-            return;
+            }
+            else if (!isPlayerAttacking)
+            {
+                attackingText.text = attackingPartyPresence.Lord.UnitName;
+                defendingText.text = "Player";
+                defendingPartyController = playerPartyController;
+                attackingPartyController = ctx.enemyParty;
+                attackingPartyPresence = attackingPartyController.GetComponent<PartyPresence>();
+                defendingPartyPresence = defendingPartyController.GetComponent<PartyPresence>();
+
+            }
+
         }
+        else
+        {
+            Debug.LogWarning("Expected CombatMenuContext");
+        }
+
+
+
+
         confirmButton.onClick.RemoveAllListeners();
 
         confirmButton.onClick.AddListener(() =>
         {
             // do stuff
-            CombatResult result = CombatSimulator.SimulateBattle(playerPartyController.PartyMembers, enemyPartyController.PartyMembers);
+            CombatResult result = CombatSimulator.SimulateBattle(attackingPartyController.PartyMembers, defendingPartyController.PartyMembers);
 
             // show results
-            PopulateGrid(playerUnitsGrid, result.AttackerParty);
-            PopulateGrid(enemyUnitsGrid, result.DefenderParty);
+            PopulateGrid(attackingUnitsGrid, result.AttackerParty);
+            PopulateGrid(defendingUnitsGrid, result.DefenderParty);
 
             // apply results
-            CombatOutCombeProcessor.ApplyCombatResult(result, playerPartyController, enemyPartyController);
+            CombatOutcomeProcessor.ApplyCombatResult(result, attackingPartyController, defendingPartyController);
 
             confirmButton.GetComponentInChildren<TextMeshProUGUI>().text = "Continue";
             confirmButton.onClick.RemoveAllListeners();
             confirmButton.onClick.AddListener(() =>
             {
-                if (result.Party1Wins)
+                if ((result.Party1Wins && isPlayerAttacking) || (!result.Party1Wins && !isPlayerAttacking))
                 {
-                    List<UnitInstance> prisoners = CombatOutCombeProcessor.ReturnPrisoners(enemyPartyController);
-                    // progress to prisoner allotment / loot screen
-                    MainMenuController menu = gameObject.transform.parent?.GetComponent<MainMenuController>();
-                    if (menu == null)
-                    {
-                        Debug.LogWarning("Main menu not found");
-                        return;
-                    }
-
-                    // destroy the enemy party? 
-                    if (enemyPartyPresence.Lord.Faction.name == "Brigand")
-                    {
-                        Destroy(enemyPartyController.gameObject);
-                        Debug.Log("attempting party destruction");
-                    }
-                    else
-                    {
-                        // it is a faction, a faction manager should handle this
-                        // probably destroy it, then let the faction manager respawn if the lord is free
-                    }
-                    menu.OpenSubMenu("prisoners", prisoners);
-
+                    HandlePlayerWin();
                 }
                 else
                 {
@@ -96,8 +100,8 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
 
         // populate grids
-        PopulateGrid(playerUnitsGrid, playerPartyController.PartyMembers);
-        PopulateGrid(enemyUnitsGrid, enemyPartyController.PartyMembers);
+        PopulateGrid(attackingUnitsGrid, attackingPartyController.PartyMembers);
+        PopulateGrid(defendingUnitsGrid, defendingPartyController.PartyMembers);
 
 
     }
@@ -125,5 +129,51 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
         // do nothing
     }
 
+    private void HandlePlayerWin()
+    {
+        List<UnitInstance> prisoners;
+        if (isPlayerAttacking)
+        {
+            prisoners = CombatOutcomeProcessor.ReturnPrisoners(defendingPartyController);
+        }
+        else
+        {
+            prisoners = CombatOutcomeProcessor.ReturnPrisoners(attackingPartyController);
+        }
+
+        // progress to prisoner allotment / loot screen
+        MainMenuController menu = gameObject.transform.parent?.GetComponent<MainMenuController>();
+        if (menu == null)
+        {
+            Debug.LogWarning("Main menu not found");
+            return;
+        }
+
+        // destroy the enemy party? 
+
+        Destroy(defendingPartyController.gameObject);
+        Debug.Log("attempting party destruction");
+
+
+        menu.OpenSubMenu("prisoners", prisoners);
+
+
+
+    }
+
 
 }
+
+
+public class CombatMenuContext
+{
+    public PartyController enemyParty;
+    public bool isPlayerAttacking;
+
+    public CombatMenuContext(PartyController enemyParty, bool isPlayerAttacking)
+    {
+        this.enemyParty = enemyParty;
+        this.isPlayerAttacking = isPlayerAttacking;
+    }
+}
+

@@ -8,6 +8,5 @@ public class PartyProfile : ScriptableObject
 {
     public PartyType type;
     public CharacterData Lord;
-    public string faction;
     public List<UnitData> startingUnits;
 }

@@ -18,7 +18,11 @@ public class FactionsManager : MonoBehaviour
 
     private Dictionary<Faction, HashSet<Faction>> allies = new();
     private Dictionary<Faction, HashSet<Faction>> enemies = new();
-    public bool AreAllied(Faction a, Faction b) => allies[a].Contains(b);
+    public bool AreAllied(Faction a, Faction b)
+    {
+        return allies[a].Contains(b) || a == b;
+    }
+
     public bool AreEnemies(Faction a, Faction b) => enemies[a].Contains(b);
 
 

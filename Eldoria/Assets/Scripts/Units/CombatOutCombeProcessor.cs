@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 
-public static class CombatOutCombeProcessor
+public static class CombatOutcomeProcessor
 {
     public static void ApplyCombatResult(CombatResult result, PartyController party1, PartyController party2)
     {
@@ -20,9 +20,17 @@ public static class CombatOutCombeProcessor
     {
         foreach (var simulated in simulatedUnits)
         {
+            Debug.Log($"Looking for simulated ID: {simulated.ID}");
+            foreach (var unit in party.PartyMembers)
+                Debug.Log($"Party member ID: {unit.ID}");
+
             var actual = party.PartyMembers.Find(u => u.ID == simulated.ID);
-            if (actual != null)
-                actual.SetHealth(simulated.Health);
+            if (actual == null)
+            {
+                Debug.LogWarning("error in applying damage. party member not found?");
+                continue;
+            }
+            actual.SetHealth(simulated.Health);
             if (actual.Health == 0)
             {
                 // kill unit

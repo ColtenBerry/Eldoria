@@ -6,6 +6,15 @@ public class TouchManager : MonoBehaviour
 {
     Vector2 inputPos = new Vector2(0, 0);
 
+    LayerMask interactableLayer;
+
+    void Awake()
+    {
+        interactableLayer = LayerMask.GetMask("Interactable");
+
+    }
+
+
     void Update()
     {
         if (InputGate.IsUIBlockingGameInput) return;
@@ -35,7 +44,7 @@ public class TouchManager : MonoBehaviour
         if (inputDetected)
         {
             // Check if object is interactable 
-            RaycastHit2D hit = Physics2D.Raycast(inputPos, Vector2.zero);
+            RaycastHit2D hit = Physics2D.Raycast(inputPos, Vector2.zero, 0f, interactableLayer);
             if (hit.collider != null && hit.collider.name != "Player")
             {
                 Debug.Log($"Clicked or touched: {hit.collider.name}");

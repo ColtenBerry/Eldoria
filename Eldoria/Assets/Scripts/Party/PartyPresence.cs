@@ -27,9 +27,13 @@ public class PartyPresence : MonoBehaviour, IInteractable
         lord = new CharacterInstance(partyProfile.Lord);
         Debug.Log("lord: " + lord);
 
-        InitializeParty();
         ApplyVisuals();
 
+    }
+
+    void Start()
+    {
+        InitializeParty();
     }
 
     private void InitializeParty()
@@ -66,7 +70,15 @@ public class PartyPresence : MonoBehaviour, IInteractable
     {
         List<InteractionOption> options = new();
 
-        if (FactionsManager.Instance.AreEnemies(lord.Faction, FactionsManager.Instance.GetFactionByName("Player"))) options.Add(new InteractionOption("Attack Party", () => Debug.Log("Attempting to Attack"), "combat"));
+        if (FactionsManager.Instance.AreEnemies(lord.Faction, FactionsManager.Instance.GetFactionByName("Player")))
+        {
+            options.Add(new InteractionOption("Attack Party", () =>
+            {
+                Debug.Log("Attempting to Attack");
+                CombatSimulator.InitiateCombat(partyController, true);
+            }
+                ));
+        }
         options.Add(new InteractionOption("Talk to Leader", () => Debug.Log("Attempting to spaek")));
         options.Add(new InteractionOption("Leave", () => Debug.Log("Attempting to Leave")));
 

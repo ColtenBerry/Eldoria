@@ -7,6 +7,29 @@ using UnityEngine;
 
 public static class CombatSimulator
 {
+    public static Action<PartyController, bool> OnCombatMenuRequested;
+    public static void InitiateCombat(PartyController enemyParty, bool isPlayerAttacking)
+    {
+        Debug.Log("reached initiate combat");
+        InputGate.OnMenuOpened?.Invoke();
+        Debug.Log("reached input gate");
+        OnCombatMenuRequested?.Invoke(enemyParty, isPlayerAttacking);
+        Debug.Log("Reached oncombatmenurequested");
+    }
+
+    public static void InitiateCombat(PartyController party1, PartyController party2)
+    {
+
+        // auto battle: 
+        CombatResult result = SimulateBattle(party1.PartyMembers, party2.PartyMembers);
+
+        // apply result
+        CombatOutcomeProcessor.ApplyCombatResult(result, party1, party2);
+    }
+
+
+
+
     public static CombatResult SimulateBattle(List<UnitInstance> party1, List<UnitInstance> party2)
     {
         CombatResult result = new CombatResult
