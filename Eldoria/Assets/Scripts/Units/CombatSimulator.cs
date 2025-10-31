@@ -92,7 +92,7 @@ public static class CombatSimulator
         {
             if (defenders.Count == 0) continue;
             int index = i % defenders.Count;
-            SimulateAttack(attackers[index], defenders[index]);
+            SimulateAttack(attackers[i], defenders[index]);
 
         }
         result.AttackerParty.RemoveAll(u => u.Health <= 0);
@@ -104,7 +104,7 @@ public static class CombatSimulator
         {
             if (attackers.Count == 0) continue;
             int index = i % attackers.Count;
-            SimulateAttack(defenders[index], attackers[index]);
+            SimulateAttack(defenders[i], attackers[index]);
 
         }
 

@@ -77,7 +77,7 @@ public class UnitInstance
             attack = attack,
             defence = defence,
             moral = moral,
-            ID = ID
+            idString = idString
         };
     }
 

@@ -157,7 +157,7 @@ public class NPCStateMachine : MonoBehaviour
                 PartyController personalPartyController = GetComponent<PartyController>();
                 if (personalPartyController == null) Debug.LogWarning("Party controller not found");
 
-                PartyController enemyPartyController = GetComponent<PartyController>();
+                PartyController enemyPartyController = closest.GetComponent<PartyController>();
                 if (enemyPartyController == null) Debug.LogWarning("party controller not found");
 
                 CombatSimulator.InitiateCombat(personalPartyController, enemyPartyController);
