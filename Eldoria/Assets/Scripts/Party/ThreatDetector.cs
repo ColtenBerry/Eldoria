@@ -27,6 +27,7 @@ public class ThreatDetector : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.gameObject == self.gameObject) return;
         Debug.Log("Enter");
         PartyPresence otherPresence = other.GetComponent<PartyPresence>();
         if (otherPresence == null) return;
@@ -39,6 +40,7 @@ public class ThreatDetector : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
+        if (other.gameObject == self.gameObject) return;
         Debug.Log("Exit");
         PartyPresence otherPresence = other.GetComponent<PartyPresence>();
         if (otherPresence == null) return;
