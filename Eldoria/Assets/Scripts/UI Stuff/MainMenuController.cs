@@ -24,68 +24,55 @@ public abstract class MenuController : MonoBehaviour
 
 }
 
+
 public class MainMenuController : MenuController
 {
-    [SerializeField]
-    private Button closeButton;
-
+    [SerializeField] private Button closeButton;
     [SerializeField] private List<SubMenuEntry> subMenuEntries;
-    private Dictionary<string, GameObject> subMenus; // dictionary mapping submenu names to approprate menu
+
+    private Dictionary<string, GameObject> subMenus;
+
     private void Awake()
     {
+        closeButton.onClick.AddListener(() => InputGate.OnMenuClosed?.Invoke());
 
-        closeButton.onClick.AddListener(() =>
+        subMenus = new();
+        foreach (var entry in subMenuEntries)
         {
-            CloseAllMenus();
-        });
-
-        subMenus = new Dictionary<string, GameObject>();
-        foreach (SubMenuEntry entry in subMenuEntries)
-        {
-            print("reached");
             if (!subMenus.ContainsKey(entry.id))
                 subMenus.Add(entry.id, entry.panel);
         }
-        Debug.Log("subscribing to combatsimulator.oncombatmenurequested");
-        CombatSimulator.OnCombatMenuRequested += HandleCombatMenu;
-
     }
 
-    private void Start()
-    {
-    }
-
-    private void HandleCombatMenu(PartyController enemyParty, bool isPlayerAttacking)
-    {
-        Debug.Log("attempting to open combat menu");
-        gameObject.SetActive(true);
-        OpenSubMenu("CombatMenu", new CombatMenuContext(enemyParty, isPlayerAttacking));
-    }
-
-    private void CloseAllMenus()
-    {
-        InputGate.OnMenuClosed?.Invoke();
-    }
-
-    public void OpenSubMenu(string id, object source)
+    public void OpenSubMenu(string id, object context = null)
     {
         InputGate.OnMenuOpened?.Invoke();
-        foreach (GameObject panel in subMenus.Values)
-        {
-            panel.SetActive(false);
-        }
 
-        if (subMenus.TryGetValue(id, out var panel2))
+        foreach (var panel in subMenus.Values)
+            panel.SetActive(false);
+
+        if (subMenus.TryGetValue(id, out var panelToOpen))
         {
-            if (panel2.TryGetComponent<IMenuWithSource>(out var menuWithSource))
+            panelToOpen.SetActive(true);
+
+            if (panelToOpen.TryGetComponent<IMenuWithSource>(out var menuWithSource))
             {
-                panel2.SetActive(true);
-                menuWithSource.OpenMenu(source);
+                menuWithSource.OpenMenu(context);
             }
         }
-        else Debug.LogWarning($"Submenu '{id}' not found");
+        else
+        {
+            Debug.LogWarning($"MainMenuController: Submenu '{id}' not found.");
+        }
     }
 
+    public void CloseAllMenus()
+    {
+        foreach (var panel in subMenus.Values)
+            panel.SetActive(false);
+        InputGate.OnMenuClosed?.Invoke();
+        gameObject.SetActive(false);
+    }
 }
 
 

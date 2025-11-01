@@ -4,71 +4,65 @@ using UnityEngine.UI;
 
 public class HUDButtonsManager : MonoBehaviour
 {
-
-    // Exists to combine buttons and their menu panel
     [System.Serializable]
     public class MenuButtonBinding
     {
         public Button button;
-        public GameObject menuPanel;
+        public string subMenuId; // ID used by UIManager to open the submenu
     }
 
-    [SerializeField]
-    private GameObject mainPanel;
-    [SerializeField]
-    private List<MenuButtonBinding> bindings = new();
-    private GameObject activePanel = null;
+    [SerializeField] private GameObject mainPanel;
+    [SerializeField] private List<MenuButtonBinding> bindings = new();
 
-    void OnEnable()
-    {
-        InputGate.OnMenuClosed += CloseActivePanel;
-    }
-    void OnDisable()
-    {
-        // InputGate.OnMenuClosed -= CloseActivePanel;
-    }
+    private bool menuOpen = false;
 
-    void Awake()
+    private void Awake()
     {
         foreach (var binding in bindings)
         {
-            binding.button.onClick.AddListener(() => TryOpenPanel(binding.menuPanel));
+            var id = binding.subMenuId;
+            binding.button.onClick.AddListener(() => TryOpenSubMenu(id));
         }
     }
-    private void TryOpenPanel(GameObject targetPanel)
-    {
-        if (activePanel != null) return; // ignore clicks while menu is open
 
-        OpenPanel(targetPanel);
+    private void OnEnable()
+    {
+        InputGate.OnMenuClosed += HandleMenuClosed;
     }
 
-    private void OpenPanel(GameObject panel)
+    private void OnDisable()
     {
+        InputGate.OnMenuClosed -= HandleMenuClosed;
+    }
 
-        Debug.Log("attempting to open a panel: " + panel.name);
+    private void TryOpenSubMenu(string subMenuId)
+    {
+        if (menuOpen) return;
+
+        OpenSubMenu(subMenuId);
+    }
+
+    private void OpenSubMenu(string subMenuId)
+    {
+        Debug.Log($"HUDButtonsManager: Opening submenu '{subMenuId}'");
         mainPanel.SetActive(true);
-        panel.SetActive(true);
-        activePanel = panel;
-        InputGate.OnMenuOpened?.Invoke();
+        UIManager.Instance.OpenSubMenu(subMenuId);
+        menuOpen = true;
         SetButtonsInteractable(false);
     }
-    private void CloseActivePanel()
+
+    private void HandleMenuClosed()
     {
-        Debug.Log("closing panel");
-        if (activePanel != null)
-        {
-            activePanel.SetActive(false);
-            activePanel = null;
-            SetButtonsInteractable(true);
-        }
+        Debug.Log("HUDButtonsManager: Menu closed");
+        menuOpen = false;
+        SetButtonsInteractable(true);
     }
 
     private void SetButtonsInteractable(bool state)
     {
         foreach (var binding in bindings)
         {
-            //binding.button.interactable = state;
-            gameObject.SetActive(state);
+            binding.button.interactable = state;
         }
     }
 }
