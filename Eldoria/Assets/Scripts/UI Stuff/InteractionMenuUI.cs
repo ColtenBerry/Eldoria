@@ -2,56 +2,55 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
 public class InteractionMenuUI : MonoBehaviour
 {
-    public MainMenuController mainMenuController;
-    public GameObject buttonPrefab;
-    public Transform buttonContainer;
+    [SerializeField] private GameObject buttonPrefab;
+    [SerializeField] private Transform buttonContainer;
 
-    void OnEnable()
+    private void OnEnable()
     {
-        // disable hud buttons?
+        InputGate.OnMenuOpened?.Invoke();
+        // Optionally disable HUD buttons here if needed
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
-        // disable hud buttons?
+        // Optionally re-enable HUD buttons here if needed
     }
 
     public void ShowOptions(List<InteractionOption> options, IInteractable source)
     {
-        InputGate.OnMenuOpened?.Invoke();
-
         gameObject.SetActive(true);
+
+        // Clear previous buttons
         foreach (Transform child in buttonContainer)
             Destroy(child.gameObject);
 
+        // Create new buttons
         foreach (InteractionOption option in options)
         {
-
             var buttonGO = Instantiate(buttonPrefab, buttonContainer);
             var button = buttonGO.GetComponent<Button>();
             var label = buttonGO.GetComponentInChildren<TMP_Text>();
             label.text = option.label;
+
             button.onClick.AddListener(() =>
             {
-                option.callback.Invoke();
-                if (option.subMenuName != null)
-                {
-                    mainMenuController.gameObject.SetActive(true);
-                    mainMenuController.OpenSubMenu(option.subMenuName, source);
-                    gameObject.SetActive(false);
-                }
-                else
-                    CloseMenu(); // close this panel
+                option.callback?.Invoke();
 
+                if (!string.IsNullOrEmpty(option.subMenuName))
+                {
+                    UIManager.Instance.OpenSubMenu(option.subMenuName, source);
+                }
+
+                CloseMenu();
             });
         }
     }
 
-    void CloseMenu()
+    private void CloseMenu()
     {
-        InputGate.OnMenuClosed?.Invoke();
         gameObject.SetActive(false);
     }
 }

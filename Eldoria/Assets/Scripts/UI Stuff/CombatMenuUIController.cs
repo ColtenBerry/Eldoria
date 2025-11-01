@@ -37,22 +37,22 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
             isPlayerAttacking = ctx.isPlayerAttacking;
             if (isPlayerAttacking)
             {
-                attackingText.text = "Player";
-                defendingText.text = defendingPartyPresence.Lord.UnitName;
                 attackingPartyController = playerPartyController;
                 defendingPartyController = ctx.enemyParty;
                 attackingPartyPresence = attackingPartyController.GetComponent<PartyPresence>();
                 defendingPartyPresence = defendingPartyController.GetComponent<PartyPresence>();
+                attackingText.text = "Player";
+                defendingText.text = defendingPartyPresence.Lord.UnitName;
 
             }
             else if (!isPlayerAttacking)
             {
-                attackingText.text = attackingPartyPresence.Lord.UnitName;
-                defendingText.text = "Player";
                 defendingPartyController = playerPartyController;
                 attackingPartyController = ctx.enemyParty;
                 attackingPartyPresence = attackingPartyController.GetComponent<PartyPresence>();
                 defendingPartyPresence = defendingPartyController.GetComponent<PartyPresence>();
+                attackingText.text = attackingPartyPresence.Lord.UnitName;
+                defendingText.text = "Player";
 
             }
 

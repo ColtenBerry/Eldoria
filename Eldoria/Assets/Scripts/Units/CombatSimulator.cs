@@ -10,11 +10,15 @@ public static class CombatSimulator
     public static Action<PartyController, bool> OnCombatMenuRequested;
     public static void InitiateCombat(PartyController enemyParty, bool isPlayerAttacking)
     {
-        Debug.Log("reached initiate combat");
-        InputGate.OnMenuOpened?.Invoke();
-        Debug.Log("reached input gate");
-        OnCombatMenuRequested?.Invoke(enemyParty, isPlayerAttacking);
-        Debug.Log("Reached oncombatmenurequested");
+        Debug.Log("Initiating player-involved combat");
+
+        if (UIManager.Instance == null)
+        {
+            Debug.LogError("UIManager instance not found.");
+            return;
+        }
+
+        UIManager.Instance.OpenSubMenu("combat", new CombatMenuContext(enemyParty, isPlayerAttacking));
     }
 
     public static void InitiateCombat(PartyController party1, PartyController party2)

@@ -29,6 +29,7 @@ public class MainMenuController : MenuController
 {
     [SerializeField] private Button closeButton;
     [SerializeField] private List<SubMenuEntry> subMenuEntries;
+    [SerializeField] private InteractionMenuUI interactionMenu;
 
     private Dictionary<string, GameObject> subMenus;
 
@@ -70,6 +71,7 @@ public class MainMenuController : MenuController
     {
         foreach (var panel in subMenus.Values)
             panel.SetActive(false);
+        interactionMenu.gameObject.SetActive(false);
         InputGate.OnMenuClosed?.Invoke();
         gameObject.SetActive(false);
     }
