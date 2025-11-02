@@ -9,8 +9,4 @@ public class CharacterData : UnitData
     public int intelligence;
     public int charisma;
     public int endurance;
-
-    [Header("Faction")]
-    public Faction faction;
-
 }

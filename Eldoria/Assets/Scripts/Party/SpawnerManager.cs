@@ -4,6 +4,7 @@ using UnityEngine;
 public class SpawnerManager : MonoBehaviour
 {
     public GameObject npcPartyPrefab;
+    public LordProfileSO banditLordTemplate;
     [SerializeField] private int idealNumParties;
     [SerializeField] private float spawnRadius = 5.0f;
 
@@ -33,15 +34,26 @@ public class SpawnerManager : MonoBehaviour
     }
 
 
+
+
     private void SpawnParty()
     {
         // get location
         Vector3 spawnPoint = GetRandomPointInCircle(transform.position, spawnRadius);
         // instantiate party
         GameObject newParty = Instantiate(npcPartyPrefab, spawnPoint, Quaternion.identity);
-        // register the party
         PartyPresence partyPresence = newParty.GetComponent<PartyPresence>();
+
+        // Generate LordProfile
+        LordProfile profile = new LordProfile(banditLordTemplate);
+        profile.AddActiveParty(partyPresence);
+
+
+
         RegisterParty(partyPresence);
+
+        newParty.SetActive(true);
+
 
     }
 }

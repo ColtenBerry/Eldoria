@@ -152,7 +152,7 @@ public class NPCStateMachine : MonoBehaviour
             }
             else
             {
-                Debug.Log(selfPresence.Lord.UnitName + "is attacking " + closest.Lord.UnitName);
+                Debug.Log(selfPresence.Lord.Lord.UnitName + "is attacking " + closest.Lord.Lord.UnitName);
 
                 PartyController personalPartyController = GetComponent<PartyController>();
                 if (personalPartyController == null) Debug.LogWarning("Party controller not found");

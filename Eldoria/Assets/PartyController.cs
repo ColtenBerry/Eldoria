@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class PartyController : MonoBehaviour
 {
-    [Header("Lord Settings")]
 
     [Header("Party Settings")]
     // public List<UnitData> startingUnits;

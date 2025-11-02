@@ -19,7 +19,7 @@ public class CharacterMenuUI : MonoBehaviour
         // initialize button listeners
 
 
-        character = partyPresence.Lord;
+        character = partyPresence.Lord.Lord;
         RefreshUI();
     }
 

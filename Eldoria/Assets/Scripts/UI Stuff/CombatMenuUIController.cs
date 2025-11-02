@@ -42,7 +42,7 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
                 attackingPartyPresence = attackingPartyController.GetComponent<PartyPresence>();
                 defendingPartyPresence = defendingPartyController.GetComponent<PartyPresence>();
                 attackingText.text = "Player";
-                defendingText.text = defendingPartyPresence.Lord.UnitName;
+                defendingText.text = defendingPartyPresence.Lord.Lord.UnitName;
 
             }
             else if (!isPlayerAttacking)
@@ -51,7 +51,7 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
                 attackingPartyController = ctx.enemyParty;
                 attackingPartyPresence = attackingPartyController.GetComponent<PartyPresence>();
                 defendingPartyPresence = defendingPartyController.GetComponent<PartyPresence>();
-                attackingText.text = attackingPartyPresence.Lord.UnitName;
+                attackingText.text = attackingPartyPresence.Lord.Lord.UnitName;
                 defendingText.text = "Player";
 
             }

@@ -234,7 +234,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8688783460291531531
 Transform:
   m_ObjectHideFlags: 0
@@ -355,26 +355,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 342d0cd5affb9584dae2f430588fa3e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  partyProfile: {fileID: 0}
   partyController: {fileID: 0}
   isPlayer: 0
-  lord:
-    baseData: {fileID: 0}
-    unitName: 
-    currentExperience: 0
-    currentLevel: 0
-    health: 0
-    maxHealth: 0
-    attack: 0
-    defence: 0
-    moral: 0
-    experienceToNextLevel: 0
-    idString: 
-    strength: 0
-    agility: 0
-    intelligence: 0
-    charisma: 0
-    endurance: 0
 --- !u!114 &7551585776252368353
 MonoBehaviour:
   m_ObjectHideFlags: 0

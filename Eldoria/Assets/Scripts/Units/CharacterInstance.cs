@@ -21,10 +21,6 @@ public class CharacterInstance : UnitInstance
     public int Charisma => charisma;
     public int Endurance => endurance;
 
-    [Header("Faction")]
-    private Faction faction;
-
-    public Faction Faction => faction;
 
     public CharacterInstance(CharacterData data) : base(data)
     {
@@ -34,7 +30,6 @@ public class CharacterInstance : UnitInstance
         charisma = data.charisma;
         endurance = data.endurance;
 
-        faction = data.faction;
     }
 
     protected override void LevelUp()
