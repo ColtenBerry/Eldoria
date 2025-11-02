@@ -5,7 +5,10 @@ public class TickManager : MonoBehaviour
 {
     public static TickManager Instance { get; private set; }
 
+    public bool IsTicking { get; private set; } = true;
+
     [Header("Tick Settings")]
+    [SerializeField] private float tickIntervalSeconds = 1.0f;
     [SerializeField] private int ticksPerDay = 10;
     [SerializeField] private int daysPerWeek = 7;
 
@@ -17,6 +20,8 @@ public class TickManager : MonoBehaviour
     public event Action<int> OnDayPassed;
     public event Action<int> OnWeekPassed;
 
+    private float tickTimer = 0f;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -25,6 +30,26 @@ public class TickManager : MonoBehaviour
             return;
         }
         Instance = this;
+        InputGate.OnMenuOpened += PauseTicks;
+        InputGate.OnMenuClosed += ResumeTicks;
+    }
+
+    private void OnDestroy()
+    {
+        InputGate.OnMenuOpened -= PauseTicks;
+        InputGate.OnMenuClosed -= ResumeTicks;
+    }
+
+    private void Update()
+    {
+        if (!IsTicking) return;
+
+        tickTimer += Time.deltaTime;
+        if (tickTimer >= tickIntervalSeconds)
+        {
+            AdvanceTick();
+            tickTimer = 0f;
+        }
     }
 
     /// <summary>
@@ -32,6 +57,7 @@ public class TickManager : MonoBehaviour
     /// </summary>
     public void AdvanceTick()
     {
+        if (!IsTicking) return;
         TickCount++;
         OnTick?.Invoke(TickCount);
 
@@ -68,4 +94,7 @@ public class TickManager : MonoBehaviour
             AdvanceTick();
         }
     }
+
+    public void PauseTicks() => IsTicking = false;
+    public void ResumeTicks() => IsTicking = true;
 }

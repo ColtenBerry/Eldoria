@@ -5,17 +5,20 @@ public class SpawnerManager : MonoBehaviour
 {
     public GameObject npcPartyPrefab;
     public LordProfileSO banditLordTemplate;
-    [SerializeField] private int idealNumParties;
+    [SerializeField] private int idealNumParties = 3;
     [SerializeField] private float spawnRadius = 5.0f;
 
     private List<PartyPresence> activeParties = new();
 
-    void Update()
+    private void OnEnable()
     {
-        if (activeParties.Count < idealNumParties)
-        {
-            SpawnParty();
-        }
+        TickManager.Instance.OnDayPassed += HandleDayPassed;
+    }
+
+    private void Osable()
+    {
+        TickManager.Instance.OnDayPassed -= HandleDayPassed;
+
     }
     public void RegisterParty(PartyPresence npcParty)
     {
@@ -55,5 +58,13 @@ public class SpawnerManager : MonoBehaviour
         newParty.SetActive(true);
 
 
+    }
+
+    private void HandleDayPassed(int i)
+    {
+        while (activeParties.Count < idealNumParties)
+        {
+            SpawnParty();
+        }
     }
 }
