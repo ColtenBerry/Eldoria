@@ -6,6 +6,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public GameObject player;
+
+    public GameObject partyPrefab;
     public LordProfileSO playerProfileSO;
     private LordProfile playerProfile;
 
@@ -42,17 +44,30 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void Start()
+    public void Start()
     {
-
+        foreach (LordProfile profile in LordRegistry.Instance.GetAllLords())
+        {
+            if (profile.SourceData == playerProfileSO) continue;
+            SpawnParty(profile);
+        }
     }
 
-    void Update()
+    public void SpawnParty(LordProfile lordProfile)
     {
-        // Optional: game-wide update logic
+        Vector3 spawnPoint = TerritoryManager.Instance.GetSettlementsOf(lordProfile)[0].gameObject.transform.position;
+
+        GameObject newParty = Instantiate(partyPrefab, spawnPoint, Quaternion.identity);
+        PartyPresence partyPresence = newParty.GetComponent<PartyPresence>();
+
+        lordProfile.AddActiveParty(partyPresence);
+
+        FactionsManager.Instance.RegisterParty(partyPresence);
+
+        newParty.SetActive(true);
     }
 
-    // Optional: expose playerProfile if needed
+
     public LordProfile GetPlayerProfile()
     {
         return playerProfile;

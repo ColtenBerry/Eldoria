@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4760188784419831982}
   - component: {fileID: 4912614907078719588}
   - component: {fileID: 95579121599768841}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Castle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -176,7 +176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8759100573236746216}
   - component: {fileID: 9065869502407294994}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LeftFlag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -263,7 +263,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4227188919411870000}
   - component: {fileID: 1260016480481399858}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: RightFlag
   m_TagString: Untagged
   m_Icon: {fileID: 0}

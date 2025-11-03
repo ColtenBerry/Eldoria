@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Village : Settlement
 {
+
     public override List<InteractionOption> GetInteractionOptions()
     {
         List<InteractionOption> options = new();
@@ -13,6 +14,7 @@ public class Village : Settlement
         options.Add(new InteractionOption("Leave", () =>
         {
             Debug.Log("Attempting to leave");
+            InputGate.OnMenuClosed?.Invoke();
 
         })
         );

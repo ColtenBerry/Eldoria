@@ -16,9 +16,12 @@ public class Castle : Settlement
         if (garrisonController == null) Debug.LogWarning("Expected party controller");
     }
 
-    void Start()
+
+    public override void Start()
     {
+        base.Start();
         ApplyVisuals();
+
     }
 
     private void ApplyVisuals()
@@ -52,7 +55,7 @@ public class Castle : Settlement
             options.Add(new InteractionOption("Wait Inside", () => WaitInsideCastle()));
         }
 
-        options.Add(new InteractionOption("Leave", () => { }));
+        options.Add(new InteractionOption("Leave", () => { InputGate.OnMenuClosed?.Invoke(); }));
         return options;
     }
 

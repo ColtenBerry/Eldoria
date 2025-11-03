@@ -3,8 +3,13 @@ using UnityEngine;
 
 public abstract class Settlement : MonoBehaviour, IInteractable
 {
-    [SerializeField] protected string settlementName;
+    [SerializeField][ReadOnly] protected string settlementName;
     [SerializeField] protected int prosperity;
+
+    public virtual void Start()
+    {
+        settlementName = gameObject.name;
+    }
 
     public string GetSettlementName() => settlementName;
     public int GetProsperity() => prosperity;

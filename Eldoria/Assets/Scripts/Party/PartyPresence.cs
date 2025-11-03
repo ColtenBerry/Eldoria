@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PartyPresence : MonoBehaviour, IInteractable
 {
-    public PartyController partyController;
+    private PartyController partyController;
     public bool isPlayer;
 
     [SerializeField] private LordProfile lord;
@@ -31,6 +31,8 @@ public class PartyPresence : MonoBehaviour, IInteractable
     void Start()
     {
         InitializeParty();
+
+        gameObject.name = Lord.Lord.UnitName;
     }
 
     private void InitializeParty()
