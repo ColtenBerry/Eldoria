@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+
+[DefaultExecutionOrder(-80)]
 public class FactionsManager : MonoBehaviour
 {
     public static FactionsManager Instance { get; private set; }

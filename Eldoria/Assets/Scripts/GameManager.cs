@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
+
+[DefaultExecutionOrder(0)]
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -12,6 +14,10 @@ public class GameManager : MonoBehaviour
     private LordProfile playerProfile;
 
     public LordProfile PlayerProfile => playerProfile;
+
+    void OnEnable() => Debug.Log("GameManager enabled");
+    void OnDisable() => Debug.Log("GameManager disabled");
+
 
     void Awake()
     {
@@ -31,6 +37,9 @@ public class GameManager : MonoBehaviour
 
         // spawn player
         PartyPresence partyPresence = player.GetComponent<PartyPresence>();
+        if (partyPresence == null)
+            Debug.LogError("PartyPresence missing on player!");
+
 
         // Generate LordProfile
         playerProfile.AddActiveParty(partyPresence);
@@ -59,6 +68,10 @@ public class GameManager : MonoBehaviour
 
         GameObject newParty = Instantiate(partyPrefab, spawnPoint, Quaternion.identity);
         PartyPresence partyPresence = newParty.GetComponent<PartyPresence>();
+
+        if (partyPresence == null)
+            Debug.LogError("PartyPresence missing on " + lordProfile.Lord.UnitName + "!");
+
 
         lordProfile.AddActiveParty(partyPresence);
 

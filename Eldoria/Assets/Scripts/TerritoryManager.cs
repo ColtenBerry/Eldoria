@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[DefaultExecutionOrder(-90)]
 public class TerritoryManager : MonoBehaviour
 {
     public static TerritoryManager Instance { get; private set; }
