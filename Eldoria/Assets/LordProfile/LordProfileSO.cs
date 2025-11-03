@@ -10,9 +10,6 @@ public class LordProfileSO : ScriptableObject
     [Header("Faction")]
     public Faction faction;
 
-    [Header("Owned Territories")]
-    public List<Settlement> ownedTerritories;
-
     [Header("Starting Units")]
     public List<UnitData> startingUnits;
 }

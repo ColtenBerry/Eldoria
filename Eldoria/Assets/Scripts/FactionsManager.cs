@@ -13,7 +13,6 @@ public class FactionsManager : MonoBehaviour
     [SerializeField]
     private List<FactionPartyList> factionPartyView = new();
     private Dictionary<Faction, List<PartyPresence>> factionParties = new();
-    private Dictionary<Faction, HashSet<Settlement>> factionSettlements = new();
 
 
     private Dictionary<Faction, HashSet<Faction>> allies = new();
@@ -23,7 +22,10 @@ public class FactionsManager : MonoBehaviour
         return allies[a].Contains(b) || a == b;
     }
 
-    public bool AreEnemies(Faction a, Faction b) => enemies[a].Contains(b);
+    public bool AreEnemies(Faction a, Faction b)
+    {
+        return enemies.TryGetValue(a, out var enemySet) && enemySet.Contains(b);
+    }
 
 
     private void Awake()
@@ -42,6 +44,7 @@ public class FactionsManager : MonoBehaviour
 
     private void Start()
     {
+        InitializeFactionsFromLords();
         InitializeWars();
     }
     public Faction GetFactionByName(string name) =>
@@ -62,6 +65,23 @@ public class FactionsManager : MonoBehaviour
         allies[a].Add(b);
         allies[b].Add(a);
     }
+
+    public void InitializeFactionsFromLords()
+    {
+        AllFactions = LordRegistry.Instance
+            .GetAllLords()
+            .Select(l => l.Faction)
+            .Where(f => f != null)
+            .Distinct()
+            .ToList();
+
+        foreach (var faction in AllFactions)
+        {
+            if (!allies.ContainsKey(faction)) allies[faction] = new HashSet<Faction>();
+            if (!enemies.ContainsKey(faction)) enemies[faction] = new HashSet<Faction>();
+        }
+    }
+
 
     private void InitializeWars()
     {
@@ -87,10 +107,6 @@ public class FactionsManager : MonoBehaviour
     {
 
         var faction = party.Lord.Faction;
-
-        // Add to AllFactions if missing
-        if (!AllFactions.Contains(faction))
-            AllFactions.Add(faction);
 
         // Update internal dictionary
         if (!factionParties.ContainsKey(faction))
@@ -120,20 +136,6 @@ public class FactionsManager : MonoBehaviour
         viewEntry?.parties.Remove(party);
     }
 
-    public void RegisterTerritory(Settlement territory, Faction faction)
-    {
-        if (!factionSettlements.ContainsKey(faction))
-            factionSettlements[faction] = new HashSet<Settlement>();
-
-        factionSettlements[faction].Add(territory);
-    }
-
-    public void UnregisterTerritory(Settlement territory, Faction faction)
-    {
-        if (factionSettlements.ContainsKey(faction))
-            factionSettlements[faction].Remove(territory);
-    }
-
     public int GetFactionStrength(Faction faction)
     {
         if (!factionParties.ContainsKey(faction)) return 0;
@@ -142,6 +144,18 @@ public class FactionsManager : MonoBehaviour
             .Where(p => p != null)
             .Sum(p => p.GetStrengthEstimate());
     }
+
+    public List<Settlement> GetSettlementsOfFaction(Faction faction)
+    {
+        return TerritoryManager.Instance.GetSettlementsOfFaction(faction);
+    }
+
+    public List<LordProfile> GetLordsOfFaction(Faction faction)
+    {
+        return LordRegistry.Instance.GetLordsOfFaction(faction);
+    }
+
+
 }
 
 [System.Serializable]

@@ -3,18 +3,18 @@ using UnityEngine;
 
 public abstract class Settlement : MonoBehaviour, IInteractable
 {
-    [SerializeField]
-    protected Faction faction;
-    public Faction GetFaction() => faction;
-    [SerializeField]
-    protected string settlementName;
+    [SerializeField] protected string settlementName;
+    [SerializeField] protected int prosperity;
+
     public string GetSettlementName() => settlementName;
-    [SerializeField]
-    protected int prosperity;
     public int GetProsperity() => prosperity;
 
+    public Faction GetFaction() =>
+        TerritoryManager.Instance.GetLordOf(this)?.Faction;
+
+    public LordProfile GetOwner() =>
+        TerritoryManager.Instance.GetLordOf(this);
+
     public abstract List<InteractionOption> GetInteractionOptions();
-
     public abstract void Interact();
-
 }

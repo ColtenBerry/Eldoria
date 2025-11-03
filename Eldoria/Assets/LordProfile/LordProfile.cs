@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
@@ -5,43 +6,35 @@ using UnityEngine;
 public class LordProfile
 {
     private CharacterInstance lord;
-    private List<Settlement> ownedTerritories;
     private PartyPresence activeParty;
     private Faction faction;
     private List<UnitData> startingUnits;
 
     public CharacterInstance Lord => lord;
-    public List<Settlement> OwnedTerritories => ownedTerritories;
     public PartyPresence ActiveParty => activeParty;
     public Faction Faction => faction;
     public List<UnitData> StartingUnits => startingUnits;
+
+    public LordProfileSO SourceData { get; private set; }
 
 
     public LordProfile(LordProfileSO data)
     {
         lord = new CharacterInstance(data.lordData);
-        ownedTerritories = new List<Settlement>();
 
-        foreach (Settlement territoryData in data.ownedTerritories)
-        {
-            ownedTerritories.Add(territoryData);
-        }
         activeParty = null; // Can be assigned later when the party is spawned
 
         faction = data.faction;
 
         startingUnits = data.startingUnits;
+        SourceData = data;
     }
 
-    public void AddLand(Settlement settlement)
-    {
-        if (!OwnedTerritories.Contains(settlement)) OwnedTerritories.Add(settlement);
-    }
+    public List<Settlement> GetOwnedTerritories() =>
+    TerritoryManager.Instance.GetSettlementsOf(this);
 
-    public void RemoveLand(Settlement settlement)
-    {
-        OwnedTerritories.Remove(settlement);
-    }
+    public List<T> GetOwnedSettlementsOfType<T>() where T : Settlement =>
+        TerritoryManager.Instance.GetSettlementsOfType<T>(this);
 
     public void RemoveActiveParty()
     {

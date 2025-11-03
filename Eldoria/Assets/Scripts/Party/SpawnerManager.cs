@@ -49,6 +49,7 @@ public class SpawnerManager : MonoBehaviour
 
         // Generate LordProfile
         LordProfile profile = new LordProfile(banditLordTemplate);
+        LordRegistry.Instance.Register(profile);
         profile.AddActiveParty(partyPresence);
 
 
