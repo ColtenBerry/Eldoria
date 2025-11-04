@@ -16,6 +16,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Brigand Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 3056824623419625540, guid: e94a4bb33eb678c4da30a4a16a23b19c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3995047506523111344, guid: e94a4bb33eb678c4da30a4a16a23b19c, type: 3}
       propertyPath: moveSpeed
       value: 0.5
@@ -79,5 +83,31 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3056824623419625540, guid: e94a4bb33eb678c4da30a4a16a23b19c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8325454269471639905}
   m_SourcePrefab: {fileID: 100100000, guid: e94a4bb33eb678c4da30a4a16a23b19c, type: 3}
+--- !u!1 &3631098774120739566 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3056824623419625540, guid: e94a4bb33eb678c4da30a4a16a23b19c, type: 3}
+  m_PrefabInstance: {fileID: 1731709734656582314}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-8325454269471639905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3631098774120739566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73d1f256b81220b48a389afe3f313566, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentState: 0
+  strengthPercent: 0.25
+  nearbyEnemies: []
+  nearbyAllies: []
+  directionChangeInterval: 5
+  wanderRadius: 10

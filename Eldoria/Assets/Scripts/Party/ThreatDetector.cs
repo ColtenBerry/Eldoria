@@ -3,13 +3,13 @@ using UnityEngine;
 public class ThreatDetector : MonoBehaviour
 {
     [SerializeField] private float detectionRange = 5f; // detection for parties to chase / flee
-    private NPCStateMachine npc;
+    private BaseNPCStateMachine npc;
     private PartyPresence self;
     private CircleCollider2D detectionCollider;
 
     void Awake()
     {
-        npc = GetComponentInParent<NPCStateMachine>();
+        npc = GetComponentInParent<BaseNPCStateMachine>();
         self = GetComponentInParent<PartyPresence>();
 
         detectionCollider = GetComponent<CircleCollider2D>();

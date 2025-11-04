@@ -226,7 +226,6 @@ GameObject:
   - component: {fileID: 8255052441302732649}
   - component: {fileID: 7551585776252368353}
   - component: {fileID: 3829685204394496096}
-  - component: {fileID: 1251759580682807051}
   - component: {fileID: 1476042736481506817}
   m_Layer: 6
   m_Name: PartyPrefab
@@ -382,24 +381,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
---- !u!114 &1251759580682807051
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3056824623419625540}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44815c1cf1e585b498978034929d60c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentState: 0
-  directionChangeInterval: 5
-  wanderRadius: 10
-  strengthPercent: 0.25
-  nearbyEnemies: []
-  nearbyAllies: []
 --- !u!58 &1476042736481506817
 CircleCollider2D:
   m_ObjectHideFlags: 0

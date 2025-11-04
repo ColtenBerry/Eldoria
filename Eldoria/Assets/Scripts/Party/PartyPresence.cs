@@ -79,7 +79,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
                 ));
         }
         options.Add(new InteractionOption("Talk to Leader", () => Debug.Log("Attempting to spaek")));
-        options.Add(new InteractionOption("Leave", () => Debug.Log("Attempting to Leave")));
+        options.Add(new InteractionOption("Leave", () => InputGate.OnMenuClosed?.Invoke()));
 
 
         return options;
