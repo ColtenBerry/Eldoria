@@ -12,4 +12,7 @@ public class LordProfileSO : ScriptableObject
 
     [Header("Starting Units")]
     public List<UnitData> startingUnits;
+
+    [Header("Economy")]
+    public int startingGold = 5000;
 }

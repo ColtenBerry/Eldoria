@@ -9,10 +9,12 @@ public class LordProfile
     private PartyPresence activeParty;
     private Faction faction;
     private List<UnitData> startingUnits;
+    private int goldAmount;
 
     public CharacterInstance Lord => lord;
     public PartyPresence ActiveParty => activeParty;
     public Faction Faction => faction;
+    public int GoldAmount => goldAmount;
     public List<UnitData> StartingUnits => startingUnits;
 
     public LordProfileSO SourceData { get; private set; }
@@ -27,6 +29,7 @@ public class LordProfile
         faction = data.faction;
 
         startingUnits = data.startingUnits;
+        goldAmount = data.startingGold;
         SourceData = data;
     }
 
@@ -51,5 +54,10 @@ public class LordProfile
 
         activeParty = party;
         party.SetLordProfile(this);
+    }
+
+    public void ChangeGold(int amount)
+    {
+        goldAmount = goldAmount + amount;
     }
 }

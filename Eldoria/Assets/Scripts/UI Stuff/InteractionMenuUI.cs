@@ -11,6 +11,7 @@ public class InteractionMenuUI : MonoBehaviour
     private void OnEnable()
     {
         InputGate.OnMenuOpened?.Invoke();
+        StatsPanelUIController.NotifyProfileUpdated();
         // Optionally disable HUD buttons here if needed
     }
 
