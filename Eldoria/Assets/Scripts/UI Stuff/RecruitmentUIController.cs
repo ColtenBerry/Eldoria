@@ -22,8 +22,8 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
             // add troops to party
             foreach (UnitInstance unit in potentialRecruits)
             {
-                playerParty.AddUnit(unit);
-                recruitmentSource.recruitUnit(unit);
+                if (playerParty.AddUnit(unit))
+                    recruitmentSource.recruitUnit(unit);
             }
             potentialRecruits.Clear();
             GetRecruits();

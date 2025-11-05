@@ -10,7 +10,7 @@ public class RecruitmentSource : MonoBehaviour
 
     void Awake()
     {
-        CalculatePorentiallyRecruitableUnits();
+        CalculatePotentiallyRecruitableUnits();
     }
 
     public List<UnitInstance> GetRecruitableUnits()
@@ -18,7 +18,7 @@ public class RecruitmentSource : MonoBehaviour
         return recruitableUnits;
     }
 
-    public void CalculatePorentiallyRecruitableUnits()
+    public void CalculatePotentiallyRecruitableUnits()
     {
         recruitableUnits.Clear();
         // generate unit list

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public enum NPCIntent
@@ -16,7 +17,7 @@ public enum NPCIntent
     PatrolTerritory
 }
 
-
+[RequireComponent(typeof(PartyController))]
 public class LordNPCStateMachine : BaseNPCStateMachine
 {
 
@@ -26,6 +27,17 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     [SerializeField] private NPCIntent currentIntent;
     [SerializeField] private NPCIntent previousIntent;
     private LordProfile currentLord;
+    private PartyController partyController;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        partyController = GetComponent<PartyController>();
+        if (partyController == null)
+        {
+            Debug.LogWarning("Expecte4d PartyController");
+        }
+    }
 
 
     void Initialize()
@@ -89,31 +101,23 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     private void MakeIndividualDecision()
     {
         Initialize();
-        if (currentLord == null && true) return;
+        if (currentLord == null) return;
         // choose to recruit, sit in fief, upgrade fief, patrol lands, etc.
         GameObject objective;
+
         if (ShouldRecruit())
         {
             currentIntent = NPCIntent.RecruitTroops;
-            // get closest owned settlement with recruits
+
             List<Settlement> ownedSettlements = TerritoryManager.Instance.GetSettlementsOf(currentLord);
-            var targetSettlement = ownedSettlements.Where(s =>
-        {
-            var source = s.GetComponent<RecruitmentSource>();
-            return source != null && source.GetRecruitableUnits().Count > 0;
-        })
-        .OrderBy(s => Vector3.Distance(s.transform.position, transform.position))
-        .FirstOrDefault();
+            List<Settlement> validRecruitmentSources = ownedSettlements.FindAll(settlement =>
+        settlement.TryGetComponent<RecruitmentSource>(out var source) &&
+        source.GetRecruitableUnits().Count > 0);
 
-            if (targetSettlement == null)
-            {
-                Debug.LogWarning($"{name} could not find a recruitable settlement.");
-                return;
-            }
+            List<GameObject> recruitmentGameObjects = validRecruitmentSources
+                .ConvertAll(settlement => settlement.gameObject);
 
-            objective = targetSettlement.gameObject;
-
-
+            objective = GetClosest(recruitmentGameObjects);
         }
 
         else
@@ -131,7 +135,12 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         {
             currentPath.Clear();
 
-            GeneratePathTO(intentLocation);
+            GeneratePathTo(intentLocation);
+
+            if (previousIntent == NPCIntent.WaitInFief)
+            {
+                LeaveFief();
+            }
 
             previousIntent = currentIntent;
         }
@@ -142,7 +151,13 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             switch (currentIntent)
             {
                 case NPCIntent.RecruitTroops:
-                    Recruit();
+                    Debug.Log("Attempting to get recruitment source");
+                    RecruitmentSource source = objective.GetComponent<RecruitmentSource>();
+                    if (source == null)
+                    {
+                        Debug.Log("Recruitment source is null");
+                    }
+                    Recruit(source);
                     break;
                 case NPCIntent.WaitInFief:
                     WaitInFief();
@@ -157,18 +172,77 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
     private bool ShouldRecruit()
     {
+        if (partyController.MaxPartyMembers == partyController.PartyMembers.Count)
+        {
+            return false;
+        }
         // should recruit logic
-        return false;
+        List<Settlement> ownedSettlements = TerritoryManager.Instance.GetSettlementsOf(currentLord);
+        List<Settlement> validRecruitmentSources = ownedSettlements.FindAll(settlement =>
+    settlement.TryGetComponent<RecruitmentSource>(out var source) &&
+    source.GetRecruitableUnits().Count > 0);
+        return validRecruitmentSources.Count > 0;
     }
 
-    private void Recruit()
+    private void Recruit(RecruitmentSource source)
     {
-        // code
+        Debug.Log("Attempting Recruit");
+        if (source == null)
+        {
+            Debug.LogWarning("Recruitment source is null");
+            return;
+        }
+
+        List<UnitInstance> recruits = new List<UnitInstance>(source.GetRecruitableUnits());
+
+        for (int i = recruits.Count - 1; i >= 0; i--)
+        {
+            UnitInstance unit = recruits[i];
+            Debug.Log("Attempting to recruit: " + unit.UnitName);
+
+            if (partyController.AddUnit(unit))
+            {
+                source.recruitUnit(unit); // remove from source
+            }
+        }
     }
 
     public void WaitInFief()
     {
         // code
+        gameObject.layer = LayerMask.NameToLayer("");
+        SetTransparency(gameObject, 0.0f);
+    }
+
+    public void LeaveFief()
+    {
+        gameObject.layer = LayerMask.NameToLayer("Interactable");
+        SetTransparency(gameObject, 1.0f);
+    }
+
+    public void SetTransparency(GameObject root, float alpha)
+    {
+        foreach (var sr in root.GetComponentsInChildren<SpriteRenderer>(includeInactive: true))
+        {
+            Color color = sr.color;
+            color.a = alpha;
+            sr.color = color;
+        }
+
+        // Handle TextMeshPro components
+        foreach (var tmp in root.GetComponentsInChildren<TextMeshPro>(includeInactive: true))
+        {
+            Color color = tmp.color;
+            color.a = alpha;
+            tmp.color = color;
+        }
+
+        foreach (var tmpUGUI in root.GetComponentsInChildren<TextMeshProUGUI>(includeInactive: true))
+        {
+            Color color = tmpUGUI.color;
+            color.a = alpha;
+            tmpUGUI.color = color;
+        }
     }
 
 
@@ -194,11 +268,29 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     }
 
 
-    private void GeneratePathTO(Vector3 destination)
+    private void GeneratePathTo(Vector3 destination)
     {
         List<Vector3> path = PathfindingManager.Instance.FindPath(transform.position, destination);
-        currentPath = path != null ? new Queue<Vector3>(path) : new Queue<Vector3>();
+
+        // If a valid path was found, add the exact destination as the final step
+        if (path != null && path.Count > 0)
+        {
+            Vector3 finalStep = destination;
+
+            // Only add final step if it's not already close to the last path point
+            if (Vector3.Distance(path[^1], finalStep) > 0.05f)
+            {
+                path.Add(finalStep);
+            }
+
+            currentPath = new Queue<Vector3>(path);
+        }
+        else
+        {
+            currentPath = new Queue<Vector3>();
+        }
     }
+
 
     private void MoveTowardsNextTileInPath()
     {
@@ -210,6 +302,26 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
         if (IsCloseTo(next))
             currentPath.Dequeue();
+    }
+
+    private GameObject GetClosest(List<GameObject> objects)
+    {
+        GameObject closest = null;
+        float shortestDistance = float.MaxValue;
+
+        foreach (GameObject obj in objects)
+        {
+            if (obj == null) continue;
+
+            float distance = Vector3.Distance(transform.position, obj.transform.position);
+            if (distance < shortestDistance)
+            {
+                shortestDistance = distance;
+                closest = obj;
+            }
+        }
+
+        return closest;
     }
 
 }
