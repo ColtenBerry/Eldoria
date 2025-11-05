@@ -59,8 +59,11 @@ public class TerritoryManager : MonoBehaviour
     public LordProfile GetLordOf(Settlement settlement) =>
         settlementToLord.TryGetValue(settlement, out var lord) ? lord : null;
 
-    public List<Settlement> GetSettlementsOf(LordProfile lord) =>
-        lordToSettlements.TryGetValue(lord, out var list) ? list : new List<Settlement>();
+    public List<Settlement> GetSettlementsOf(LordProfile lord)
+    {
+        Debug.Log("Attempting to get settlements of lord by name: " + lord.Lord.UnitName);
+        return lordToSettlements.TryGetValue(lord, out var list) ? list : new List<Settlement>();
+    }
 
     public List<Settlement> GetSettlementsOfFaction(Faction faction)
     {

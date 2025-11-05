@@ -61,7 +61,7 @@ public class BrigandNPCStateMachine : BaseNPCStateMachine
         Wander();
     }
 
-    protected override void SetTransitionActions()
+    protected override void ExecuteTransitionActions()
     {
         if (currentState == NPCState.Idle)
         {

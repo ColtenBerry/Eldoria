@@ -35,7 +35,7 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
 
         if (currentState != previousState)
         {
-            SetTransitionActions();
+            ExecuteTransitionActions();
         }
 
         switch (currentState)
@@ -56,7 +56,7 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
     }
 
     protected abstract void SetIdleBehavior();
-    protected abstract void SetTransitionActions(); // for actions that need to be taken when changing states
+    protected abstract void ExecuteTransitionActions(); // for actions that need to be taken when changing states
 
     protected Vector3 targetDirection;
 
@@ -185,6 +185,12 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
     {
         movementController.MoveTowards(target);
     }
+
+    protected bool IsCloseTo(Vector3 target, float threshold = 0.05f)
+    {
+        return Vector3.Distance(transform.position, target) < threshold;
+    }
+
 
 }
 
