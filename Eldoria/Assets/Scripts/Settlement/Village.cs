@@ -14,8 +14,7 @@ public class Village : Settlement
         options.Add(new InteractionOption("Recruit", () => Debug.Log("Attempting to Recruit"), "recruit"));
         options.Add(new InteractionOption("Leave", () =>
         {
-            Debug.Log("Attempting to leave");
-            InputGate.OnMenuClosed?.Invoke();
+            UIManager.Instance.CloseAllMenus();
 
         })
         );

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
@@ -6,6 +7,8 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private MainMenuController mainMenuController;
     [SerializeField] private WaitingMenuController waitingMenuController;
+    [SerializeField] private InteractionMenuUI interactionMenuUI;
+
 
     private void Awake()
     {
@@ -21,27 +24,59 @@ public class UIManager : MonoBehaviour
     {
         mainMenuController.gameObject.SetActive(true);
         mainMenuController.OpenSubMenu("CombatMenu", new CombatMenuContext(enemyParty, isPlayerAttacking));
+        InputGate.OnMenuOpened?.Invoke();
+        TimeGate.PauseTime();
     }
 
     public void OpenSubMenu(string id, object context = null)
     {
         mainMenuController.gameObject.SetActive(true);
         mainMenuController.OpenSubMenu(id, context);
+        InputGate.OnMenuOpened?.Invoke();
+        TimeGate.PauseTime();
     }
 
     public void OpenWaitingMenu(string key)
     {
         waitingMenuController.gameObject.SetActive(true);
         waitingMenuController.OpenMenu(key);
+        InputGate.OnMenuOpened?.Invoke();
+        TimeGate.ResumeTime(); // the interaction menu pauses time so we must resume it
     }
 
-    public void CloseWaitingMenu()
+    public void OpenInteractionMenu(List<InteractionOption> options, IInteractable interactable)
     {
-        waitingMenuController.gameObject.SetActive(false);
+        interactionMenuUI.ShowOptions(options, interactable);
+        interactionMenuUI.gameObject.SetActive(true);
+        InputGate.OnMenuOpened?.Invoke();
+        TimeGate.PauseTime();
     }
 
     public void CloseAllMenus()
     {
         mainMenuController.CloseAllMenus();
+        waitingMenuController.gameObject.SetActive(false);
+        InputGate.OnMenuClosed?.Invoke();
+        TimeGate.ResumeTime();
+    }
+}
+
+
+public static class TimeGate
+{
+    public static bool IsTimePaused { get; private set; }
+
+    public static void PauseTime()
+    {
+        if (IsTimePaused) return;
+        IsTimePaused = true;
+        TickManager.Instance.PauseTicks();
+    }
+
+    public static void ResumeTime()
+    {
+        if (!IsTimePaused) return;
+        IsTimePaused = false;
+        TickManager.Instance.ResumeTicks();
     }
 }

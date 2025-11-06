@@ -50,7 +50,7 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
             }
 
             // close menu
-            InputGate.OnMenuClosed?.Invoke();
+            UIManager.Instance.CloseAllMenus();
         });
     }
 

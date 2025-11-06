@@ -28,7 +28,7 @@ public class WaitingMenuController : MonoBehaviour
 
         stopButton.onClick.AddListener(() =>
         {
-            gameObject.SetActive(false);
+            UIManager.Instance.CloseAllMenus();
         });
     }
 

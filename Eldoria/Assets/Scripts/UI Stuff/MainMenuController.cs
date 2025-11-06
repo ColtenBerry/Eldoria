@@ -14,7 +14,6 @@ public abstract class MenuController : MonoBehaviour
     protected virtual void OnDisable()
     {
         InputGate.OnMenuClosed -= HandleClose;
-
     }
 
     protected virtual void HandleClose()
@@ -29,25 +28,36 @@ public class MainMenuController : MenuController
 {
     [SerializeField] private Button closeButton;
     [SerializeField] private List<SubMenuEntry> subMenuEntries;
-    [SerializeField] private InteractionMenuUI interactionMenu;
 
     private Dictionary<string, GameObject> subMenus;
 
     private void Awake()
     {
-        closeButton.onClick.AddListener(() => InputGate.OnMenuClosed?.Invoke());
+        closeButton.onClick.AddListener(() => UIManager.Instance.CloseAllMenus());
+
+        InitializeIfNeeded();
+    }
+
+    private bool isInitialized = false;
+
+    private void InitializeIfNeeded()
+    {
+        if (isInitialized) return;
 
         subMenus = new();
         foreach (var entry in subMenuEntries)
         {
-            if (!subMenus.ContainsKey(entry.id))
+            if (entry.panel != null && !subMenus.ContainsKey(entry.id))
                 subMenus.Add(entry.id, entry.panel);
         }
+
+        isInitialized = true;
     }
+
 
     public void OpenSubMenu(string id, object context = null)
     {
-        InputGate.OnMenuOpened?.Invoke();
+        InitializeIfNeeded();
 
         foreach (var panel in subMenus.Values)
             panel.SetActive(false);
@@ -69,10 +79,9 @@ public class MainMenuController : MenuController
 
     public void CloseAllMenus()
     {
+        InitializeIfNeeded();
         foreach (var panel in subMenus.Values)
             panel.SetActive(false);
-        interactionMenu.gameObject.SetActive(false);
-        InputGate.OnMenuClosed?.Invoke();
         gameObject.SetActive(false);
     }
 }

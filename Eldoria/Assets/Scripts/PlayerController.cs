@@ -10,7 +10,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private InventoryManager playerInventoryManager;
 
-    public InteractionMenuUI menuUI;
 
     // public float moveSpeed = 5f;
     private Vector2 targetPosition;
@@ -65,7 +64,7 @@ public class PlayerController : MonoBehaviour
                     // pendingInteraction.Interact();
                     List<InteractionOption> options = pendingInteraction.GetInteractionOptions();
                     // display the options
-                    menuUI.ShowOptions(options, pendingInteraction);
+                    UIManager.Instance.OpenInteractionMenu(options, pendingInteraction);
                 }
             }
 

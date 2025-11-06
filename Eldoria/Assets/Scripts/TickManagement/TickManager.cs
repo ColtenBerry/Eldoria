@@ -30,14 +30,10 @@ public class TickManager : MonoBehaviour
             return;
         }
         Instance = this;
-        InputGate.OnMenuOpened += PauseTicks;
-        InputGate.OnMenuClosed += ResumeTicks;
     }
 
     private void OnDestroy()
     {
-        InputGate.OnMenuOpened -= PauseTicks;
-        InputGate.OnMenuClosed -= ResumeTicks;
     }
 
     private void Update()

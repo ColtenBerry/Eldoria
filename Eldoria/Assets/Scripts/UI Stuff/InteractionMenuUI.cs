@@ -10,7 +10,6 @@ public class InteractionMenuUI : MonoBehaviour
 
     private void OnEnable()
     {
-        InputGate.OnMenuOpened?.Invoke();
         StatsPanelUIController.NotifyProfileUpdated();
         // Optionally disable HUD buttons here if needed
     }
@@ -22,8 +21,6 @@ public class InteractionMenuUI : MonoBehaviour
 
     public void ShowOptions(List<InteractionOption> options, IInteractable source)
     {
-        gameObject.SetActive(true);
-
         // Clear previous buttons
         foreach (Transform child in buttonContainer)
             Destroy(child.gameObject);

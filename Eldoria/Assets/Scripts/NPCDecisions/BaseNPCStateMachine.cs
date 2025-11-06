@@ -29,7 +29,7 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
     public List<PartyPresence> nearbyAllies = new();
     protected virtual void FixedUpdate()
     {
-        if (InputGate.IsUIBlockingGameInput) return;
+        if (!TickManager.Instance.IsTicking) return;
 
         EvaluateGroupThreat();
 

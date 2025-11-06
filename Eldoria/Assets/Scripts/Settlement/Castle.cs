@@ -80,13 +80,14 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
             options.Add(new InteractionOption("Wait Inside", () => WaitInsideCastle()));
         }
 
-        options.Add(new InteractionOption("Leave", () => { InputGate.OnMenuClosed?.Invoke(); }));
+        options.Add(new InteractionOption("Leave", () => { UIManager.Instance.CloseAllMenus(); }));
         return options;
     }
 
     private void WaitInsideCastle()
     {
         // open wait menu
+        UIManager.Instance.OpenWaitingMenu("wait");
     }
 
     private void BesiegeCastle()
@@ -149,7 +150,7 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
             // begin battle
             if (siegeByPlayer)
             {
-                UIManager.Instance.CloseWaitingMenu();
+                UIManager.Instance.CloseAllMenus();
                 CombatSimulator.InitiateCombat(garrisonController, true);
             }
 
