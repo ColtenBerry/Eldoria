@@ -33,7 +33,12 @@ public static class CombatSimulator
 
 
 
-
+    /// <summary>
+    /// Simulates the battle itself
+    /// </summary>
+    /// <param name="party1"></param>
+    /// <param name="party2"></param>
+    /// <returns></returns>
     public static CombatResult SimulateBattle(List<UnitInstance> party1, List<UnitInstance> party2)
     {
         CombatResult result = new CombatResult
