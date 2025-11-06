@@ -54,6 +54,14 @@ public class TerritoryManager : MonoBehaviour
 
         if (!lordToSettlements[lord].Contains(settlement))
             lordToSettlements[lord].Add(settlement);
+
+        if (settlement is IHasBoundVillages binder)
+        {
+            foreach (var village in binder.BoundVillages)
+            {
+                RegisterOwnership(village, lord);
+            }
+        }
     }
 
     public LordProfile GetLordOf(Settlement settlement) =>

@@ -1,13 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Castle : Settlement
+public class Castle : Settlement, IHasBoundVillages
 {
     private PartyController garrisonController;
 
     public PartyController GarrisonController => garrisonController;
 
     [SerializeField] private int defenseBonus = 20;
+
+    [SerializeField] private List<Village> boundVillages;
+
+    public List<Village> BoundVillages => boundVillages;
 
 
     void Awake()

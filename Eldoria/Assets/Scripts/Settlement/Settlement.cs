@@ -3,8 +3,9 @@ using UnityEngine;
 
 public abstract class Settlement : MonoBehaviour, IInteractable
 {
-    [SerializeField][ReadOnly] protected string settlementName;
+    protected string settlementName;
     [SerializeField] protected int prosperity;
+
 
     public virtual void Start()
     {

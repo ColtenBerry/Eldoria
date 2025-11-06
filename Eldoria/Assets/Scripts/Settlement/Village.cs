@@ -4,6 +4,7 @@ using UnityEngine;
 public class Village : Settlement
 {
 
+
     public override List<InteractionOption> GetInteractionOptions()
     {
         List<InteractionOption> options = new();

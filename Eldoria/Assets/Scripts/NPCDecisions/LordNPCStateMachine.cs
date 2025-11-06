@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -37,16 +38,48 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         {
             Debug.LogWarning("Expecte4d PartyController");
         }
+        StartCoroutine(WaitForLord());
     }
 
-
-    void Initialize()
+    private IEnumerator WaitForLord()
     {
-        if (currentLord != null) return;
-        currentLord = LordRegistry.Instance.GetLordByName(gameObject.name);
-        Debug.Log("Current lord is " + currentLord.Lord.UnitName);
+        Debug.Log("📌 Starting WaitForLord coroutine...");
 
+        // Wait until LordRegistry is initialized
+        while (LordRegistry.Instance == null)
+        {
+            Debug.Log("⏳ Waiting for LordRegistry.Instance...");
+            yield return null;
+        }
+
+        // Wait until the lord is found
+        while (currentLord == null)
+        {
+            currentLord = LordRegistry.Instance.GetLordByName(gameObject.name);
+            if (currentLord == null)
+            {
+                Debug.Log("⏳ Waiting for currentLord to be assigned...");
+                yield return null;
+            }
+        }
+
+        Debug.Log("✅ Current lord is " + currentLord.Lord.UnitName);
     }
+
+
+    // void Initialize()
+    // {
+
+    //     //TODO: change this to a coroutine to run in awake until currentLord != null. Look at statspaneluicontroller for reference
+    //     if (currentLord != null) return;
+    //     currentLord = LordRegistry.Instance.GetLordByName(gameObject.name);
+    //     Debug.Log("Current lord is " + currentLord.Lord.UnitName);
+
+    // }
+
+    /// <summary>
+    /// Idle Behavior determines what behavior to call when no immediate threat or easy target is presented
+    /// </summary>
     protected override void SetIdleBehavior()
     {
         if (currentOrder == null)
@@ -98,15 +131,45 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         else MoveTowardsNextTileInPath(); // move to spot
     }
 
+    /*
+        So something I noticed about makeindividual decision is a lot of methods will be repeated. For example, in shouldrecruit() we have
+        to check if there are fiefs we can recruit, but shouldrecruit returns a bool so we have to go through all that logic again to get a suitable 
+        target to recruit from
+
+        We should make a list of private fields that we can use to store this information
+
+        I am almost tempted to make a new object for the intent where we can store this relevant information. Kind of like faction order. 
+
+        For the defensive options, it doesn't make sense to constantly check if a territory is under siege. That should be an alert that is sent to us. 
+        Not sure how to do that though...
+    */
+
+
+    private List<Settlement> unPatrolledLands = new();
+
+    private GameObject previousObjective;
+
+    /// <summary>
+    /// Current Faction Order is null, assess situation and create a local decision
+    /// </summary>
     private void MakeIndividualDecision()
     {
-        Initialize();
         if (currentLord == null) return;
         // choose to recruit, sit in fief, upgrade fief, patrol lands, etc.
         GameObject objective;
 
-        if (ShouldRecruit())
+        if (ShouldDefendFief())
         {
+            // travel to fief. Maybe pick the most valuable fief / closest fief under attack
+            List<Settlement> ownedSettlements = TerritoryManager.Instance.GetSettlementsOf(currentLord);
+            objective = ownedSettlements.First().gameObject;
+
+        }
+
+
+        else if (ShouldRecruit())
+        {
+            Debug.Log("should recruit. doing recruit if statemetn");
             currentIntent = NPCIntent.RecruitTroops;
 
             List<Settlement> ownedSettlements = TerritoryManager.Instance.GetSettlementsOf(currentLord);
@@ -120,6 +183,16 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             objective = GetClosest(recruitmentGameObjects);
         }
 
+
+        else if (ShouldPatrol())
+        {
+            Debug.Log("Intending to Patrol");
+            // get closest land in unpatrolled lands
+            List<GameObject> unPatrolledLandsGO = unPatrolledLands.ConvertAll(settlement => settlement.gameObject);
+            objective = GetClosest(unPatrolledLandsGO);
+        }
+
+
         else
         {
             // get owned fief to sit in. 
@@ -131,7 +204,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
         Vector3 intentLocation = objective.transform.position;
         // check previous intent against current intent
-        if (previousIntent != currentIntent)
+        if (previousIntent != currentIntent || previousObjective != objective)
         {
             currentPath.Clear();
 
@@ -143,6 +216,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             }
 
             previousIntent = currentIntent;
+            previousObjective = objective;
         }
 
         if (IsCloseTo(intentLocation))
@@ -162,12 +236,46 @@ public class LordNPCStateMachine : BaseNPCStateMachine
                 case NPCIntent.WaitInFief:
                     WaitInFief();
                     break;
+                case NPCIntent.PatrolTerritory:
+                    Debug.Log("Attempting to get settlement script");
+                    Settlement settlement = objective.GetComponent<Settlement>();
+                    if (settlement == null)
+                    {
+                        Debug.Log("settlement script is null");
+                    }
+                    PatrolLand(settlement);
+                    break;
             }
         }
         else
         {
             MoveTowardsNextTileInPath();
         }
+    }
+
+    private bool ShouldPatrol()
+    {
+        return unPatrolledLands.Count > 0;
+    }
+
+    private void PatrolLand(Settlement land)
+    {
+        // do patrol thing? 
+
+        // drop the land
+        unPatrolledLands.Remove(land);
+    }
+
+    private void ResetPatrolledLands()
+    {
+        unPatrolledLands.Clear();
+        unPatrolledLands.AddRange(TerritoryManager.Instance.GetSettlementsOf(currentLord));
+    }
+
+    private bool ShouldDefendFief()
+    {
+        return false;
+        // i should get an alert saying my lands are under attack. Then i should return true
     }
 
     private bool ShouldRecruit()
