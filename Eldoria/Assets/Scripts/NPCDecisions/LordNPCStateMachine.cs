@@ -29,6 +29,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     [SerializeField] private NPCIntent previousIntent;
     private LordProfile currentLord;
     private PartyController partyController;
+    private PartyPresence partyPresence;
 
     protected override void Awake()
     {
@@ -38,6 +39,13 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         {
             Debug.LogWarning("Expecte4d PartyController");
         }
+
+        partyPresence = GetComponent<PartyPresence>();
+        if (partyPresence == null)
+        {
+            Debug.LogWarning("Expecte4d partypresence");
+        }
+
         StartCoroutine(WaitForLord());
     }
 
@@ -212,7 +220,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
             if (previousIntent == NPCIntent.WaitInFief)
             {
-                LeaveFief();
+                partyPresence.LeaveFief();
             }
 
             previousIntent = currentIntent;
@@ -234,7 +242,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
                     Recruit(source);
                     break;
                 case NPCIntent.WaitInFief:
-                    WaitInFief();
+                    partyPresence.WaitInFief();
                     break;
                 case NPCIntent.PatrolTerritory:
                     Debug.Log("Attempting to get settlement script");
@@ -314,47 +322,6 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             }
         }
     }
-
-    public void WaitInFief()
-    {
-        // code
-        gameObject.layer = LayerMask.NameToLayer("");
-        SetTransparency(gameObject, 0.0f);
-    }
-
-    public void LeaveFief()
-    {
-        gameObject.layer = LayerMask.NameToLayer("Interactable");
-        SetTransparency(gameObject, 1.0f);
-    }
-
-    public void SetTransparency(GameObject root, float alpha)
-    {
-        foreach (var sr in root.GetComponentsInChildren<SpriteRenderer>(includeInactive: true))
-        {
-            Color color = sr.color;
-            color.a = alpha;
-            sr.color = color;
-        }
-
-        // Handle TextMeshPro components
-        foreach (var tmp in root.GetComponentsInChildren<TextMeshPro>(includeInactive: true))
-        {
-            Color color = tmp.color;
-            color.a = alpha;
-            tmp.color = color;
-        }
-
-        foreach (var tmpUGUI in root.GetComponentsInChildren<TextMeshProUGUI>(includeInactive: true))
-        {
-            Color color = tmpUGUI.color;
-            color.a = alpha;
-            tmpUGUI.color = color;
-        }
-    }
-
-
-
     protected override void ExecuteTransitionActions()
     {
     }

@@ -114,5 +114,43 @@ public class PartyPresence : MonoBehaviour, IInteractable
         lord = profile;
     }
 
+    public void SetTransparency(GameObject root, float alpha)
+    {
+        foreach (var sr in root.GetComponentsInChildren<SpriteRenderer>(includeInactive: true))
+        {
+            Color color = sr.color;
+            color.a = alpha;
+            sr.color = color;
+        }
+
+        // Handle TextMeshPro components
+        foreach (var tmp in root.GetComponentsInChildren<TextMeshPro>(includeInactive: true))
+        {
+            Color color = tmp.color;
+            color.a = alpha;
+            tmp.color = color;
+        }
+
+        foreach (var tmpUGUI in root.GetComponentsInChildren<TextMeshProUGUI>(includeInactive: true))
+        {
+            Color color = tmpUGUI.color;
+            color.a = alpha;
+            tmpUGUI.color = color;
+        }
+    }
+
+    public void WaitInFief()
+    {
+        // code
+        gameObject.layer = LayerMask.NameToLayer("");
+        SetTransparency(gameObject, 0.0f);
+    }
+
+    public void LeaveFief()
+    {
+        gameObject.layer = LayerMask.NameToLayer("Interactable");
+        SetTransparency(gameObject, 1.0f);
+    }
+
 
 }

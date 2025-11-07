@@ -88,6 +88,7 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
     {
         // open wait menu
         UIManager.Instance.OpenWaitingMenu("wait");
+        GameManager.Instance.player.GetComponent<PartyPresence>().WaitInFief();
     }
 
     private void BesiegeCastle()
