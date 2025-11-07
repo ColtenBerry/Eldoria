@@ -8,7 +8,7 @@ using UnityEngine;
 public static class CombatSimulator
 {
     public static Action<PartyController, bool> OnCombatMenuRequested;
-    public static void InitiateCombat(PartyController enemyParty, bool isPlayerAttacking)
+    public static void InitiateCombat(PartyController enemyParty, bool isPlayerAttacking, string enemyName)
     {
         Debug.Log("Initiating player-involved combat");
 
@@ -18,10 +18,10 @@ public static class CombatSimulator
             return;
         }
 
-        UIManager.Instance.OpenSubMenu("combat", new CombatMenuContext(enemyParty, isPlayerAttacking));
+        UIManager.Instance.OpenSubMenu("combat", new CombatMenuContext(enemyParty, isPlayerAttacking, enemyName));
     }
 
-    public static void InitiateCombat(PartyController party1, PartyController party2)
+    public static CombatResult InitiateCombat(PartyController party1, PartyController party2)
     {
 
         // auto battle: 
@@ -29,6 +29,32 @@ public static class CombatSimulator
 
         // apply result
         CombatOutcomeProcessor.ApplyCombatResult(result, party1, party2);
+
+        return result;
+    }
+
+    public static CombatResult InitiateSiegeBattle(PartyController attacker, PartyController garrison, Settlement targetFief)
+    {
+        Debug.Log("Initiating siege battle");
+
+        CombatResult result = SimulateBattle(attacker.PartyMembers, garrison.PartyMembers);
+
+
+
+        // will wipe garrison or wipe party
+        CombatOutcomeProcessor.ApplyCombatResult(result, attacker, garrison);
+
+        return result;
+
+    }
+
+    public static void InitiateSiegeBattle(PartyController notPlayerPartyController, Settlement targetFief, bool isPlayerAttacking, string enemyName)
+    {
+        Debug.Log("Initiating siege battle");
+
+        CombatMenuContext ctx = new CombatMenuContext(notPlayerPartyController, isPlayerAttacking, enemyName, true, targetFief);
+
+        UIManager.Instance.OpenCombatMenu(ctx);
     }
 
 

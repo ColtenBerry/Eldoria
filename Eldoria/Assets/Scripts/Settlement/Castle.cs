@@ -39,7 +39,7 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
 
     }
 
-    private void ApplyVisuals()
+    public override void ApplyVisuals()
     {
         SpriteRenderer spriteRenderer = transform.Find("LeftFlag").GetComponent<SpriteRenderer>();
         spriteRenderer.color = GetFaction().factionColor;
@@ -151,12 +151,12 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
             if (siegeByPlayer)
             {
                 UIManager.Instance.CloseAllMenus();
-                CombatSimulator.InitiateCombat(garrisonController, true);
+                CombatSimulator.InitiateSiegeBattle(garrisonController, this, true, settlementName + " garrison");
             }
 
             else
             {
-                CombatSimulator.InitiateCombat(siegeAttacker, garrisonController);
+                CombatSimulator.InitiateSiegeBattle(siegeAttacker, garrisonController, this);
             }
 
             // siege is over

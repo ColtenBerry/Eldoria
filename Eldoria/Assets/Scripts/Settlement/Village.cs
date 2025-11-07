@@ -3,7 +3,10 @@ using UnityEngine;
 
 public class Village : Settlement
 {
-
+    public override void ApplyVisuals()
+    {
+        // do nothing
+    }
 
     public override List<InteractionOption> GetInteractionOptions()
     {

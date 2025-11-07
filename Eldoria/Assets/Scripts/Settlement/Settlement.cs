@@ -21,6 +21,8 @@ public abstract class Settlement : MonoBehaviour, IInteractable
     public LordProfile GetOwner() =>
         TerritoryManager.Instance.GetLordOf(this);
 
+    public abstract void ApplyVisuals();
+
     public abstract List<InteractionOption> GetInteractionOptions();
     public abstract void Interact();
 }

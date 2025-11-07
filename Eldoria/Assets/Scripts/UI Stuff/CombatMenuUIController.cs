@@ -21,9 +21,9 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
     private PartyController attackingPartyController;
     private PartyController defendingPartyController;
-    private PartyPresence attackingPartyPresence;
-    private PartyPresence defendingPartyPresence;
     private bool isPlayerAttacking;
+    private bool isSiegeBattle;
+    Settlement fief;
 
     public void Awake()
     {
@@ -35,23 +35,21 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
         if (source is CombatMenuContext ctx)
         {
             isPlayerAttacking = ctx.isPlayerAttacking;
+            isSiegeBattle = ctx.isSiegeBattle;
+            fief = ctx.fiefUnderSiege;
             if (isPlayerAttacking)
             {
                 attackingPartyController = playerPartyController;
                 defendingPartyController = ctx.enemyParty;
-                attackingPartyPresence = attackingPartyController.GetComponent<PartyPresence>();
-                defendingPartyPresence = defendingPartyController.GetComponent<PartyPresence>();
                 attackingText.text = "Player";
-                defendingText.text = defendingPartyPresence.Lord.Lord.UnitName;
+                defendingText.text = ctx.enemyName;
 
             }
             else if (!isPlayerAttacking)
             {
                 defendingPartyController = playerPartyController;
                 attackingPartyController = ctx.enemyParty;
-                attackingPartyPresence = attackingPartyController.GetComponent<PartyPresence>();
-                defendingPartyPresence = defendingPartyController.GetComponent<PartyPresence>();
-                attackingText.text = attackingPartyPresence.Lord.Lord.UnitName;
+                attackingText.text = ctx.enemyName;
                 defendingText.text = "Player";
 
             }
@@ -83,13 +81,60 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
             confirmButton.onClick.RemoveAllListeners();
             confirmButton.onClick.AddListener(() =>
             {
+                //player wins
                 if ((result.Party1Wins && isPlayerAttacking) || (!result.Party1Wins && !isPlayerAttacking))
                 {
-                    HandlePlayerWin();
+                    List<UnitInstance> prisoners;
+                    if (isPlayerAttacking)
+                    {
+                        prisoners = CombatOutcomeProcessor.ReturnPrisoners(defendingPartyController);
+                    }
+                    else
+                    {
+                        prisoners = CombatOutcomeProcessor.ReturnPrisoners(attackingPartyController);
+                    }
+
+                    // progress to prisoner allotment / loot screen
+                    UIManager.Instance.OpenSubMenu("prisoners", prisoners);
+
+                    if (isSiegeBattle)
+                    {
+                        if (isPlayerAttacking)
+                        {
+                            TerritoryManager.Instance.RegisterOwnership(fief, GameManager.Instance.PlayerProfile);
+
+                            // later on enter the territory
+                        }
+                        // player is not attacking, but player won. so attackers are destroyed  
+                        else
+                        {
+                            Destroy(attackingPartyController.gameObject);
+                        }
+                    }
+                    // not a siege battle
+                    else
+                    {
+                        if (isPlayerAttacking) Destroy(defendingPartyController.gameObject);
+                        else Destroy(attackingPartyController.gameObject);
+                    }
                 }
+                // player loses
                 else
                 {
-                    // destruction of player party?
+                    if (isSiegeBattle)
+                    {
+                        // owner of settlement loses the settlement
+                        PartyPresence p = attackingPartyController.GetComponent<PartyPresence>();
+                        if (p == null)
+                        {
+                            Debug.LogWarning("attacker party presence is null");
+                        }
+                        LordProfile lordProfile = LordRegistry.Instance.GetLordByName(p.Lord.Lord.UnitName);
+                        TerritoryManager.Instance.RegisterOwnership(fief, lordProfile);
+                    }
+                    // player is captured
+                    //idk how to do this now
+
                 }
 
 
@@ -129,38 +174,6 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
         // do nothing
     }
 
-    private void HandlePlayerWin()
-    {
-        List<UnitInstance> prisoners;
-        if (isPlayerAttacking)
-        {
-            prisoners = CombatOutcomeProcessor.ReturnPrisoners(defendingPartyController);
-        }
-        else
-        {
-            prisoners = CombatOutcomeProcessor.ReturnPrisoners(attackingPartyController);
-        }
-
-        // progress to prisoner allotment / loot screen
-        MainMenuController menu = gameObject.transform.parent?.GetComponent<MainMenuController>();
-        if (menu == null)
-        {
-            Debug.LogWarning("Main menu not found");
-            return;
-        }
-
-        // destroy the enemy party? 
-
-        Destroy(defendingPartyController.gameObject);
-        Debug.Log("attempting party destruction");
-
-
-        menu.OpenSubMenu("prisoners", prisoners);
-
-
-
-    }
-
 
 }
 
@@ -168,12 +181,18 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 public class CombatMenuContext
 {
     public PartyController enemyParty;
+    public bool isSiegeBattle;
     public bool isPlayerAttacking;
+    public Settlement fiefUnderSiege;
+    public string enemyName;
 
-    public CombatMenuContext(PartyController enemyParty, bool isPlayerAttacking)
+    public CombatMenuContext(PartyController enemyParty, bool isPlayerAttacking, string enemyName, bool isSiegeBattle = false, Settlement fiefUnderSiege = null)
     {
         this.enemyParty = enemyParty;
         this.isPlayerAttacking = isPlayerAttacking;
+        this.enemyName = enemyName;
+        this.isSiegeBattle = isSiegeBattle;
+        this.fiefUnderSiege = fiefUnderSiege;
     }
 }
 

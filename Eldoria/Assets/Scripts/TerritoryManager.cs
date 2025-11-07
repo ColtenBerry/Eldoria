@@ -53,7 +53,10 @@ public class TerritoryManager : MonoBehaviour
             lordToSettlements[lord] = new List<Settlement>();
 
         if (!lordToSettlements[lord].Contains(settlement))
+        {
             lordToSettlements[lord].Add(settlement);
+            settlement.ApplyVisuals();
+        }
 
         if (settlement is IHasBoundVillages binder)
         {

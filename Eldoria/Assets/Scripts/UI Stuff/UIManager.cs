@@ -20,10 +20,10 @@ public class UIManager : MonoBehaviour
         Instance = this;
     }
 
-    public void OpenCombatMenu(PartyController enemyParty, bool isPlayerAttacking)
+    public void OpenCombatMenu(CombatMenuContext ctx)
     {
         mainMenuController.gameObject.SetActive(true);
-        mainMenuController.OpenSubMenu("CombatMenu", new CombatMenuContext(enemyParty, isPlayerAttacking));
+        mainMenuController.OpenSubMenu("combat", ctx);
         InputGate.OnMenuOpened?.Invoke();
         TimeGate.PauseTime();
     }

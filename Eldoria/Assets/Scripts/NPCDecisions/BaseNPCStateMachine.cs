@@ -114,7 +114,7 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
                 Debug.Log("Attacking Player!!!");
                 PartyController personalPartyController = GetComponent<PartyController>();
                 if (personalPartyController == null) Debug.LogWarning("Party controller not found");
-                CombatSimulator.InitiateCombat(personalPartyController, false);
+                CombatSimulator.InitiateCombat(personalPartyController, true, selfPresence.Lord.Lord.UnitName);
             }
             else
             {

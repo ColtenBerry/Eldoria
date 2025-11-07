@@ -55,6 +55,7 @@ public static class CombatOutcomeProcessor
         }
     }
 
+
     private static bool DecideDeath(double surviveChance)
     {
         System.Random rng = new System.Random();
