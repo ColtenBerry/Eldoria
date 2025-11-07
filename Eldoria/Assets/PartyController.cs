@@ -75,4 +75,12 @@ public class PartyController : MonoBehaviour
         Prisoners.Clear();
     }
 
+    /// <summary>
+    /// I dislike this, it is so that PartyUI can refresh
+    /// </summary>
+    public void NotifyPartyUpdated()
+    {
+        OnPartyUpdated?.Invoke();
+    }
+
 }

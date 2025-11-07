@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private MainMenuController mainMenuController;
     [SerializeField] private WaitingMenuController waitingMenuController;
     [SerializeField] private InteractionMenuUI interactionMenuUI;
+    [SerializeField] private UpgradeUIController upgradeUIController;
 
 
     private void Awake()
@@ -50,6 +51,20 @@ public class UIManager : MonoBehaviour
         interactionMenuUI.gameObject.SetActive(true);
         InputGate.OnMenuOpened?.Invoke();
         TimeGate.PauseTime();
+    }
+    public void OpenUpgradeUnitMenu(UpgradeObject upgradeObject)
+    {
+        upgradeUIController.gameObject.SetActive(true);
+        upgradeUIController.OpenMenu(upgradeObject);
+        InputGate.OnMenuOpened?.Invoke();
+        TimeGate.PauseTime();
+    }
+    public void CloseUpgradeUnitMenu()
+    {
+        upgradeUIController.gameObject.SetActive(false);
+        // update partyui??
+
+        // partyui should still be open, so no need to close inputgate or time
     }
 
     public void CloseAllMenus()

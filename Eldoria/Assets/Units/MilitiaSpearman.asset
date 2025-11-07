@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: MilitiaSpearman
   m_EditorClassIdentifier: 
   unitName: Militia Spearman
-  powerStat: 1
   health: 10
   attack: 2
   defence: 1
   moral: 50
   level: 1
-  experience: 0
+  experience: 49
   experienceToNextLevel: 50
+  upgradeOptions:
+  - {fileID: 11400000, guid: 076a4459812c2714fac4c9e403624368, type: 2}
+  - {fileID: 11400000, guid: 7a9f90855101e8c43b198a9b4ff6a70c, type: 2}

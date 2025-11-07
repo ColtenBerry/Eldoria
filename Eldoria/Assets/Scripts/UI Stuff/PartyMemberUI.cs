@@ -6,7 +6,9 @@ using Microsoft.Unity.VisualStudio.Editor;
 public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
 {
     public TMP_Text nameText;
-    public TMP_Text powerText;
+    public TMP_Text healthText;
+    public TMP_Text experienceText;
+    public GameObject upgradeIndicator;
     private ICardHandler<UnitInstance> handler;
     private UnitInstance unit;
 
@@ -15,12 +17,15 @@ public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
         this.handler = handler;
         nameText.text = member.UnitName;
         unit = member;
-        powerText.text = $"Health: {member.Health} / {member.MaxHealth}";
+        healthText.text = $"Health: {member.Health} / {member.MaxHealth}";
 
         if (unit.Health == 0)
         {
             gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.red;
         }
+
+        experienceText.text = member.CurrentExperience.ToString();
+        upgradeIndicator.SetActive(member.CanUpgrade);
     }
 
     public void OnPointerClick(PointerEventData eventData)

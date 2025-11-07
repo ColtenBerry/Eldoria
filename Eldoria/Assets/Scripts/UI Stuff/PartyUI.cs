@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using System.Linq;
 
 public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
 {
@@ -7,6 +9,10 @@ public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
     public Transform partyParent; // e.g. a Vertical Layout Group
     public Transform prisonerParent;
     public PartyMemberUI partyMemberUIPrefab; //Prefab for unit display
+
+    public Button upgradeButton;
+
+    private UnitInstance selectedUnit;
 
     //private List<PartyMemberUI> activeUIElements = new();
 
@@ -24,8 +30,24 @@ public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
         partyController.OnPrisonersUpdated -= RefreshPrisonerUI;
     }
 
-    void RefreshUI()
+    void Awake()
     {
+        upgradeButton.onClick.AddListener(() =>
+        {
+            // open upgrade menu. 
+
+            // get all upgradable units:
+            List<UnitInstance> upgradableUnits = partyController.PartyMembers.Where(unit => unit.CanUpgrade).ToList();
+
+            // open upgrade menu with new units
+            UpgradeObject upgradeObject = new UpgradeObject(selectedUnit, selectedUnit.baseData.upgradeOptions);
+            UIManager.Instance.OpenUpgradeUnitMenu(upgradeObject);
+        });
+    }
+
+    private void RefreshUI()
+    {
+        upgradeButton.interactable = false;
         // Clear old UI
         foreach (Transform go in partyParent)
             Destroy(go.gameObject);
@@ -61,6 +83,15 @@ public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
 
     public void OnCardClicked(UnitInstance unit)
     {
-
+        if (unit.CanUpgrade)
+        {
+            upgradeButton.interactable = true;
+            selectedUnit = unit;
+        }
+        else
+        {
+            upgradeButton.interactable = false;
+            selectedUnit = null;
+        }
     }
 }

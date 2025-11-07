@@ -25,6 +25,7 @@ public class UnitInstance
     private int moral;
     [SerializeField]
     private int experienceToNextLevel;
+    [SerializeField] private bool canUpgrade;
 
 
     public string UnitName => unitName; // effectively makes this readonly but public? 
@@ -36,6 +37,9 @@ public class UnitInstance
     public int Attack => attack;
     public int Defence => defence;
     public int Moral => moral;
+
+    public bool CanUpgrade => canUpgrade;
+
 
     [SerializeField] private string idString;
 
@@ -62,6 +66,7 @@ public class UnitInstance
         attack = data.attack;
         defence = data.defence;
         moral = data.moral;
+        canUpgrade = false;
     }
 
     public UnitInstance Clone()
@@ -114,7 +119,26 @@ public class UnitInstance
     protected virtual void LevelUp()
     {
         currentLevel++;
-        currentExperience = 0;
-        // Optionally scale powerStat or other shared stats
+        //currentExperience = 0;
+
+        if (baseData.upgradeOptions != null && baseData.upgradeOptions.Count > 0)
+        {
+            canUpgrade = true;
+            Debug.Log("Can upgrade is true");
+        }
     }
+    public void ApplyUpgrade(UnitData newData)
+    {
+        baseData = newData;
+        unitName = newData.unitName;
+        attack = newData.attack;
+        defence = newData.defence;
+        moral = newData.moral;
+        maxHealth = newData.health;
+        health = maxHealth;
+        // Optionally reset experience or keep it
+        currentExperience = 0;
+        canUpgrade = false;
+    }
+
 }
