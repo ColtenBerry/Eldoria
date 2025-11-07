@@ -25,7 +25,12 @@ public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
         }
 
         experienceText.text = member.CurrentExperience.ToString();
-        upgradeIndicator.SetActive(member.CanUpgrade);
+        if (member.CanUpgrade)
+        {
+            Debug.Log("party member can upgrade");
+            upgradeIndicator.SetActive(member.CanUpgrade);
+
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
