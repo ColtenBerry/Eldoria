@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,8 +20,8 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
     // [SerializeField] private PartyController playerPartyController;
 
-    private PartyController attackingPartyController;
-    private PartyController defendingPartyController;
+    private List<PartyController> attackingPartyControllers;
+    private List<PartyController> defendingPartyControllers;
     private bool isPlayerAttacking;
     private bool isSiegeBattle;
     Settlement fief;
@@ -39,16 +40,24 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
             fief = ctx.fiefUnderSiege;
             if (isPlayerAttacking)
             {
-                attackingPartyController = playerPartyController;
-                defendingPartyController = ctx.enemyParty;
+                attackingPartyControllers = new List<PartyController>
+                {
+                    playerPartyController
+                };
+                attackingPartyControllers.AddRange(ctx.friendlyParties);
+                defendingPartyControllers = ctx.enemyParties;
                 attackingText.text = "Player";
                 defendingText.text = ctx.enemyName;
 
             }
             else if (!isPlayerAttacking)
             {
-                defendingPartyController = playerPartyController;
-                attackingPartyController = ctx.enemyParty;
+                defendingPartyControllers = new List<PartyController>
+                {
+                    playerPartyController
+                };
+                defendingPartyControllers.AddRange(ctx.friendlyParties);
+                attackingPartyControllers = ctx.enemyParties;
                 attackingText.text = ctx.enemyName;
                 defendingText.text = "Player";
 
@@ -68,75 +77,20 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
         confirmButton.onClick.AddListener(() =>
         {
             // do stuff
-            CombatResult result = CombatSimulator.SimulateBattle(attackingPartyController.PartyMembers, defendingPartyController.PartyMembers);
+            CombatResult result = CombatSimulator.SimulateBattle(attackingPartyControllers, defendingPartyControllers);
 
             // show results
-            PopulateGrid(attackingUnitsGrid, result.AttackerParty);
-            PopulateGrid(defendingUnitsGrid, result.DefenderParty);
+            PopulateGrid(attackingUnitsGrid, result.AttackerUnits);
+            PopulateGrid(defendingUnitsGrid, result.DefenderUnits);
 
             // apply results
-            CombatOutcomeProcessor.ApplyCombatResult(result, attackingPartyController, defendingPartyController);
+            CombatOutcomeProcessor.ApplyCombatResult(result, attackingPartyControllers, defendingPartyControllers);
 
             confirmButton.GetComponentInChildren<TextMeshProUGUI>().text = "Continue";
             confirmButton.onClick.RemoveAllListeners();
             confirmButton.onClick.AddListener(() =>
             {
-                //player wins
-                if ((result.Party1Wins && isPlayerAttacking) || (!result.Party1Wins && !isPlayerAttacking))
-                {
-                    List<UnitInstance> prisoners;
-                    if (isPlayerAttacking)
-                    {
-                        prisoners = CombatOutcomeProcessor.ReturnPrisoners(defendingPartyController);
-                    }
-                    else
-                    {
-                        prisoners = CombatOutcomeProcessor.ReturnPrisoners(attackingPartyController);
-                    }
-
-                    // progress to prisoner allotment / loot screen
-                    UIManager.Instance.OpenSubMenu("prisoners", prisoners);
-
-                    if (isSiegeBattle)
-                    {
-                        if (isPlayerAttacking)
-                        {
-                            TerritoryManager.Instance.RegisterOwnership(fief, GameManager.Instance.PlayerProfile);
-
-                            // later on enter the territory
-                        }
-                        // player is not attacking, but player won. so attackers are destroyed  
-                        else
-                        {
-                            Destroy(attackingPartyController.gameObject);
-                        }
-                    }
-                    // not a siege battle
-                    else
-                    {
-                        if (isPlayerAttacking) Destroy(defendingPartyController.gameObject);
-                        else Destroy(attackingPartyController.gameObject);
-                    }
-                }
-                // player loses
-                else
-                {
-                    if (isSiegeBattle)
-                    {
-                        // owner of settlement loses the settlement
-                        PartyPresence p = attackingPartyController.GetComponent<PartyPresence>();
-                        if (p == null)
-                        {
-                            Debug.LogWarning("attacker party presence is null");
-                        }
-                        LordProfile lordProfile = LordRegistry.Instance.GetLordByName(p.Lord.Lord.UnitName);
-                        TerritoryManager.Instance.RegisterOwnership(fief, lordProfile);
-                    }
-                    // player is captured
-                    //idk how to do this now
-
-                }
-
+                CombatOutcomeProcessor.ProcessPlayerBattleResult(result, attackingPartyControllers, defendingPartyControllers, isPlayerAttacking, isSiegeBattle, fief);
 
             });
 
@@ -145,9 +99,20 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
 
         // populate grids
-        PopulateGrid(attackingUnitsGrid, attackingPartyController.PartyMembers);
-        PopulateGrid(defendingUnitsGrid, defendingPartyController.PartyMembers);
 
+
+        // Flatten all units from each party controller
+        List<UnitInstance> attackingUnits = attackingPartyControllers
+            .SelectMany(party => party.PartyMembers)
+            .ToList();
+
+        List<UnitInstance> defendingUnits = defendingPartyControllers
+            .SelectMany(party => party.PartyMembers)
+            .ToList();
+
+        // Populate the grids with the full unit lists
+        PopulateGrid(attackingUnitsGrid, attackingUnits);
+        PopulateGrid(defendingUnitsGrid, defendingUnits);
 
     }
 
@@ -180,15 +145,17 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
 public class CombatMenuContext
 {
-    public PartyController enemyParty;
+    public List<PartyController> friendlyParties;
+    public List<PartyController> enemyParties;
     public bool isSiegeBattle;
     public bool isPlayerAttacking;
     public Settlement fiefUnderSiege;
     public string enemyName;
 
-    public CombatMenuContext(PartyController enemyParty, bool isPlayerAttacking, string enemyName, bool isSiegeBattle = false, Settlement fiefUnderSiege = null)
+    public CombatMenuContext(List<PartyController> friendlyParties, List<PartyController> enemyParties, bool isPlayerAttacking, string enemyName, bool isSiegeBattle = false, Settlement fiefUnderSiege = null)
     {
-        this.enemyParty = enemyParty;
+        this.friendlyParties = friendlyParties;
+        this.enemyParties = enemyParties;
         this.isPlayerAttacking = isPlayerAttacking;
         this.enemyName = enemyName;
         this.isSiegeBattle = isSiegeBattle;

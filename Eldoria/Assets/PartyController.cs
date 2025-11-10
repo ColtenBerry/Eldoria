@@ -23,8 +23,16 @@ public class PartyController : MonoBehaviour
     public List<UnitInstance> Prisoners { get; private set; } = new();
     public event Action OnPrisonersUpdated;
 
+    [Header("Party Identity")]
+    [SerializeField] private string partyID;
+    public string PartyID => partyID;
+
+
     private void Awake()
     {
+        if (string.IsNullOrEmpty(partyID))
+            partyID = Guid.NewGuid().ToString();
+
         InitializeParty();
     }
 

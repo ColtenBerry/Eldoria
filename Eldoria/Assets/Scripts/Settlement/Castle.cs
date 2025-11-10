@@ -152,12 +152,13 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
             if (siegeByPlayer)
             {
                 UIManager.Instance.CloseAllMenus();
-                CombatSimulator.InitiateSiegeBattle(garrisonController, this, true, settlementName + " garrison");
+                CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, GetFaction(), this);
             }
 
             else
             {
-                CombatSimulator.InitiateSiegeBattle(siegeAttacker, garrisonController, this);
+                CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, GetFaction(), this);
+
             }
 
             // siege is over

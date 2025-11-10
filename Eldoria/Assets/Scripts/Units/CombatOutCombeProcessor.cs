@@ -5,17 +5,33 @@ using UnityEngine;
 
 public static class CombatOutcomeProcessor
 {
-    public static void ApplyCombatResult(CombatResult result, PartyController party1, PartyController party2)
+    public static void ApplyCombatResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders)
     {
-        double SURVIVE_CHANCE = .5;
-        ApplyDamage(result.AttackerParty, party1, SURVIVE_CHANCE);
-        ApplyDamage(result.DefenderParty, party2, SURVIVE_CHANCE);
+        foreach (var party in attackers)
+        {
+            var relevantSimulated = result.AttackerUnits
+                .Where(u => party.PartyMembers.Any(p => p.ID == u.ID))
+                .ToList();
 
-        var defeatedParty2 = GetDefeatedUnits(result.DefenderParty);
-        RewardExperience(result.AttackerParty, party1, defeatedParty2);
+            ApplyDamage(relevantSimulated, party, 0.5);
+        }
 
-        var defeatedParty1 = GetDefeatedUnits(result.AttackerParty);
-        RewardExperience(result.DefenderParty, party2, defeatedParty1);
+        foreach (var party in defenders)
+        {
+            var relevantSimulated = result.DefenderUnits
+                .Where(u => party.PartyMembers.Any(p => p.ID == u.ID))
+                .ToList();
+
+            ApplyDamage(relevantSimulated, party, 0.5);
+        }
+
+        var defeatedDefenders = result.DefenderUnits.Where(u => u.Health <= 0).ToList();
+        foreach (var party in attackers)
+            RewardExperience(result.AttackerUnits, party, defeatedDefenders);
+
+        var defeatedAttackers = result.AttackerUnits.Where(u => u.Health <= 0).ToList();
+        foreach (var party in defenders)
+            RewardExperience(result.DefenderUnits, party, defeatedAttackers);
 
     }
 
@@ -25,9 +41,11 @@ public static class CombatOutcomeProcessor
     }
 
 
-    public static List<UnitInstance> ReturnPrisoners(PartyController losingParty)
+    public static List<UnitInstance> ReturnPrisoners(List<PartyController> losingParties)
     {
-        return losingParty.PartyMembers;
+        return losingParties
+                .SelectMany(party => party.PartyMembers)
+                .ToList();
     }
 
 
@@ -101,7 +119,117 @@ public static class CombatOutcomeProcessor
     }
 
 
+    public static void ProcessAutoResolveResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders, bool isSiegeBattle, Settlement fief)
+    {
+        ApplyCombatResult(result, attackers, defenders);
 
+        bool attackersWin = result.AttackersWin;
+
+        if (attackersWin)
+        {
+            if (isSiegeBattle)
+            {
+                TerritoryManager.Instance.RegisterOwnership(fief, attackers.First().GetComponent<PartyPresence>().Lord);
+
+                // Wipe garrison units but keep GameObject
+                var garrison = defenders.FirstOrDefault();
+                if (garrison != null)
+                    garrison.PartyMembers.Clear();
+
+                // Destroy other defenders
+                for (int i = 1; i < defenders.Count; i++)
+                    Object.Destroy(defenders[i].gameObject);
+            }
+            else
+            {
+                foreach (var party in defenders)
+                    Object.Destroy(party.gameObject);
+            }
+        }
+        else
+        {
+            if (isSiegeBattle)
+            {
+                TerritoryManager.Instance.RegisterOwnership(fief, defenders.First().GetComponent<PartyPresence>().Lord);
+
+                foreach (var party in attackers)
+                    Object.Destroy(party.gameObject);
+            }
+            else
+            {
+                foreach (var party in attackers)
+                    Object.Destroy(party.gameObject);
+            }
+        }
+    }
+
+    public static void ProcessPlayerBattleResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders, bool isPlayerAttacking, bool isSiegeBattle, Settlement fief)
+    {
+        ApplyCombatResult(result, attackers, defenders);
+
+        bool playerWon = (result.AttackersWin && isPlayerAttacking) || (!result.AttackersWin && !isPlayerAttacking);
+
+
+        if (playerWon)
+        {
+            var losers = isPlayerAttacking ? defenders : attackers;
+            var prisoners = ReturnPrisoners(losers);
+            UIManager.Instance.OpenSubMenu("prisoners", prisoners);
+
+            if (isSiegeBattle)
+            {
+                if (isPlayerAttacking)
+                {
+                    TerritoryManager.Instance.RegisterOwnership(fief, GameManager.Instance.PlayerProfile);
+
+                    // Wipe garrison units but keep GameObject
+                    if (defenders.Count > 0)
+                        defenders[0].PartyMembers.Clear();
+
+                    for (int i = 1; i < defenders.Count; i++)
+                        Object.Destroy(defenders[i].gameObject);
+                }
+                else
+                {
+                    foreach (var party in attackers)
+                    {
+                        // TODO: if party is player, handle differently
+                        Object.Destroy(party.gameObject);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var party in losers)
+                {
+                    // TODO: if party is player, handle differently
+                    Object.Destroy(party.gameObject);
+                }
+            }
+        }
+        else // player lost
+        {
+            if (isSiegeBattle)
+            {
+                var attackerPresence = attackers.FirstOrDefault()?.GetComponent<PartyPresence>();
+                if (attackerPresence == null)
+                {
+                    Debug.LogWarning("attacker party presence is null");
+                    return;
+                }
+
+                var newOwner = LordRegistry.Instance.GetLordByName(attackerPresence.Lord.Lord.UnitName);
+                TerritoryManager.Instance.RegisterOwnership(fief, newOwner);
+            }
+
+            var losers = isPlayerAttacking ? attackers : defenders;
+            foreach (var party in losers)
+            {
+                // TODO: if party is player, handle differently
+                Object.Destroy(party.gameObject);
+            }
+        }
+    }
 
 
 }

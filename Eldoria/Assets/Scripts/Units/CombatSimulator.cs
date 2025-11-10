@@ -8,55 +8,131 @@ using UnityEngine;
 public static class CombatSimulator
 {
     public static Action<PartyController, bool> OnCombatMenuRequested;
-    public static void InitiateCombat(PartyController enemyParty, bool isPlayerAttacking, string enemyName)
+    public static void StartBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction, bool isPlayerAttacking)
     {
-        Debug.Log("Initiating player-involved combat");
+        List<PartyPresence> nearbyPresences = GetNearbyParties(location, 30f);
 
-        if (UIManager.Instance == null)
-        {
-            Debug.LogError("UIManager instance not found.");
-            return;
-        }
+        List<PartyController> attackers = nearbyPresences
+    .Where(presence => presence.Lord.Faction == attackingFaction)
+    .Select(presence => presence.GetComponent<PartyController>())
+    .Where(controller => controller != null)
+    .ToList();
 
-        UIManager.Instance.OpenSubMenu("combat", new CombatMenuContext(enemyParty, isPlayerAttacking, enemyName));
-    }
-
-    public static CombatResult InitiateCombat(PartyController party1, PartyController party2)
-    {
-
-        // auto battle: 
-        CombatResult result = SimulateBattle(party1.PartyMembers, party2.PartyMembers);
-
-        // apply result
-        CombatOutcomeProcessor.ApplyCombatResult(result, party1, party2);
-
-        return result;
-    }
-
-    public static CombatResult InitiateSiegeBattle(PartyController attacker, PartyController garrison, Settlement targetFief)
-    {
-        Debug.Log("Initiating siege battle");
-
-        CombatResult result = SimulateBattle(attacker.PartyMembers, garrison.PartyMembers);
+        List<PartyController> defenders = nearbyPresences
+            .Where(presence => presence.Lord.Faction == defendingFaction)
+            .Select(presence => presence.GetComponent<PartyController>())
+            .Where(controller => controller != null)
+            .ToList();
 
 
+        var enemyName = defenders.FirstOrDefault()?.name ?? "Unknown";
+        CombatMenuContext ctx = new CombatMenuContext(
+            friendlyParties: isPlayerAttacking ? attackers : defenders,
+            enemyParties: isPlayerAttacking ? defenders : attackers,
+            isPlayerAttacking: isPlayerAttacking,
+            enemyName: enemyName
 
-        // will wipe garrison or wipe party
-        CombatOutcomeProcessor.ApplyCombatResult(result, attacker, garrison);
 
-        return result;
-
-    }
-
-    public static void InitiateSiegeBattle(PartyController notPlayerPartyController, Settlement targetFief, bool isPlayerAttacking, string enemyName)
-    {
-        Debug.Log("Initiating siege battle");
-
-        CombatMenuContext ctx = new CombatMenuContext(notPlayerPartyController, isPlayerAttacking, enemyName, true, targetFief);
+        );
 
         UIManager.Instance.OpenCombatMenu(ctx);
     }
 
+    public static CombatResult StartBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction)
+    {
+        List<PartyPresence> nearbyPresences = GetNearbyParties(location, 30f);
+
+        List<PartyController> attackers = nearbyPresences
+            .Where(p => p.Lord.Faction == attackingFaction)
+            .Select(p => p.GetComponent<PartyController>())
+            .Where(pc => pc != null)
+            .ToList();
+
+        List<PartyController> defenders = nearbyPresences
+            .Where(p => p.Lord.Faction == defendingFaction)
+            .Select(p => p.GetComponent<PartyController>())
+            .Where(pc => pc != null)
+            .ToList();
+
+        CombatResult result = SimulateBattle(attackers, defenders);
+        CombatOutcomeProcessor.ApplyCombatResult(result, attackers, defenders);
+        CombatOutcomeProcessor.ProcessAutoResolveResult(result, attackers, defenders, false, null);
+        return result;
+    }
+
+    public static CombatResult StartSiegeBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction, Settlement targetFief)
+    {
+        List<PartyPresence> nearbyPresences = GetNearbyParties(location, 30f);
+
+        List<PartyController> attackers = nearbyPresences
+            .Where(p => p.Lord.Faction == attackingFaction)
+            .Select(p => p.GetComponent<PartyController>())
+            .Where(pc => pc != null)
+            .ToList();
+
+        List<PartyController> defenders = nearbyPresences
+            .Where(p => p.Lord.Faction == defendingFaction)
+            .Select(p => p.GetComponent<PartyController>())
+            .Where(pc => pc != null)
+            .ToList();
+        PartyController garrison = targetFief.GetComponent<PartyController>();
+        if (garrison != null)
+        {
+            defenders.Insert(0, garrison);
+        }
+
+        CombatResult result = SimulateBattle(attackers, defenders);
+        CombatOutcomeProcessor.ApplyCombatResult(result, attackers, defenders);
+        return result;
+    }
+
+
+
+    public static void StartSiegeBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction, Settlement targetFief, bool isPlayerAttacking)
+    {
+        List<PartyPresence> nearbyPresences = GetNearbyParties(location, 30f);
+
+        List<PartyController> attackers = nearbyPresences
+            .Where(p => p.Lord.Faction == attackingFaction)
+            .Select(p => p.GetComponent<PartyController>())
+            .Where(pc => pc != null)
+            .ToList();
+
+        List<PartyController> defenders = nearbyPresences
+            .Where(p => p.Lord.Faction == defendingFaction)
+            .Select(p => p.GetComponent<PartyController>())
+            .Where(pc => pc != null)
+            .ToList();
+
+        var enemyName = defenders.FirstOrDefault()?.name ?? "Unknown";
+
+        PartyController garrison = targetFief.GetComponent<PartyController>();
+        if (garrison != null)
+        {
+            defenders.Insert(0, garrison);
+        }
+
+
+        CombatMenuContext ctx = new CombatMenuContext(
+            friendlyParties: isPlayerAttacking ? attackers : defenders,
+            enemyParties: isPlayerAttacking ? defenders : attackers,
+            isPlayerAttacking: isPlayerAttacking,
+            enemyName: enemyName,
+            isSiegeBattle: true,
+            fiefUnderSiege: targetFief
+        );
+
+        UIManager.Instance.OpenCombatMenu(ctx);
+    }
+
+
+    public static List<PartyPresence> GetNearbyParties(Vector3 battleLocation, float radius)
+    {
+        return UnityEngine.Object.FindObjectsOfType<PartyPresence>()
+            .Where(p =>
+                Vector3.Distance(p.transform.position, battleLocation) <= radius && p != GameManager.Instance.player.GetComponent<PartyPresence>())
+            .ToList();
+    }
 
 
     /// <summary>
@@ -65,50 +141,69 @@ public static class CombatSimulator
     /// <param name="party1"></param>
     /// <param name="party2"></param>
     /// <returns></returns>
-    public static CombatResult SimulateBattle(List<UnitInstance> party1, List<UnitInstance> party2)
+    public static CombatResult SimulateBattle(List<PartyController> attackers, List<PartyController> defenders)
     {
-        CombatResult result = new CombatResult
+        var result = new CombatResult
         {
-            AttackerParty = party1.Select(u => u.Clone()).ToList(),
-            DefenderParty = party2.Select(u => u.Clone()).ToList()
+            AttackerUnits = new List<UnitInstance>(),
+            DefenderUnits = new List<UnitInstance>(),
+            PartyUnitMap = new Dictionary<string, List<UnitInstance>>()
         };
 
-
-        int safetyCounter = 0;
-        while (result.AttackerParty.Count > 0 && result.DefenderParty.Count > 0 && safetyCounter < 1000)
+        // Clone attacker units and track origin
+        foreach (var party in attackers)
         {
-            SimulateRound(result);
-            safetyCounter++;
+            var clones = party.PartyMembers.Select(u => u.Clone()).ToList();
+            result.AttackerUnits.AddRange(clones);
+            result.PartyUnitMap[party.PartyID] = clones;
         }
 
-        result.Party1Wins = result.AttackerParty.Count > 0;
-
-
-        // rewrite the combat result lists so that i get same order units with updated stats
-        var simulatedAttackers = result.AttackerParty;
-        var simulatedDefenders = result.DefenderParty;
-
-        result.AttackerParty = party1.Select(original =>
+        // Clone defender units and track origin
+        foreach (var party in defenders)
         {
-            var simulated = simulatedAttackers.FirstOrDefault(sim => sim.ID == original.ID);
-            if (simulated != null)
-                return simulated;
+            var clones = party.PartyMembers.Select(u => u.Clone()).ToList();
+            result.DefenderUnits.AddRange(clones);
+            result.PartyUnitMap[party.PartyID] = clones;
+        }
 
-            var clone = original.Clone();
-            clone.SetHealth(0);
-            return clone;
-        }).ToList();
+        int safetyCounter = 0;
+        while (result.AttackerUnits.Count > 0 && result.DefenderUnits.Count > 0 && safetyCounter++ < 1000)
+            SimulateRound(result);
 
-        result.DefenderParty = party2.Select(original =>
-        {
-            var simulated = simulatedDefenders.FirstOrDefault(sim => sim.ID == original.ID);
-            if (simulated != null)
-                return simulated;
+        // After simulation loop
+        result.AttackersWin = result.AttackerUnits.Count > 0;
 
-            var clone = original.Clone();
-            clone.SetHealth(0);
-            return clone;
-        }).ToList();
+        // Rehydrate full unit lists with updated stats
+        var simulatedAttackers = result.AttackerUnits;
+        var simulatedDefenders = result.DefenderUnits;
+
+        result.AttackerUnits = attackers
+    .SelectMany(party => party.PartyMembers)
+    .Select(original =>
+    {
+        var simulated = simulatedAttackers.FirstOrDefault(sim => sim.ID == original.ID);
+        if (simulated != null)
+            return simulated;
+
+        var clone = original.Clone();
+        clone.SetHealth(0);
+        return clone;
+    })
+    .ToList(); // ✅ This fixes the CS0266 error
+
+        result.DefenderUnits = defenders
+            .SelectMany(party => party.PartyMembers)
+            .Select(original =>
+            {
+                var simulated = simulatedDefenders.FirstOrDefault(sim => sim.ID == original.ID);
+                if (simulated != null)
+                    return simulated;
+
+                var clone = original.Clone();
+                clone.SetHealth(0);
+                return clone;
+            })
+            .ToList(); // ✅ Same fix here
 
 
         return result;
@@ -116,8 +211,8 @@ public static class CombatSimulator
 
     private static void SimulateRound(CombatResult result)
     {
-        List<UnitInstance> attackers = new(result.AttackerParty);
-        List<UnitInstance> defenders = new(result.DefenderParty);
+        List<UnitInstance> attackers = new(result.AttackerUnits); // shallow copy for shuffle
+        List<UnitInstance> defenders = new(result.DefenderUnits);
         ShuffleList(attackers);
         ShuffleList(defenders);
         Debug.Log("round called");
@@ -130,8 +225,8 @@ public static class CombatSimulator
             SimulateAttack(attackers[i], defenders[index]);
 
         }
-        result.AttackerParty.RemoveAll(u => u.Health <= 0);
-        result.DefenderParty.RemoveAll(u => u.Health <= 0);
+        result.AttackerUnits.RemoveAll(u => u.Health <= 0);
+        result.DefenderUnits.RemoveAll(u => u.Health <= 0);
 
 
         // defenders attack
@@ -143,8 +238,8 @@ public static class CombatSimulator
 
         }
 
-        result.AttackerParty.RemoveAll(u => u.Health <= 0);
-        result.DefenderParty.RemoveAll(u => u.Health <= 0);
+        result.AttackerUnits.RemoveAll(u => u.Health <= 0);
+        result.DefenderUnits.RemoveAll(u => u.Health <= 0);
 
 
     }
@@ -204,7 +299,9 @@ public static class CombatSimulator
 
 public class CombatResult
 {
-    public List<UnitInstance> AttackerParty;
-    public List<UnitInstance> DefenderParty;
-    public bool Party1Wins;
+    public List<UnitInstance> AttackerUnits;
+    public List<UnitInstance> DefenderUnits;
+    public bool AttackersWin;
+
+    public Dictionary<string, List<UnitInstance>> PartyUnitMap = new();
 }

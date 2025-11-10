@@ -23,10 +23,11 @@ public class UIManager : MonoBehaviour
 
     public void OpenCombatMenu(CombatMenuContext ctx)
     {
-        mainMenuController.gameObject.SetActive(true);
-        mainMenuController.OpenSubMenu("combat", ctx);
         InputGate.OnMenuOpened?.Invoke();
         TimeGate.PauseTime();
+        mainMenuController.gameObject.SetActive(true);
+        mainMenuController.OpenSubMenu("combat", ctx);
+
     }
 
     public void OpenSubMenu(string id, object context = null)

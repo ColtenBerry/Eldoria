@@ -74,7 +74,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
             options.Add(new InteractionOption("Attack Party", () =>
             {
                 Debug.Log("Attempting to Attack");
-                CombatSimulator.InitiateCombat(partyController, true, Lord.Lord.UnitName);
+                CombatSimulator.StartBattle(gameObject.transform.position, FactionsManager.Instance.GetFactionByName("Player"), Lord.Faction, true);
             }
                 ));
         }

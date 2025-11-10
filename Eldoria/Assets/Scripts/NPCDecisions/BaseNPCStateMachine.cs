@@ -109,25 +109,22 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
         {
             // attempt attack
 
-            if (closest.gameObject.name == "Player")
+
+            Debug.Log(selfPresence.Lord.Lord.UnitName + "is attacking " + closest.Lord.Lord.UnitName);
+
+            if (closest.gameObject == GameManager.Instance.player)
             {
-                Debug.Log("Attacking Player!!!");
-                PartyController personalPartyController = GetComponent<PartyController>();
-                if (personalPartyController == null) Debug.LogWarning("Party controller not found");
-                CombatSimulator.InitiateCombat(personalPartyController, true, selfPresence.Lord.Lord.UnitName);
+                Debug.Log("Attacking player");
+                CombatSimulator.StartBattle(gameObject.transform.position, selfPresence.Lord.Faction, closest.GetComponent<PartyPresence>().Lord.Faction, false);
+
+
             }
             else
             {
-                Debug.Log(selfPresence.Lord.Lord.UnitName + "is attacking " + closest.Lord.Lord.UnitName);
-
-                PartyController personalPartyController = GetComponent<PartyController>();
-                if (personalPartyController == null) Debug.LogWarning("Party controller not found");
-
-                PartyController enemyPartyController = closest.GetComponent<PartyController>();
-                if (enemyPartyController == null) Debug.LogWarning("party controller not found");
-
-                CombatSimulator.InitiateCombat(personalPartyController, enemyPartyController);
+                CombatSimulator.StartBattle(gameObject.transform.position, selfPresence.Lord.Faction, closest.GetComponent<PartyPresence>().Lord.Faction);
             }
+
+
 
         }
     }
