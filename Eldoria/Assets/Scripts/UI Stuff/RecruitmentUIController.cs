@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,12 +10,14 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
     [SerializeField] private Transform potentialRecruitParent;
     [SerializeField] private GameObject recruitPrefab;
     [SerializeField] private PartyController playerParty;
+    [SerializeField] private TextMeshProUGUI accumulatedCostText;
 
     [SerializeField] private Button confirmButton;
 
     private List<UnitInstance> recruitOptions = new();
     private List<UnitInstance> potentialRecruits = new();
     private RecruitmentSource recruitmentSource;
+    private int accumulatedCost = 0;
 
     void Awake()
     {
@@ -22,12 +26,12 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
             // add troops to party
             foreach (UnitInstance unit in potentialRecruits)
             {
-                if (playerParty.AddUnit(unit))
-                    recruitmentSource.recruitUnit(unit);
+                RecruitmentUtility.TryRecruitUnit(unit, playerParty, GameManager.Instance.PlayerProfile, recruitmentSource);
             }
             potentialRecruits.Clear();
             GetRecruits();
             PopulateGrids();
+            accumulatedCost = 0;
         });
 
     }
@@ -55,6 +59,26 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
 
         PopulateGrids();
 
+        UpdateAccumulatedCostText();
+
+    }
+
+    private void UpdateAccumulatedCostText()
+    {
+        accumulatedCostText.text = "Gold: " + accumulatedCost.ToString();
+        if (GameManager.Instance.PlayerProfile != null)
+        {
+            if (GameManager.Instance.PlayerProfile.CanAfford(accumulatedCost))
+            {
+                accumulatedCostText.color = Color.white;
+                confirmButton.interactable = true;
+            }
+            else
+            {
+                accumulatedCostText.color = Color.red;
+                confirmButton.interactable = false;
+            }
+        }
     }
 
     private void PopulateGrids()
@@ -103,11 +127,13 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
         {
             potentialRecruits.Remove(unit);
             recruitOptions.Add(unit);
+            accumulatedCost -= unit.baseData.recruitmentCost;
         }
         else if (recruitOptions.Contains(unit))
         {
             potentialRecruits.Add(unit);
             recruitOptions.Remove(unit);
+            accumulatedCost += unit.baseData.recruitmentCost;
         }
         else
         {
@@ -115,6 +141,7 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
         }
 
         PopulateGrids();
+        UpdateAccumulatedCostText();
 
     }
 

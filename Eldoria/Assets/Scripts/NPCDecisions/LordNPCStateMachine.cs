@@ -289,6 +289,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         {
             return false;
         }
+        if (!currentLord.CanAfford(500)) return false; // Check if the lord can afford recruitment. at least 500 gold
         // should recruit logic
         List<Settlement> ownedSettlements = TerritoryManager.Instance.GetSettlementsOf(currentLord);
         List<Settlement> validRecruitmentSources = ownedSettlements.FindAll(settlement =>
@@ -315,7 +316,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
             if (partyController.AddUnit(unit))
             {
-                source.recruitUnit(unit); // remove from source
+                RecruitmentUtility.TryRecruitUnit(unit, partyController, currentLord, source);
             }
         }
     }

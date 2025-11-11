@@ -17,4 +17,9 @@ public class UnitData : ScriptableObject
     public int experienceToNextLevel = 50;
     public List<UnitData> upgradeOptions;
 
+    [Header("Cost")]
+    public int recruitmentCost;
+    public int upkeepCostPerDay;
+    public int upgradeCost;
+
 }

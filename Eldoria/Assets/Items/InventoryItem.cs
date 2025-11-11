@@ -17,4 +17,5 @@ public abstract class InventoryItem : ScriptableObject
     public string description;
     public bool isStackable;
     public int maxStackSize = 60;
+    public int baseCost;
 }

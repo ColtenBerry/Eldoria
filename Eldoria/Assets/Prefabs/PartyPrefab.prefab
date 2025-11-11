@@ -368,6 +368,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   partyMembers: []
+  partyID: 
 --- !u!114 &3829685204394496096
 MonoBehaviour:
   m_ObjectHideFlags: 0

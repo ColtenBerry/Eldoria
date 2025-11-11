@@ -56,8 +56,28 @@ public class LordProfile
         party.SetLordProfile(this);
     }
 
+
+    // Gold System
+
+    public bool CanAfford(int amount) => goldAmount >= amount;
+
+    public bool TrySpendGold(int amount)
+    {
+        if (!CanAfford(amount)) return false;
+        goldAmount -= amount;
+        return true;
+    }
+
+    public void AddGold(int amount)
+    {
+        goldAmount += amount;
+    }
+
     public void ChangeGold(int amount)
     {
         goldAmount = goldAmount + amount;
     }
+
+
+    public string GetGoldSummary() => $"{lord.UnitName} has {goldAmount} gold.";
 }
