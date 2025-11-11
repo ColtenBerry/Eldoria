@@ -19,5 +19,6 @@ MonoBehaviour:
   description: For eating
   isStackable: 1
   maxStackSize: 60
+  baseCost: 2
   restoreAmount: 0
   affectsMorale: 1

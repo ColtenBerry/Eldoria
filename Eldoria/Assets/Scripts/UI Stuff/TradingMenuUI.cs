@@ -10,6 +10,7 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
     [SerializeField] private Transform playerItemsPanel;
     [SerializeField] private TMP_Text traderText;
     [SerializeField] private GameObject itemPrefab;
+    [SerializeField] private TextMeshProUGUI goldTransferAmountText;
 
     [SerializeField] private Button confirmButton;
 
@@ -20,6 +21,7 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
     [SerializeField] private List<ItemStack> playerPendingSale = new();
     private InventoryManager traderInventory;
     [SerializeField] private InventoryManager playerInventory;
+    private int goldTransferToTraderAmount = 0;
 
     void Awake()
     {
@@ -35,6 +37,7 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
                     // sell item
                     playerInventory.RemoveItem(stack.item, tradeAmount);
                     traderInventory.AddItem(stack.item, tradeAmount);
+                    GameManager.Instance.PlayerProfile.AddGold(stack.quantity * stack.item.baseCost);
                 }
             }
 
@@ -48,8 +51,11 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
                     // buy item
                     traderInventory.RemoveItem(stack.item, tradeAmount);
                     playerInventory.AddItem(stack.item, tradeAmount);
+                    GameManager.Instance.PlayerProfile.AddGold(-stack.quantity * stack.item.baseCost);
                 }
             }
+            goldTransferToTraderAmount = 0;
+            UpdateGoldTransferAmountText();
             playerPendingPurchase.Clear();
             playerPendingSale.Clear();
             GetTraderItems();
@@ -80,6 +86,7 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
         GetPlayerItems();
         PopulateGrid(traderItemsPanel, traderDisplayItems);
         PopulateGrid(playerItemsPanel, playerDisplayItems);
+        UpdateGoldTransferAmountText();
     }
 
     void GetTraderItems()
@@ -127,6 +134,7 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
             var match = playerPendingPurchase.FirstOrDefault(s => s.item == stack.item && s.quantity == stack.quantity);
             if (match != null) playerPendingPurchase.Remove(match);
             else playerPendingSale.Add(new ItemStack(stack.item, stack.quantity));
+            UpdateGoldTransferAmount(-stack.quantity * stack.item.baseCost);
 
             // Move the stack visually
             playerDisplayItems.Remove(stack);
@@ -141,6 +149,7 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
             var match = playerPendingSale.FirstOrDefault(s => s.item == stack.item && s.quantity == stack.quantity);
             if (match != null) playerPendingSale.Remove(match);
             else playerPendingPurchase.Add(new ItemStack(stack.item, stack.quantity));
+            UpdateGoldTransferAmount(stack.quantity * stack.item.baseCost);
 
             // Move the stack visually
             traderDisplayItems.Remove(stack);
@@ -178,6 +187,49 @@ public class TradingMenuUI : MenuController, ICardHandler<ItemStack>, IMenuWithS
         // // update grids
         // PopulateGrid(traderItemsPanel, traderDisplayItems);
         // PopulateGrid(playerItemsPanel, playerDisplayItems);
+    }
+    private void UpdateGoldTransferAmount(int amount)
+    {
+        goldTransferToTraderAmount += amount;
+        UpdateGoldTransferAmountText();
+
+        if (goldTransferToTraderAmount > 0)
+        {
+            // player is giving gold to trader
+            if (GameManager.Instance.PlayerProfile.CanAfford(goldTransferToTraderAmount))
+            {
+                goldTransferAmountText.color = Color.white;
+                confirmButton.interactable = true;
+            }
+            else
+            {
+                goldTransferAmountText.color = Color.red;
+                confirmButton.interactable = false;
+            }
+        }
+        else
+        {
+            // trader is giving gold to player
+            goldTransferAmountText.color = Color.white;
+            confirmButton.interactable = true;
+        }
+    }
+
+    private void UpdateGoldTransferAmountText()
+    {
+        if (goldTransferToTraderAmount > 0)
+        {
+            goldTransferAmountText.text = "=>\n" + goldTransferToTraderAmount.ToString() + "\n=>";
+
+        }
+        else if (goldTransferToTraderAmount == 0)
+        {
+            goldTransferAmountText.text = "";
+        }
+        else if (goldTransferToTraderAmount < 0)
+        {
+            goldTransferAmountText.text = "<=\n" + (-goldTransferToTraderAmount).ToString() + "\n<=";
+        }
     }
 
     bool PlayerHas(ItemStack stack) =>
