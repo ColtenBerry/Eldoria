@@ -138,12 +138,14 @@ public static class CombatOutcomeProcessor
 
                 // Destroy other defenders
                 for (int i = 1; i < defenders.Count; i++)
-                    Object.Destroy(defenders[i].gameObject);
+                {
+                    NotifyAndDestroyParty(defenders[i]);
+                }
             }
             else
             {
                 foreach (var party in defenders)
-                    Object.Destroy(party.gameObject);
+                    NotifyAndDestroyParty(party);
             }
         }
         else
@@ -153,12 +155,12 @@ public static class CombatOutcomeProcessor
                 TerritoryManager.Instance.RegisterOwnership(fief, defenders.First().GetComponent<PartyPresence>().Lord);
 
                 foreach (var party in attackers)
-                    Object.Destroy(party.gameObject);
+                    NotifyAndDestroyParty(party);
             }
             else
             {
                 foreach (var party in attackers)
-                    Object.Destroy(party.gameObject);
+                    NotifyAndDestroyParty(party);
             }
         }
     }
@@ -229,6 +231,22 @@ public static class CombatOutcomeProcessor
                 Object.Destroy(party.gameObject);
             }
         }
+    }
+
+    private static void NotifyAndDestroyParty(PartyController party)
+    {
+        PartyPresence presence = party.GetComponent<PartyPresence>();
+        if (presence == null)
+        {
+            Debug.LogWarning("PartyPresence component not found on party to be destroyed.");
+            return;
+        }
+        LordProfile lord = presence.Lord;
+        FactionWarManager factionWarManager;
+        factionWarManager = FactionsManager.Instance.GetWarManager(lord.Faction);
+        factionWarManager.NotifyPartyDestroyed(lord);
+
+        GameObject.Destroy(party.gameObject);
     }
 
 

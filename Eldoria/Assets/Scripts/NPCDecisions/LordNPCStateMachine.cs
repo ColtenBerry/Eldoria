@@ -324,6 +324,8 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     {
         Debug.Log("lordnpcstatemachine sieging castle name: " + castle.name);
         castle.StartSiege(partyController, false);
+        factionWarManager.ClearOrder(currentLord);
+        currentOrder = null;
     }
     protected override void ExecuteTransitionActions()
     {
