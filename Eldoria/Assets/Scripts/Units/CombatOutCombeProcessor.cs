@@ -175,8 +175,12 @@ public static class CombatOutcomeProcessor
         if (playerWon)
         {
             var losers = isPlayerAttacking ? defenders : attackers;
-            var prisoners = ReturnPrisoners(losers);
-            UIManager.Instance.OpenSubMenu("prisoners", prisoners);
+            List<UnitInstance> prisoners = ReturnPrisoners(losers);
+            int goldEarned = CalculateLootFromPartyList(losers);
+            List<ItemStack> potentialLoot = new();
+            PrisonerAndLootMenuContext ctx = new PrisonerAndLootMenuContext(prisoners, goldEarned, potentialLoot);
+
+            UIManager.Instance.OpenSubMenu("prisoners", ctx);
 
             if (isSiegeBattle)
             {
@@ -249,5 +253,39 @@ public static class CombatOutcomeProcessor
         GameObject.Destroy(party.gameObject);
     }
 
+    #region LootRegion
+    private static System.Random rng = new System.Random();
+    private static int CalculateGoldFromUnit(UnitInstance enemy)
+    {
+        int DIVISOR = 5;
+        int statSum = enemy.Attack + enemy.Defence + enemy.Moral;
+        int baseGold = Mathf.Max(1, statSum / DIVISOR);
+
+        // Add ±20% variance
+        float VARIANCE = 0.2f;
+        float multiplier = 1f + ((float)rng.NextDouble() * 2f - 1f) * VARIANCE;
+        int randomizedGold = Mathf.RoundToInt(baseGold * multiplier);
+
+        return Mathf.Max(1, randomizedGold);
+    }
+
+    private static int CalculateLootFromPartyList(List<PartyController> parties)
+    {
+        int totalLootValue = 0;
+        foreach (var party in parties)
+        {
+            foreach (var unit in party.PartyMembers)
+            {
+                totalLootValue += CalculateGoldFromUnit(unit);
+            }
+        }
+        return totalLootValue;
+    }
+
+    //TODO: Expand to include items, etc.
+
+
+
+    #endregion
 
 }

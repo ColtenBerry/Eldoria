@@ -32,6 +32,7 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
             GetRecruits();
             PopulateGrids();
             accumulatedCost = 0;
+            UpdateAccumulatedCostText();
         });
 
     }

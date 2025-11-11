@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,7 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
     [SerializeField] private Transform currentLootGrid;
     [SerializeField] private GameObject unitPrefab;
     [SerializeField] private GameObject itemPrefab;
+    [SerializeField] private TextMeshProUGUI goldEarnedText;
 
     [SerializeField] private GameObject playerParty; // will provide current prisoners and current inventory
     private PartyController playerPartyController;
@@ -23,6 +25,8 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
 
     public List<ItemStack> currentLootList = new();
     public List<ItemStack> potentialLootList = new();
+
+    private int goldEarned = 0;
 
 
     public void Awake()
@@ -49,6 +53,8 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
                 playerPartyController.AddPrisoner(prisoner);
             }
 
+            GameManager.Instance.PlayerProfile.AddGold(goldEarned);
+
             // close menu
             UIManager.Instance.CloseAllMenus();
         });
@@ -57,15 +63,21 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
 
     public void OpenMenu(object source)
     {
+        if (source is not PrisonerAndLootMenuContext)
+        {
+            Debug.LogWarning("PrisonerAndLootMenuContext expected as source");
+            return;
+        }
+        PrisonerAndLootMenuContext ctx = source as PrisonerAndLootMenuContext;
         potentialLootList.Clear();
         potentialPrisonerList.Clear();
         currentLootList.Clear();
         currentPrisonerList.Clear();
         // populate prisoner list: 
-        potentialPrisonerList.AddRange(source as List<UnitInstance>);
+        potentialPrisonerList.AddRange(ctx.potentialPrisoners);
         if (potentialPrisonerList == null)
         {
-            Debug.LogWarning("OpenMenu called with invalid source type.");
+            Debug.LogWarning("something is wrong, potentialPrisonerList is null");
             return;
         }
 
@@ -75,7 +87,10 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
         // populate Loot lists: 
         currentLootList.AddRange(playerInventoryManager.GetAllItems());
 
-        potentialLootList = new();
+        // set loot list
+        potentialLootList = ctx.potentialLoot;
+        // set gold earned
+        SetGoldEarned(ctx.goldEarned);
 
 
         PopulatePrisonerGrids();
@@ -161,5 +176,26 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
         }
 
         PopulatePrisonerGrids();
+    }
+
+    private void SetGoldEarned(int amount)
+    {
+        goldEarned = amount;
+        goldEarnedText.text = "Gold Earned: " + goldEarned.ToString();
+    }
+}
+
+
+public class PrisonerAndLootMenuContext
+{
+    public List<UnitInstance> potentialPrisoners;
+    public int goldEarned;
+    public List<ItemStack> potentialLoot;
+
+    public PrisonerAndLootMenuContext(List<UnitInstance> potentialPrisoners, int goldEarned, List<ItemStack> potentialLoot)
+    {
+        this.potentialPrisoners = potentialPrisoners;
+        this.goldEarned = goldEarned;
+        this.potentialLoot = potentialLoot;
     }
 }
