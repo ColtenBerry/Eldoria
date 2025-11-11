@@ -48,6 +48,7 @@ public class TerritoryManager : MonoBehaviour
         }
 
         settlementToLord[settlement] = lord;
+        Debug.Log($"{lord.Lord.UnitName} is the new lord of {settlement.name}");
 
         if (!lordToSettlements.ContainsKey(lord))
             lordToSettlements[lord] = new List<Settlement>();

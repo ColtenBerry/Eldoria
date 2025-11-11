@@ -117,6 +117,8 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
             Debug.Log("Apparently a besieged castle is under siege again...");
             return;
         }
+        Debug.Log($"{name} is besieged by {attacker.name}");
+        FactionsManager.Instance.GetWarManager(GetFaction()).NotifySettlementUnderSiege(this);
 
         siegeAttacker = attacker;
         siegeByPlayer = isPlayer;
@@ -152,11 +154,12 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
             if (siegeByPlayer)
             {
                 UIManager.Instance.CloseAllMenus();
-                CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, GetFaction(), this);
+                CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, GetFaction(), this, true);
             }
 
             else
             {
+                Debug.Log("starting siege battle");
                 CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, GetFaction(), this);
 
             }

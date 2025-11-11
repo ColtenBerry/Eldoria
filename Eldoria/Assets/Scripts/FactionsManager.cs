@@ -17,8 +17,13 @@ public class FactionsManager : MonoBehaviour
     private Dictionary<Faction, List<PartyPresence>> factionParties = new();
 
 
-    private Dictionary<Faction, HashSet<Faction>> allies = new();
-    private Dictionary<Faction, HashSet<Faction>> enemies = new();
+    private Dictionary<Faction, List<Faction>> allies = new();
+    private Dictionary<Faction, List<Faction>> enemies = new();
+
+
+
+    private Dictionary<Faction, FactionWarManager> warManagers = new();
+
     public bool AreAllied(Faction a, Faction b)
     {
         return allies[a].Contains(b) || a == b;
@@ -27,6 +32,10 @@ public class FactionsManager : MonoBehaviour
     public bool AreEnemies(Faction a, Faction b)
     {
         return enemies.TryGetValue(a, out var enemySet) && enemySet.Contains(b);
+    }
+    public List<Faction> GetEnemiesOf(Faction faction)
+    {
+        return enemies[faction];
     }
 
 
@@ -48,7 +57,30 @@ public class FactionsManager : MonoBehaviour
     {
         InitializeFactionsFromLords();
         InitializeWars();
+        CreateWarManagers();
     }
+
+    private void CreateWarManagers()
+    {
+        foreach (var faction in AllFactions)
+        {
+            GameObject managerGO = new GameObject($"WarManager_{faction.factionName}");
+            managerGO.transform.SetParent(transform); // optional: keep hierarchy clean
+
+            FactionWarManager manager = managerGO.AddComponent<FactionWarManager>();
+            manager.owningFaction = faction;
+
+            warManagers[faction] = manager;
+        }
+    }
+
+    public FactionWarManager GetWarManager(Faction faction)
+    {
+        warManagers.TryGetValue(faction, out var manager);
+        return manager;
+    }
+
+
     public Faction GetFactionByName(string name) =>
         AllFactions.FirstOrDefault(f => f.factionName == name);
 
@@ -79,8 +111,8 @@ public class FactionsManager : MonoBehaviour
 
         foreach (var faction in AllFactions)
         {
-            if (!allies.ContainsKey(faction)) allies[faction] = new HashSet<Faction>();
-            if (!enemies.ContainsKey(faction)) enemies[faction] = new HashSet<Faction>();
+            if (!allies.ContainsKey(faction)) allies[faction] = new List<Faction>();
+            if (!enemies.ContainsKey(faction)) enemies[faction] = new List<Faction>();
         }
     }
 
@@ -98,10 +130,10 @@ public class FactionsManager : MonoBehaviour
 
     private void EnsureRelationKeys(Faction a, Faction b)
     {
-        if (!allies.ContainsKey(a)) allies[a] = new HashSet<Faction>();
-        if (!allies.ContainsKey(b)) allies[b] = new HashSet<Faction>();
-        if (!enemies.ContainsKey(a)) enemies[a] = new HashSet<Faction>();
-        if (!enemies.ContainsKey(b)) enemies[b] = new HashSet<Faction>();
+        if (!allies.ContainsKey(a)) allies[a] = new List<Faction>();
+        if (!allies.ContainsKey(b)) allies[b] = new List<Faction>();
+        if (!enemies.ContainsKey(a)) enemies[a] = new List<Faction>();
+        if (!enemies.ContainsKey(b)) enemies[b] = new List<Faction>();
     }
 
 

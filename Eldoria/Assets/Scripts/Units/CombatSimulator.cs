@@ -83,6 +83,7 @@ public static class CombatSimulator
 
         CombatResult result = SimulateBattle(attackers, defenders);
         CombatOutcomeProcessor.ApplyCombatResult(result, attackers, defenders);
+        CombatOutcomeProcessor.ProcessAutoResolveResult(result, attackers, defenders, true, targetFief);
         return result;
     }
 

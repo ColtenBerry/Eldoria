@@ -28,6 +28,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     [SerializeField] private NPCIntent currentIntent;
     [SerializeField] private NPCIntent previousIntent;
     private LordProfile currentLord;
+    private FactionWarManager factionWarManager;
     private PartyController partyController;
     private PartyPresence partyPresence;
 
@@ -72,6 +73,8 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         }
 
         Debug.Log("✅ Current lord is " + currentLord.Lord.UnitName);
+
+        factionWarManager = FactionsManager.Instance.GetWarManager(currentLord.Faction);
     }
 
 
@@ -90,133 +93,105 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     /// </summary>
     protected override void SetIdleBehavior()
     {
-        if (currentOrder == null)
+        if (currentOrder != null)
         {
-            currentIntent = NPCIntent.None;
-            MakeIndividualDecision();
-            return;
+            EvaluateFactionOrder();
         }
-
-        switch (currentOrder.Type)
+        else
         {
-            case FactionOrderType.Patrol:
-                currentIntent = NPCIntent.PatrolTerritory;
-                Patrol(currentOrder.TargetLocation);
-                break;
-            case FactionOrderType.Defend:
-                currentIntent = ResolveDefendIntent(currentOrder.TargetObject);
-                Defend(currentOrder.TargetObject, currentOrder.TargetLocation);
-                break;
-            case FactionOrderType.Attack:
-                currentIntent = ResolveAttackIntent(currentOrder.TargetObject);
-                Engage(currentOrder.TargetObject, currentOrder.TargetLocation);
-                break;
+            EvaluateLocalIntent();
         }
+        Debug.Log("execute if close");
+        ExecuteIntentIfClose();
     }
-
-    private void Patrol(Vector3 location)
-    {
-        RequestMove(location); // later we will implement a patrol loop
-    }
-
-    private void Defend(IInteractable interactableObject, Vector3 targetPosition)
-    {
-        if (IsCloseTo(targetPosition))
-        {
-            // engage nearby enemies, wait in territory, etc.
-
-        }
-        else RequestMove(targetPosition); // move to spot
-    }
-
-    private void Engage(IInteractable interactableObject, Vector3 targetPosition)
-    {
-        if (IsCloseTo(targetPosition))
-        {
-            // engage target. Siege castle, raid land, attack party, etc. 
-
-        }
-        else MoveTowardsNextTileInPath(); // move to spot
-    }
-
-    /*
-        So something I noticed about makeindividual decision is a lot of methods will be repeated. For example, in shouldrecruit() we have
-        to check if there are fiefs we can recruit, but shouldrecruit returns a bool so we have to go through all that logic again to get a suitable 
-        target to recruit from
-
-        We should make a list of private fields that we can use to store this information
-
-        I am almost tempted to make a new object for the intent where we can store this relevant information. Kind of like faction order. 
-
-        For the defensive options, it doesn't make sense to constantly check if a territory is under siege. That should be an alert that is sent to us. 
-        Not sure how to do that though...
-    */
 
 
     private List<Settlement> unPatrolledLands = new();
 
     private GameObject previousObjective;
+    private GameObject objective;
 
-    /// <summary>
-    /// Current Faction Order is null, assess situation and create a local decision
-    /// </summary>
-    private void MakeIndividualDecision()
+    private void EvaluateFactionOrder()
+    {
+        if (currentOrder == null) return;
+
+        currentIntent = currentOrder.Type switch
+        {
+            FactionOrderType.Attack => ResolveAttackIntent(currentOrder.TargetObject),
+            FactionOrderType.Defend => ResolveDefendIntent(currentOrder.TargetObject),
+            _ => NPCIntent.None
+        };
+        GameObject targetGO = (currentOrder.TargetObject as MonoBehaviour)?.gameObject;
+        if (targetGO == null)
+        {
+            Debug.LogError("expected a monobehavior on the game object");
+            return;
+        }
+
+
+        if (previousIntent != currentIntent || previousObjective != targetGO)
+        {
+            currentPath.Clear();
+            GeneratePathTo(currentOrder.TargetLocation);
+            Debug.Log("Generating path to: " + currentOrder.TargetLocation);
+
+            // preserve previous intent so we can run leave-fief logic if we were waiting
+            var wasWaiting = previousIntent == NPCIntent.WaitInFief;
+
+            previousIntent = currentIntent;
+            objective = targetGO;
+
+            // fix: remember the objective so future checks see that we've already applied it
+            previousObjective = objective;
+
+            if (wasWaiting && partyPresence != null)
+                partyPresence.LeaveFief();
+        }
+        Debug.Log("Intent: " + currentIntent);
+        Debug.Log("Target location: " + currentOrder.TargetLocation);
+        Debug.Log("Target object: " + (currentOrder.TargetObject as MonoBehaviour)?.name);
+
+    }
+
+    private void EvaluateLocalIntent()
     {
         if (currentLord == null) return;
-        // choose to recruit, sit in fief, upgrade fief, patrol lands, etc.
-        GameObject objective;
+
 
         if (ShouldDefendFief())
         {
-            // travel to fief. Maybe pick the most valuable fief / closest fief under attack
-            List<Settlement> ownedSettlements = TerritoryManager.Instance.GetSettlementsOf(currentLord);
-            objective = ownedSettlements.First().gameObject;
-
+            currentIntent = NPCIntent.DefendFief;
+            objective = TerritoryManager.Instance.GetSettlementsOf(currentLord).First().gameObject;
         }
-
-
         else if (ShouldRecruit())
         {
-            Debug.Log("should recruit. doing recruit if statemetn");
             currentIntent = NPCIntent.RecruitTroops;
+            var validSources = TerritoryManager.Instance.GetSettlementsOf(currentLord)
+                .Where(s => s.TryGetComponent<RecruitmentSource>(out var src) && src.GetRecruitableUnits().Count > 0)
+                .Select(s => s.gameObject)
+                .ToList();
 
-            List<Settlement> ownedSettlements = TerritoryManager.Instance.GetSettlementsOf(currentLord);
-            List<Settlement> validRecruitmentSources = ownedSettlements.FindAll(settlement =>
-        settlement.TryGetComponent<RecruitmentSource>(out var source) &&
-        source.GetRecruitableUnits().Count > 0);
-
-            List<GameObject> recruitmentGameObjects = validRecruitmentSources
-                .ConvertAll(settlement => settlement.gameObject);
-
-            objective = GetClosest(recruitmentGameObjects);
+            objective = GetClosest(validSources);
         }
-
-
         else if (ShouldPatrol())
         {
-            Debug.Log("Intending to Patrol");
-            // get closest land in unpatrolled lands
-            List<GameObject> unPatrolledLandsGO = unPatrolledLands.ConvertAll(settlement => settlement.gameObject);
-            objective = GetClosest(unPatrolledLandsGO);
+            currentIntent = NPCIntent.PatrolTerritory;
+            objective = GetClosest(unPatrolledLands.Select(s => s.gameObject).ToList());
         }
-
-
         else
         {
-            // get owned fief to sit in. 
             currentIntent = NPCIntent.WaitInFief;
-            List<Settlement> ownedSettlements = TerritoryManager.Instance.GetSettlementsOf(currentLord);
-            Settlement richest = ownedSettlements.OrderByDescending(s => s.GetProsperity()).FirstOrDefault();
-            objective = richest.gameObject;
+            objective = TerritoryManager.Instance.GetSettlementsOf(currentLord)
+                .OrderByDescending(s => s.GetProsperity())
+                .FirstOrDefault()?.gameObject;
         }
 
-        Vector3 intentLocation = objective.transform.position;
-        // check previous intent against current intent
+        if (objective == null) return;
+
         if (previousIntent != currentIntent || previousObjective != objective)
         {
             currentPath.Clear();
-
-            GeneratePathTo(intentLocation);
+            GeneratePathTo(objective.transform.position);
 
             if (previousIntent == NPCIntent.WaitInFief)
             {
@@ -226,40 +201,62 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             previousIntent = currentIntent;
             previousObjective = objective;
         }
+    }
 
-        if (IsCloseTo(intentLocation))
+    private void ExecuteIntentIfClose()
+    {
+        Debug.Log("execute if close called");
+        if (objective == null) return;
+
+        Vector3 targetPos = objective.transform.position;
+
+        if (IsCloseTo(targetPos))
         {
-            // attempt relevant action. 
+            Debug.Log("is close to : " + objective.name);
             switch (currentIntent)
             {
                 case NPCIntent.RecruitTroops:
-                    Debug.Log("Attempting to get recruitment source");
-                    RecruitmentSource source = objective.GetComponent<RecruitmentSource>();
-                    if (source == null)
-                    {
-                        Debug.Log("Recruitment source is null");
-                    }
+                    var source = objective.GetComponent<RecruitmentSource>();
                     Recruit(source);
                     break;
                 case NPCIntent.WaitInFief:
                     partyPresence.WaitInFief();
                     break;
                 case NPCIntent.PatrolTerritory:
-                    Debug.Log("Attempting to get settlement script");
-                    Settlement settlement = objective.GetComponent<Settlement>();
-                    if (settlement == null)
-                    {
-                        Debug.Log("settlement script is null");
-                    }
+                    var settlement = objective.GetComponent<Settlement>();
                     PatrolLand(settlement);
                     break;
+                case NPCIntent.SiegeCastle:
+                    Castle castle = objective.GetComponent<Castle>();
+                    if (castle != null)
+                    {
+                        Debug.Log("npc intent thing reached on castle: " + castle.name);
+                        SiegeCastle(castle);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("previousobjective is not a castle");
+                    }
+
+                    break;
+                default:
+                    Debug.Log("something is wrong. default hit");
+                    break;
+
             }
         }
         else
         {
             MoveTowardsNextTileInPath();
+            Debug.Log("Current path count: " + currentPath.Count);
         }
     }
+
+
+
+    /// <summary>
+    /// Current Faction Order is null, assess situation and create a local decision
+    /// </summary>
 
     private bool ShouldPatrol()
     {
@@ -322,6 +319,12 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             }
         }
     }
+
+    private void SiegeCastle(Castle castle)
+    {
+        Debug.Log("lordnpcstatemachine sieging castle name: " + castle.name);
+        castle.StartSiege(partyController, false);
+    }
     protected override void ExecuteTransitionActions()
     {
     }
@@ -372,7 +375,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         if (currentPath.Count == 0) return;
 
         Vector3 next = currentPath.Peek();
-        Debug.Log("Next tile goal: " + next);
+        // Debug.Log("Next tile goal: " + next);
         RequestMove(next);
 
         if (IsCloseTo(next))
