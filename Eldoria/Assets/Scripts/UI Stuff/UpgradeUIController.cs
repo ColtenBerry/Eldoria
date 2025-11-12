@@ -12,6 +12,8 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
     [SerializeField] private TextMeshProUGUI previousTroopTextStats;
     [SerializeField] private TextMeshProUGUI upgradedTroopTextName;
     [SerializeField] private TextMeshProUGUI upgradedTroopTextStats;
+    [SerializeField] private TextMeshProUGUI upgradeCostText;
+    [SerializeField] private Button closeMenuButton;
 
     private UnitData currentUnitSelected;
     private UpgradeObject upgradeData;
@@ -32,8 +34,15 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
             // alert partymenu ui that something changed
             playerPartyController.NotifyPartyUpdated();
 
+            GameManager.Instance.PlayerProfile.ChangeGold(-currentUnitSelected.upgradeCost);
+
             UIManager.Instance.CloseUpgradeUnitMenu();
 
+        });
+
+        closeMenuButton.onClick.AddListener(() =>
+        {
+            UIManager.Instance.CloseUpgradeUnitMenu();
         });
     }
 
@@ -88,6 +97,20 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
 
         UpgradeOptionToggle selectedOption = selectedToggle.GetComponent<UpgradeOptionToggle>();
         if (selectedOption == null) return;
+
+        upgradeCostText.text = $"Cost: {selectedOption.GetUnitData().upgradeCost}";
+
+        if (GameManager.Instance.PlayerProfile.CanAfford(selectedOption.GetUnitData().upgradeCost))
+        {
+            upgradeCostText.color = Color.white;
+            upgradeButton.interactable = true;
+        }
+        else
+        {
+            upgradeCostText.color = Color.red;
+            upgradeButton.interactable = false;
+        }
+
 
         currentUnitSelected = selectedOption.GetUnitData();
         PopulateUpgradeOptionInfo(currentUnitSelected);

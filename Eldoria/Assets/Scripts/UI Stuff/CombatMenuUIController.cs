@@ -83,8 +83,6 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
             PopulateGrid(attackingUnitsGrid, result.AttackerUnits);
             PopulateGrid(defendingUnitsGrid, result.DefenderUnits);
 
-            // apply results
-            CombatOutcomeProcessor.ApplyCombatResult(result, attackingPartyControllers, defendingPartyControllers);
 
             confirmButton.GetComponentInChildren<TextMeshProUGUI>().text = "Continue";
             confirmButton.onClick.RemoveAllListeners();

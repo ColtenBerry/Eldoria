@@ -167,17 +167,18 @@ public static class CombatOutcomeProcessor
 
     public static void ProcessPlayerBattleResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders, bool isPlayerAttacking, bool isSiegeBattle, Settlement fief)
     {
+        List<PartyController> losers = result.AttackersWin ? defenders : attackers;
+
+        List<ItemStack> potentialLoot = GenerateLootFromPartyList(losers);
+        int goldEarned = CalculateValueFromPartyList(losers);
+
         ApplyCombatResult(result, attackers, defenders);
 
         bool playerWon = (result.AttackersWin && isPlayerAttacking) || (!result.AttackersWin && !isPlayerAttacking);
 
-
         if (playerWon)
         {
-            var losers = isPlayerAttacking ? defenders : attackers;
             List<UnitInstance> prisoners = ReturnPrisoners(losers);
-            int goldEarned = CalculateLootFromPartyList(losers);
-            List<ItemStack> potentialLoot = new();
             PrisonerAndLootMenuContext ctx = new PrisonerAndLootMenuContext(prisoners, goldEarned, potentialLoot);
 
             UIManager.Instance.OpenSubMenu("prisoners", ctx);
@@ -228,7 +229,7 @@ public static class CombatOutcomeProcessor
                 TerritoryManager.Instance.RegisterOwnership(fief, newOwner);
             }
 
-            var losers = isPlayerAttacking ? attackers : defenders;
+            losers = isPlayerAttacking ? attackers : defenders;
             foreach (var party in losers)
             {
                 // TODO: if party is player, handle differently
@@ -255,10 +256,19 @@ public static class CombatOutcomeProcessor
 
     #region LootRegion
     private static System.Random rng = new System.Random();
-    private static int CalculateGoldFromUnit(UnitInstance enemy)
+
+    /// <summary>
+    /// Calculates the value of a defeated unit based on its stats.
+    /// Divisor controls overall scaling; higher means less value.
+    /// </summary>
+    /// <param name="enemy"></param>
+    /// <param name="DIVISOR"></param>
+    /// <returns></returns>
+    private static int CalculateValueFromUnit(UnitInstance enemy, int DIVISOR = 5)
     {
-        int DIVISOR = 5;
-        int statSum = enemy.Attack + enemy.Defence + enemy.Moral;
+        int statSum = enemy.Attack + enemy.Defence + enemy.Health;
+        Debug.Log("health: " + enemy.Health);
+        Debug.Log("stat sum: " + statSum);
         int baseGold = Mathf.Max(1, statSum / DIVISOR);
 
         // Add ±20% variance
@@ -269,14 +279,14 @@ public static class CombatOutcomeProcessor
         return Mathf.Max(1, randomizedGold);
     }
 
-    private static int CalculateLootFromPartyList(List<PartyController> parties)
+    private static int CalculateValueFromPartyList(List<PartyController> parties, int DIVISOR = 5)
     {
         int totalLootValue = 0;
         foreach (var party in parties)
         {
             foreach (var unit in party.PartyMembers)
             {
-                totalLootValue += CalculateGoldFromUnit(unit);
+                totalLootValue += CalculateValueFromUnit(unit, DIVISOR);
             }
         }
         return totalLootValue;
@@ -284,6 +294,40 @@ public static class CombatOutcomeProcessor
 
     //TODO: Expand to include items, etc.
 
+    private static List<ItemStack> GenerateLootFromPartyList(List<PartyController> parties)
+    {
+        List<ItemStack> loot = new();
+        int value = CalculateValueFromPartyList(parties);
+
+        while (value > 0)
+        {
+            InventoryItem itemData = ItemDatabase.GetRandomItem();
+            int itemValue = itemData.baseCost;
+
+            if (itemValue <= value)
+            {
+                // Check if this item already exists in the loot list
+                var existingStack = loot.FirstOrDefault(stack => stack.item == itemData);
+                if (existingStack != null)
+                {
+                    existingStack.quantity += 1;
+                }
+                else
+                {
+                    loot.Add(new ItemStack(itemData, 1));
+                }
+
+                value -= itemValue;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        // Placeholder: Currently no items are generated
+        return loot;
+    }
 
 
     #endregion

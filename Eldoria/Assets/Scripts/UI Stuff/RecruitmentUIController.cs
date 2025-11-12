@@ -39,6 +39,7 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
     public void OpenMenu(object source)
     {
         potentialRecruits.Clear();
+        accumulatedCost = 0;
 
         // Step 1: Cast the interface back to a Component
         var component = source as Component;
