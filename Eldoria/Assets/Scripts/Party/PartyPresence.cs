@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using TMPro;
@@ -151,6 +152,8 @@ public class PartyPresence : MonoBehaviour, IInteractable
         gameObject.layer = LayerMask.NameToLayer("Interactable");
         SetTransparency(gameObject, 1.0f);
     }
-
-
+    internal bool IsInFief()
+    {
+        return gameObject.layer == LayerMask.NameToLayer("");
+    }
 }

@@ -193,7 +193,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             currentPath.Clear();
             GeneratePathTo(objective.transform.position);
 
-            if (previousIntent == NPCIntent.WaitInFief)
+            if (partyPresence.IsInFief())
             {
                 partyPresence.LeaveFief();
             }
@@ -239,6 +239,9 @@ public class LordNPCStateMachine : BaseNPCStateMachine
                     }
 
                     break;
+                case NPCIntent.DefendFief:
+                    DefendFief(objective.GetComponent<Settlement>());
+                    break;
                 default:
                     Debug.Log("something is wrong. default hit");
                     break;
@@ -254,10 +257,43 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
 
 
+    private void DefendFief(Settlement fief)
+    {
+        if (nearbyEnemies.Count == 0)
+        {
+            Debug.Log("no nearby enemies to defend against");
+            factionWarManager.ClearOrder(currentLord);
+            currentOrder = null;
+            return;
+        }
+        if (fief is Castle)
+        {
+            Castle castle = (Castle)fief;
+            // defend castle logic
+            if (!castle.isUnderSiege)
+            {
+                // join castle in defense
+                partyPresence.WaitInFief();
+            }
+        }
+        else if (fief is Village)
+        {
+            // defend village logic
+            // just sit here i guess
+        }
+        else
+        {
+            Debug.LogWarning("Expected fief to be Castle or Village");
+        }
+
+        // defend logic
+    }
+
+
+
     /// <summary>
     /// Current Faction Order is null, assess situation and create a local decision
     /// </summary>
-
     private bool ShouldPatrol()
     {
         return unPatrolledLands.Count > 0;

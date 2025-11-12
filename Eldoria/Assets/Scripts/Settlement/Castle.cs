@@ -132,6 +132,15 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
         }
 
     }
+
+    public void EndSiege()
+    {
+        siegeAttacker = null;
+        siegeByPlayer = false;
+        siegeTicksRemaining = 0;
+
+        TickManager.Instance.OnTick -= HandleTick;
+    }
     private int GetSiegeTicks()
     {
         return (int)Math.Round((double)prosperity / 100);
