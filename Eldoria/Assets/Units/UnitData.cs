@@ -19,7 +19,7 @@ public class UnitData : ScriptableObject
 
     [Header("Cost")]
     public int recruitmentCost;
-    public int upkeepCostPerDay;
+    public int upkeepCostPerWeek;
     public int upgradeCost;
 
 }

@@ -83,6 +83,16 @@ public class PartyController : MonoBehaviour
         Prisoners.Clear();
     }
 
+    public int CalculateWeeklyUpkeep()
+    {
+        int totalUpkeep = 0;
+        foreach (UnitInstance unit in PartyMembers)
+        {
+            totalUpkeep += unit.baseData.upkeepCostPerWeek;
+        }
+        return totalUpkeep;
+    }
+
     /// <summary>
     /// I dislike this, it is so that PartyUI can refresh
     /// </summary>

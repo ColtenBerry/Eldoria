@@ -92,12 +92,94 @@ public class TerritoryManager : MonoBehaviour
     {
         return GetSettlementsOf(lord).FindAll(s => s is T).ConvertAll(s => s as T);
     }
-}
 
 
-[System.Serializable]
-public class TerritoryAssignment
-{
-    public Settlement settlement;
-    public LordProfileSO ownerData;
+    public void DistributeWeeklyEarnings(int weekNumber)
+    {
+        // iterate through all landowning lords
+        foreach (var kvp in lordToSettlements)
+        {
+            LordProfile lord = kvp.Key;
+            if (lord == GameManager.Instance.PlayerProfile) continue; // Skip player for later
+            List<Settlement> settlements = kvp.Value;
+            int netEarnings = CalculateLordFinances(lord, settlements);
+            lord.AddGold(netEarnings);
+        }
+        // Handle player lord separately to show UI
+        LordProfile playerLord = GameManager.Instance.PlayerProfile;
+        List<Settlement> playerSettlements = GetSettlementsOf(playerLord);
+        EarningData[] earningData = new EarningData[playerSettlements.Count * 10]; // +1 for party
+        int index = 0;
+        foreach (var settlement in playerSettlements)
+        {
+            // Calculate earnings
+            int earnings = settlement.CalculateWeeklyEarnings();
+            earningData[index] = new EarningData(settlement.name, earnings);
+            index = index + 1;
+
+            // Calculate garrison upkeep
+            int garrisonUpkeep = 0;
+            PartyController garrison = settlement.GetComponent<PartyController>();
+            if (garrison != null)
+            {
+                garrisonUpkeep = garrison.CalculateWeeklyUpkeep();
+                earningData[index] = new EarningData(settlement.name, -garrisonUpkeep);
+                index = index + 1;
+            }
+        }
+        // Calculate party upkeep
+        if (playerLord.ActiveParty != null)
+        {
+            int partyUpkeep = playerLord.ActiveParty.GetComponent<PartyController>().CalculateWeeklyUpkeep();
+            earningData[index] = new EarningData("Active Party Upkeep", -partyUpkeep);
+            index = index + 1;
+        }
+        // Resize array to actual used size
+        System.Array.Resize(ref earningData, index);
+
+        //open menu
+        UIManager.Instance.OpenWeeklyEarningsMenu(earningData);
+
+    }
+
+    private int CalculateLordFinances(LordProfile lord, List<Settlement> settlements)
+    {
+        int totalEarnings = 0;
+        int totalUpkeep = 0;
+        int netEarnings = 0;
+
+        foreach (var settlement in settlements)
+        {
+            int earnings = settlement.CalculateWeeklyEarnings();
+            totalEarnings += earnings;
+
+            // Calculate garrison upkeep
+            PartyController garrison = settlement.GetComponent<PartyController>();
+            if (garrison != null)
+            {
+                int garrisonUpkeep = garrison.CalculateWeeklyUpkeep();
+                totalUpkeep += garrisonUpkeep;
+            }
+
+            // Calculate party upkeep
+            if (lord.ActiveParty != null)
+            {
+                int partyUpkeep = lord.ActiveParty.GetComponent<PartyController>().CalculateWeeklyUpkeep();
+                totalUpkeep += partyUpkeep;
+            }
+
+            netEarnings = totalEarnings - totalUpkeep;
+        }
+        Debug.Log($"Lord {lord.Lord.UnitName} Earnings: {totalEarnings}, Upkeep: {totalUpkeep}, Net: {netEarnings}");
+        return netEarnings;
+
+    }
+
+
+    [System.Serializable]
+    public class TerritoryAssignment
+    {
+        public Settlement settlement;
+        public LordProfileSO ownerData;
+    }
 }

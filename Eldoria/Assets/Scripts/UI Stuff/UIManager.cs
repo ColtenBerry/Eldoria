@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private WaitingMenuController waitingMenuController;
     [SerializeField] private InteractionMenuUI interactionMenuUI;
     [SerializeField] private UpgradeUIController upgradeUIController;
+    [SerializeField] private WeeklyEarningsPanelController weeklyEarningsUIController;
 
 
     private void Awake()
@@ -66,6 +67,22 @@ public class UIManager : MonoBehaviour
         // update partyui??
 
         // partyui should still be open, so no need to close inputgate or time
+    }
+
+    public void OpenWeeklyEarningsMenu(EarningData[] earningData)
+    {
+        weeklyEarningsUIController.gameObject.SetActive(true);
+        weeklyEarningsUIController.OpenMenu(earningData);
+        InputGate.OnMenuOpened?.Invoke();
+        TimeGate.PauseTime();
+    }
+
+    public void CloseWeeklyEarningsMenu()
+    {
+        weeklyEarningsUIController.gameObject.SetActive(false);
+
+        InputGate.OnMenuClosed?.Invoke();
+        TimeGate.ResumeTime();
     }
 
     public void CloseAllMenus()

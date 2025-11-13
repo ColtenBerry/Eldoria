@@ -23,6 +23,15 @@ public abstract class Settlement : MonoBehaviour, IInteractable
 
     public abstract void ApplyVisuals();
 
+    public virtual int CalculateWeeklyEarnings()
+    {
+        // Base earnings could be a function of prosperity
+        int baseEarnings = prosperity;
+
+        // Additional modifiers can be added here
+        return baseEarnings;
+    }
+
     public abstract List<InteractionOption> GetInteractionOptions();
     public abstract void Interact();
 }

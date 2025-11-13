@@ -32,24 +32,24 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject); // Optional: persist across scenes
 
 
-        // setup player profile
-        playerProfile = new LordProfile(playerProfileSO);
 
-        // spawn player
-        PartyPresence partyPresence = player.GetComponent<PartyPresence>();
-        if (partyPresence == null)
-            Debug.LogError("PartyPresence missing on player!");
-
-
-        // Generate LordProfile
-        playerProfile.AddActiveParty(partyPresence);
-
-        player.SetActive(true);
 
 
 
         LordRegistry.Instance.Initialize();
         TerritoryManager.Instance.InitializeOwnership(LordRegistry.Instance.GetAllLords());
+
+        playerProfile = LordRegistry.Instance.GetLordBySO(playerProfileSO);
+        PartyPresence partyPresence = player.GetComponent<PartyPresence>();
+        if (partyPresence == null)
+            Debug.LogError("PartyPresence missing on player!");
+
+
+        playerProfile.AddActiveParty(partyPresence);
+
+        player.SetActive(true);
+
+
 
     }
 
@@ -60,6 +60,9 @@ public class GameManager : MonoBehaviour
             if (profile.SourceData == playerProfileSO) continue;
             SpawnParty(profile);
         }
+
+        // subscribe to weekly tick
+        TickManager.Instance.OnWeekPassed += TerritoryManager.Instance.DistributeWeeklyEarnings;
     }
 
     public void SpawnParty(LordProfile lordProfile)

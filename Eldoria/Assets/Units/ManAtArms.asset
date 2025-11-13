@@ -22,5 +22,5 @@ MonoBehaviour:
   experienceToNextLevel: 50
   upgradeOptions: []
   recruitmentCost: 50
-  upkeepCostPerDay: 5
+  upkeepCostPerWeek: 5
   upgradeCost: 100
