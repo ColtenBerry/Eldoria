@@ -125,6 +125,9 @@ public static class CombatOutcomeProcessor
 
         bool attackersWin = result.AttackersWin;
 
+        List<PartyController> losers = result.AttackersWin ? defenders : attackers;
+
+
         if (attackersWin)
         {
             if (isSiegeBattle)
@@ -163,6 +166,10 @@ public static class CombatOutcomeProcessor
                     NotifyAndDestroyParty(party);
             }
         }
+
+        // print the message
+        UIManager.Instance.LogMessage(new WorldMessage($"{losers.First().GetComponent<PartyPresence>().Lord.Lord.UnitName} has been defeated in battle."));
+
     }
 
     public static void ProcessPlayerBattleResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders, bool isPlayerAttacking, bool isSiegeBattle, Settlement fief)
@@ -213,6 +220,9 @@ public static class CombatOutcomeProcessor
                     Object.Destroy(party.gameObject);
                 }
             }
+
+            UIManager.Instance.LogMessage(new WorldMessage($"{losers.First().GetComponent<PartyPresence>().Lord.Lord.UnitName} has been defeated in battle."));
+
         }
         else // player lost
         {

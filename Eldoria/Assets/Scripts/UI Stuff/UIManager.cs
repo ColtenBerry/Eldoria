@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private InteractionMenuUI interactionMenuUI;
     [SerializeField] private UpgradeUIController upgradeUIController;
     [SerializeField] private WeeklyEarningsPanelController weeklyEarningsUIController;
+    [SerializeField] private MessageLog messageLog;
 
 
     private void Awake()
@@ -91,6 +92,11 @@ public class UIManager : MonoBehaviour
         waitingMenuController.gameObject.SetActive(false);
         InputGate.OnMenuClosed?.Invoke();
         TimeGate.ResumeTime();
+    }
+
+    public void LogMessage(WorldMessage msg)
+    {
+        messageLog.LogMessage(msg);
     }
 }
 
