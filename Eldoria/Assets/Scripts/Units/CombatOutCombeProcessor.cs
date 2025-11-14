@@ -221,6 +221,7 @@ public static class CombatOutcomeProcessor
                 }
             }
 
+            // throws an error because the garrison does not have a lord. 
             UIManager.Instance.LogMessage(new WorldMessage($"{losers.First().GetComponent<PartyPresence>().Lord.Lord.UnitName} has been defeated in battle."));
 
         }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class MessageLog : MonoBehaviour
 {
@@ -8,6 +9,10 @@ public class MessageLog : MonoBehaviour
     [SerializeField] private GameObject messagePrefab;
     [SerializeField] private int maxMessages = 50;
     [SerializeField] private int messageLifetimeTicks = 10; // expire after X ticks
+    [SerializeField] private Image backgroundImage; // for the black background
+
+
+    private float BACKGROUND_ALPHA = 0.86f;
 
     private readonly Queue<(WorldMessage msg, GameObject ui)> activeMessages = new();
 
@@ -24,6 +29,11 @@ public class MessageLog : MonoBehaviour
         {
             TickManager.Instance.OnTick -= HandleTick;
         }
+    }
+
+    private void Awake()
+    {
+        backgroundImage = GetComponent<Image>();
     }
     bool subscribed = false;
     private void Update()
@@ -50,6 +60,8 @@ public class MessageLog : MonoBehaviour
             Debug.Log("destorying message: " + oldest.msg.Text);
             Destroy(oldest.ui);
         }
+        UpdateBackgroundVisibility();
+
     }
 
     private void HandleTick(int tickCount)
@@ -62,6 +74,21 @@ public class MessageLog : MonoBehaviour
         {
             var expired = activeMessages.Dequeue();
             Destroy(expired.ui);
+            UpdateBackgroundVisibility();
+        }
+    }
+
+    private void UpdateBackgroundVisibility()
+    {
+        if (activeMessages.Count > 0)
+        {
+            // Show semi-transparent background
+            backgroundImage.color = new Color(0, 0, 0, BACKGROUND_ALPHA);
+        }
+        else
+        {
+            // Hide background
+            backgroundImage.color = new Color(0, 0, 0, 0);
         }
     }
 }
