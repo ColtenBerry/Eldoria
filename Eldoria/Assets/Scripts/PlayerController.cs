@@ -4,8 +4,6 @@ using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
-    public InventoryItem bread;
-    public InventoryItem ham;
     public Inventory inventory;
     [SerializeField]
     private InventoryManager playerInventoryManager;
@@ -34,9 +32,6 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         movementController = GetComponent<MovementController>();
-        inventory = new Inventory();
-        playerInventoryManager.AddItem(bread);
-        playerInventoryManager.AddItem(ham, 5);
     }
 
     void Update()

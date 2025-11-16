@@ -101,4 +101,24 @@ public class PartyController : MonoBehaviour
         OnPartyUpdated?.Invoke();
     }
 
+    public int CalculateFoodConsumption()
+    {
+        int totalConsumptionPerDay = 0;
+        foreach (UnitInstance unit in PartyMembers)
+        {
+            totalConsumptionPerDay += unit.baseData.foodConsumptionPerDay;
+        }
+        return totalConsumptionPerDay;
+    }
+
+    public void HandleStarvation(int foodShortage)
+    {
+        // for now lets just redudce health by 1 for each unit. later we can include foodshortage
+        foreach (UnitInstance unit in PartyMembers)
+        {
+            unit.TakeDamage(1);
+        }
+    }
+
+
 }
