@@ -126,6 +126,7 @@ public static class CombatOutcomeProcessor
         bool attackersWin = result.AttackersWin;
 
         List<PartyController> losers = result.AttackersWin ? defenders : attackers;
+        List<PartyController> winners = result.AttackersWin ? attackers : defenders;
 
 
         if (attackersWin)
@@ -168,13 +169,14 @@ public static class CombatOutcomeProcessor
         }
 
         // print the message
-        UIManager.Instance.LogMessage(new WorldMessage($"{losers.First().GetComponent<PartyPresence>().Lord.Lord.UnitName} has been defeated in battle."));
+        LogMessage(losers.First().gameObject.name, winners.First().gameObject.name);
 
     }
 
     public static void ProcessPlayerBattleResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders, bool isPlayerAttacking, bool isSiegeBattle, Settlement fief)
     {
         List<PartyController> losers = result.AttackersWin ? defenders : attackers;
+        List<PartyController> winners = result.AttackersWin ? attackers : defenders;
 
         List<ItemStack> potentialLoot = GenerateLootFromPartyList(losers);
         int goldEarned = CalculateValueFromPartyList(losers);
@@ -222,7 +224,7 @@ public static class CombatOutcomeProcessor
             }
 
             // throws an error because the garrison does not have a lord. 
-            UIManager.Instance.LogMessage(new WorldMessage($"{losers.First().GetComponent<PartyPresence>().Lord.Lord.UnitName} has been defeated in battle."));
+            // UIManager.Instance.LogMessage(new WorldMessage($"{losers.First().GetComponent<PartyPresence>().Lord.Lord.UnitName} has been defeated in battle."));
 
         }
         else // player lost
@@ -247,6 +249,8 @@ public static class CombatOutcomeProcessor
                 Object.Destroy(party.gameObject);
             }
         }
+        LogMessage(losers.First().gameObject.name, winners.First().gameObject.name);
+
     }
 
     private static void NotifyAndDestroyParty(PartyController party)
@@ -263,6 +267,11 @@ public static class CombatOutcomeProcessor
         factionWarManager.NotifyPartyDestroyed(lord);
 
         GameObject.Destroy(party.gameObject);
+    }
+
+    public static void LogMessage(string loserName, string winnerName)
+    {
+        UIManager.Instance.LogMessage(new WorldMessage($"{loserName} has been defeated by {winnerName} in battle."));
     }
 
     #region LootRegion

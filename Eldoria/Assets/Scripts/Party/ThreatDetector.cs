@@ -6,6 +6,7 @@ public class ThreatDetector : MonoBehaviour
     private BaseNPCStateMachine npc;
     private PartyPresence self;
     private CircleCollider2D detectionCollider;
+    [SerializeField] private LayerMask detectionLayerMask;
 
     void Awake()
     {
@@ -27,6 +28,7 @@ public class ThreatDetector : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if ((detectionLayerMask.value & (1 << other.gameObject.layer)) == 0) return;
         if (other.gameObject == self.gameObject) return;
         Debug.Log("Enter");
         PartyPresence otherPresence = other.GetComponent<PartyPresence>();
@@ -38,9 +40,26 @@ public class ThreatDetector : MonoBehaviour
             npc.OnFriendDetected(otherPresence);
     }
 
+
+    // TODO: this could be optimized. waiting to see if performance is an issue
+    void OnTriggerStay2D(Collider2D other)
+    {
+        if ((detectionLayerMask.value & (1 << other.gameObject.layer)) != 0)
+        {
+            PartyPresence otherPresence = other.GetComponent<PartyPresence>();
+            if (otherPresence == null) return;
+            if (FactionsManager.Instance.AreEnemies(self.Lord.Faction, otherPresence.Lord.Faction))
+                npc.OnThreatDetected(otherPresence);
+            else if (FactionsManager.Instance.AreAllied(self.Lord.Faction, otherPresence.Lord.Faction))
+                npc.OnFriendDetected(otherPresence);
+        }
+    }
+
+
     void OnTriggerExit2D(Collider2D other)
     {
         if (other.gameObject == self.gameObject) return;
+        if ((detectionLayerMask.value & (1 << other.gameObject.layer)) == 0) return;
         Debug.Log("Exit");
         PartyPresence otherPresence = other.GetComponent<PartyPresence>();
         if (otherPresence == null) return;

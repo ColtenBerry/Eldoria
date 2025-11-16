@@ -185,6 +185,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectionRange: 5
+  detectionLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!50 &8976721411680169833
 Rigidbody2D:
   serializedVersion: 5

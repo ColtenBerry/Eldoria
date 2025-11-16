@@ -70,7 +70,17 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
         else if (TerritoryManager.Instance.GetLordOf(this) == GameManager.Instance.PlayerProfile)
         {
             // allow upgrades TODO: make an upgrade menu
-            options.Add(new InteractionOption("Upgrade Defences", () => FortifyCastle()));
+            options.Add(new InteractionOption("Upgrade Defences", () =>
+            {
+
+                FortifyCastle();
+
+            }));
+
+            options.Add(new InteractionOption("Manage Garrison", () =>
+            {
+                UIManager.Instance.OpenSubMenu("garrison", new PartyTransferMenuContext(garrisonController, GameManager.Instance.player.GetComponent<PartyController>()));
+            }));
 
             options.Add(new InteractionOption("Wait Inside", () => WaitInsideCastle()));
         }

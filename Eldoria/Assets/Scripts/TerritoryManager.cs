@@ -108,7 +108,7 @@ public class TerritoryManager : MonoBehaviour
         // Handle player lord separately to show UI
         LordProfile playerLord = GameManager.Instance.PlayerProfile;
         List<Settlement> playerSettlements = GetSettlementsOf(playerLord);
-        EarningData[] earningData = new EarningData[playerSettlements.Count * 10]; // +1 for party
+        EarningData[] earningData = new EarningData[(playerSettlements.Count * 3) + 5]; // +1 for party
         int index = 0;
         foreach (var settlement in playerSettlements)
         {

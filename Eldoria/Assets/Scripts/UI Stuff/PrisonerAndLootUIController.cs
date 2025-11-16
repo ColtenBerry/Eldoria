@@ -55,6 +55,7 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
 
             GameManager.Instance.PlayerProfile.AddGold(goldEarned);
 
+
             // close menu
             UIManager.Instance.CloseAllMenus();
         });
