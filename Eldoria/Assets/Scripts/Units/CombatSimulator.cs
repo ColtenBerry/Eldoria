@@ -8,9 +8,10 @@ using UnityEngine;
 public static class CombatSimulator
 {
     public static Action<PartyController, bool> OnCombatMenuRequested;
+    private const float RANGE = 3f;
     public static void StartBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction, bool isPlayerAttacking)
     {
-        List<PartyPresence> nearbyPresences = GetNearbyParties(location, 30f);
+        List<PartyPresence> nearbyPresences = GetNearbyParties(location, RANGE);
 
         List<PartyController> attackers = nearbyPresences
     .Where(presence => presence.Lord.Faction == attackingFaction)
@@ -40,7 +41,7 @@ public static class CombatSimulator
 
     public static CombatResult StartBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction)
     {
-        List<PartyPresence> nearbyPresences = GetNearbyParties(location, 30f);
+        List<PartyPresence> nearbyPresences = GetNearbyParties(location, RANGE);
 
         List<PartyController> attackers = nearbyPresences
             .Where(p => p.Lord.Faction == attackingFaction)
@@ -62,7 +63,7 @@ public static class CombatSimulator
 
     public static CombatResult StartSiegeBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction, Settlement targetFief)
     {
-        List<PartyPresence> nearbyPresences = GetNearbyParties(location, 30f);
+        List<PartyPresence> nearbyPresences = GetNearbyParties(location, RANGE);
 
         List<PartyController> attackers = nearbyPresences
             .Where(p => p.Lord.Faction == attackingFaction)
@@ -91,7 +92,7 @@ public static class CombatSimulator
 
     public static void StartSiegeBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction, Settlement targetFief, bool isPlayerAttacking)
     {
-        List<PartyPresence> nearbyPresences = GetNearbyParties(location, 30f);
+        List<PartyPresence> nearbyPresences = GetNearbyParties(location, RANGE);
 
         List<PartyController> attackers = nearbyPresences
             .Where(p => p.Lord.Faction == attackingFaction)

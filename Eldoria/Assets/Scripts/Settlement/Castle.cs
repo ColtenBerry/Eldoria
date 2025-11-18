@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Castle : Settlement, IHasBoundVillages, ISiegable
@@ -48,6 +49,10 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
         spriteRenderer.color = GetFaction().factionColor;
         spriteRenderer = transform.Find("RightFlag").GetComponent<SpriteRenderer>();
         spriteRenderer.color = GetFaction().factionColor;
+
+
+        TextMeshProUGUI castleNameText = transform.Find("Canvas/CastleNameText").GetComponent<TextMeshProUGUI>();
+        castleNameText.text = gameObject.name;
     }
 
 

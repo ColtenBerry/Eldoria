@@ -80,16 +80,7 @@ public class MessageLog : MonoBehaviour
 
     private void UpdateBackgroundVisibility()
     {
-        if (activeMessages.Count > 0)
-        {
-            // Show semi-transparent background
-            backgroundImage.color = new Color(0, 0, 0, BACKGROUND_ALPHA);
-        }
-        else
-        {
-            // Hide background
-            backgroundImage.color = new Color(0, 0, 0, 0);
-        }
+        gameObject.SetActive(activeMessages.Count > 0);
     }
 }
 
