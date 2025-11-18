@@ -82,11 +82,21 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
                 UIManager.Instance.OpenSubMenu("garrison", new PartyTransferMenuContext(garrisonController, GameManager.Instance.player.GetComponent<PartyController>()));
             }));
 
+            options.Add(new InteractionOption("Sell Prisoners", () =>
+            {
+                UIManager.Instance.OpenSubMenu("prisoner_sell", null);
+            }));
+
             options.Add(new InteractionOption("Wait Inside", () => WaitInsideCastle()));
         }
 
         else
         {
+            options.Add(new InteractionOption("Sell Prisoners", () =>
+           {
+               UIManager.Instance.OpenSubMenu("prisoner_sell", null);
+           }));
+
             options.Add(new InteractionOption("Wait Inside", () => WaitInsideCastle()));
         }
 
