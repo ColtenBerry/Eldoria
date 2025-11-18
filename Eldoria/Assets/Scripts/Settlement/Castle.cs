@@ -16,6 +16,9 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
 
     [SerializeField] private List<Village> boundVillages;
 
+    [Header("Garrison")]
+    [SerializeField] private List<UnitData> startingGarrisonUnits;
+
     public List<Village> BoundVillages => boundVillages;
 
     // siege
@@ -36,7 +39,7 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
     {
         base.Start();
         ApplyVisuals();
-
+        InitializeGarrison();
     }
 
     public override void ApplyVisuals()
@@ -196,6 +199,14 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
             // siege is over
             siegeAttacker = null;
             siegeByPlayer = false;
+        }
+    }
+
+    public void InitializeGarrison()
+    {
+        foreach (UnitData unitData in startingGarrisonUnits)
+        {
+            garrisonController.AddUnit(new UnitInstance(unitData));
         }
     }
 }
