@@ -390,6 +390,15 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     {
         isSieging = false;
         castle.EndSiege();
+
+        if (objective.TryGetComponent<SiegeController>(out var sc))
+        {
+            if (sc.Settlement.GetFaction() == currentLord.Faction)
+            {
+                // castle must be conquered
+                currentOrder = null;
+            }
+        }
     }
     private bool isInFief = false;
     private SiegeController fief = null;

@@ -27,6 +27,8 @@ public class PartyController : MonoBehaviour
     [SerializeField] private string partyID;
     public string PartyID => partyID;
 
+    private bool isHealing = false;
+
 
     private void Awake()
     {
@@ -118,6 +120,35 @@ public class PartyController : MonoBehaviour
         {
             unit.TakeDamage(1);
         }
+    }
+
+    public void HealUnitsOverTime(int healRate)
+    {
+        foreach (var unit in partyMembers)
+        {
+            unit.Heal(healRate);
+        }
+    }
+
+    public void SetIsHealing(bool b)
+    {
+        isHealing = b;
+
+        if (b)
+        {
+            TickManager.Instance.OnDayPassed += HandleTick;
+        }
+        else
+        {
+            TickManager.Instance.OnDayPassed -= HandleTick;
+        }
+    }
+
+    int HEALRATE = 1;
+
+    private void HandleTick(int i)
+    {
+        HealUnitsOverTime(HEALRATE);
     }
 
 

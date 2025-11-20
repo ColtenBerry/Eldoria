@@ -265,7 +265,11 @@ public static class CombatOutcomeProcessor
         LordProfile lord = presence.Lord;
         FactionWarManager factionWarManager;
         factionWarManager = FactionsManager.Instance.GetWarManager(lord.Faction);
-        factionWarManager.NotifyPartyDestroyed(lord);
+        if (factionWarManager != null)
+        {
+            factionWarManager.NotifyPartyDestroyed(lord);
+
+        }
 
         if (party.gameObject != GameManager.Instance.player)
         {

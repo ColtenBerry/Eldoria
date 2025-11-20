@@ -145,6 +145,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
         // code
         gameObject.layer = LayerMask.NameToLayer("");
         SetTransparency(gameObject, 0.0f);
+        partyController.SetIsHealing(true);
     }
 
     public void LeaveFief()
@@ -152,9 +153,12 @@ public class PartyPresence : MonoBehaviour, IInteractable
         gameObject.layer = LayerMask.NameToLayer("Interactable");
         if (gameObject == GameManager.Instance.player) gameObject.layer = LayerMask.NameToLayer("Player");
         SetTransparency(gameObject, 1.0f);
+        partyController.SetIsHealing(false);
     }
     internal bool IsInFief()
     {
         return gameObject.layer == LayerMask.NameToLayer("");
     }
+
+
 }

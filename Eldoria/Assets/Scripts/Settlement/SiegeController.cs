@@ -50,6 +50,7 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
         {
             garrisonController.AddUnit(new UnitInstance(unitData));
         }
+        garrisonController.SetIsHealing(true);
     }
 
 
@@ -92,6 +93,12 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
 
     public void HandleTick(int i)
     {
+        HandleSiegeTicks();
+    }
+
+
+    private void HandleSiegeTicks()
+    {
         if (!IsUnderSiege) return;
 
         siegeTicksRemaining--;
@@ -131,6 +138,7 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
             siegeAttacker = null;
             siegeByPlayer = false;
         }
+
     }
 
     public void AddParty(PartyPresence party)
