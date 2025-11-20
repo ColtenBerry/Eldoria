@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ThreatDetector : MonoBehaviour
@@ -26,6 +27,11 @@ public class ThreatDetector : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if ((detectionLayerMask.value & (1 << other.gameObject.layer)) == 0) return;
@@ -41,32 +47,54 @@ public class ThreatDetector : MonoBehaviour
     }
 
 
-    // TODO: this could be optimized. waiting to see if performance is an issue
+    private Dictionary<PartyPresence, string> relationshipMap = new();
+
     void OnTriggerStay2D(Collider2D other)
     {
-        if ((detectionLayerMask.value & (1 << other.gameObject.layer)) != 0)
+        if (other.gameObject == self.gameObject) return;
+
+        PartyPresence otherPresence = other.GetComponent<PartyPresence>();
+        if (otherPresence == null) return;
+
+        if ((detectionLayerMask.value & (1 << other.gameObject.layer)) == 0)
         {
-            PartyPresence otherPresence = other.GetComponent<PartyPresence>();
-            if (otherPresence == null) return;
-            if (FactionsManager.Instance.AreEnemies(self.Lord.Faction, otherPresence.Lord.Faction))
-                npc.OnThreatDetected(otherPresence);
-            else if (FactionsManager.Instance.AreAllied(self.Lord.Faction, otherPresence.Lord.Faction))
-                npc.OnFriendDetected(otherPresence);
+            npc.OnThreatExited(otherPresence);
+            npc.OnFriendExited(otherPresence);
+            return;
+        }
+
+        string newRelation;
+        if (FactionsManager.Instance.AreEnemies(self.Lord.Faction, otherPresence.Lord.Faction))
+            newRelation = "Enemy";
+        else if (FactionsManager.Instance.AreAllied(self.Lord.Faction, otherPresence.Lord.Faction))
+            newRelation = "Ally";
+        else
+            newRelation = "Neutral";
+
+        if (!relationshipMap.TryGetValue(otherPresence, out var oldRelation) || oldRelation != newRelation)
+        {
+            // relationship changed → update lists
+            if (oldRelation == "Enemy") npc.OnThreatExited(otherPresence);
+            if (oldRelation == "Ally") npc.OnFriendExited(otherPresence);
+
+            if (newRelation == "Enemy") npc.OnThreatDetected(otherPresence);
+            if (newRelation == "Ally") npc.OnFriendDetected(otherPresence);
+
+            relationshipMap[otherPresence] = newRelation;
         }
     }
 
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject == self.gameObject) return;
-        if ((detectionLayerMask.value & (1 << other.gameObject.layer)) == 0) return;
-        Debug.Log("Exit");
         PartyPresence otherPresence = other.GetComponent<PartyPresence>();
         if (otherPresence == null) return;
 
-        if (FactionsManager.Instance.AreEnemies(self.Lord.Faction, otherPresence.Lord.Faction))
-            npc.OnThreatExited(otherPresence);
-        else if (FactionsManager.Instance.AreAllied(self.Lord.Faction, otherPresence.Lord.Faction))
-            npc.OnFriendExited(otherPresence);
+        if (relationshipMap.TryGetValue(otherPresence, out var oldRelation))
+        {
+            if (oldRelation == "Enemy") npc.OnThreatExited(otherPresence);
+            if (oldRelation == "Ally") npc.OnFriendExited(otherPresence);
+            relationshipMap.Remove(otherPresence);
+        }
     }
 }

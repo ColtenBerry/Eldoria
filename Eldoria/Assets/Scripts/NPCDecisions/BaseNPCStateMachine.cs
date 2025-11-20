@@ -107,25 +107,40 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
         }
         if (Vector2.Distance(closest.transform.position, transform.position) < 0.01f)
         {
+            // check not in settlement or something
+
             // attempt attack
+            AttackEnemy(closest);
 
 
-            Debug.Log(selfPresence.Lord.Lord.UnitName + "is attacking " + closest.Lord.Lord.UnitName);
 
-            if (closest.gameObject == GameManager.Instance.player)
+
+
+
+        }
+    }
+
+    protected void AttackEnemy(PartyPresence enemy)
+    {
+        // check still interactable
+        int interactableLayer = LayerMask.NameToLayer("Interactable");
+        int playerLayer = LayerMask.NameToLayer("Player");
+        if (enemy.gameObject.layer == interactableLayer || enemy.gameObject.layer == playerLayer)
+        {
+
+            Debug.Log(selfPresence.Lord.Lord.UnitName + "is attacking " + enemy.Lord.Lord.UnitName);
+
+            if (enemy.gameObject == GameManager.Instance.player)
             {
                 Debug.Log("Attacking player");
-                CombatSimulator.StartBattle(gameObject.transform.position, selfPresence.Lord.Faction, closest.GetComponent<PartyPresence>().Lord.Faction, false);
+                CombatSimulator.StartBattle(gameObject.transform.position, selfPresence.Lord.Faction, enemy.GetComponent<PartyPresence>().Lord.Faction, false);
 
 
             }
             else
             {
-                CombatSimulator.StartBattle(gameObject.transform.position, selfPresence.Lord.Faction, closest.GetComponent<PartyPresence>().Lord.Faction);
+                CombatSimulator.StartBattle(gameObject.transform.position, selfPresence.Lord.Faction, enemy.GetComponent<PartyPresence>().Lord.Faction);
             }
-
-
-
         }
     }
 

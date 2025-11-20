@@ -20,6 +20,9 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
     [Header("Garrison")]
     [SerializeField] private List<UnitData> startingGarrisonUnits;
 
+    [SerializeField] private List<PartyPresence> parties;
+    public List<PartyPresence> Parties => parties;
+
     public List<Village> BoundVillages => boundVillages;
 
     // siege
@@ -115,7 +118,8 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
     private void WaitInsideCastle()
     {
         // open wait menu
-        UIManager.Instance.OpenWaitingMenu("wait");
+        AddParty(GameManager.Instance.player.GetComponent<PartyPresence>());
+        UIManager.Instance.OpenWaitingMenu(new WaitingMenuContext(false, this));
         GameManager.Instance.player.GetComponent<PartyPresence>().WaitInFief();
     }
 
@@ -156,13 +160,14 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
 
         if (siegeByPlayer)
         {
-            UIManager.Instance.OpenWaitingMenu("siege");
+            UIManager.Instance.OpenWaitingMenu(new WaitingMenuContext(true, this));
         }
 
     }
 
     public void EndSiege()
     {
+        Debug.Log($"{name} siege ended.");
         siegeAttacker = null;
         siegeByPlayer = false;
         siegeTicksRemaining = 0;
@@ -192,12 +197,22 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
             {
                 UIManager.Instance.CloseAllMenus();
                 CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, GetFaction(), this, true);
+                EndSiege();
+            }
+            else if (parties.Contains(GameManager.Instance.player.GetComponent<PartyPresence>()))
+            {
+                UIManager.Instance.CloseAllMenus();
+                CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, GetFaction(), this, false);
+                EndSiege();
             }
 
             else
             {
                 Debug.Log("starting siege battle");
+                siegeAttacker.TryGetComponent<LordNPCStateMachine>(out var stateMachine);
                 CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, GetFaction(), this);
+                stateMachine.EndSiege(this);
+                EndSiege();
 
             }
 
@@ -205,6 +220,37 @@ public class Castle : Settlement, IHasBoundVillages, ISiegable
             siegeAttacker = null;
             siegeByPlayer = false;
         }
+    }
+
+    public void AddParty(PartyPresence party)
+    {
+        if (parties.Contains(party)) return;
+        parties.Add(party);
+    }
+
+    public void RemoveParty(PartyPresence party)
+    {
+        if (!parties.Contains(party)) return;
+
+        parties.Remove(party);
+    }
+
+    public List<PartyController> GetAlliedPartyControllers()
+    {
+        List<PartyController> lst = new();
+        foreach (PartyPresence p in parties)
+        {
+            if (FactionsManager.Instance.AreAllied(GetFaction(), p.Lord.Faction))
+            {
+                PartyController controller = p.GetComponent<PartyController>();
+                if (controller == null)
+                {
+                    Debug.LogError("expected controller in castle defender list");
+                }
+                lst.Add(controller);
+            }
+        }
+        return lst;
     }
 
     public void InitializeGarrison()

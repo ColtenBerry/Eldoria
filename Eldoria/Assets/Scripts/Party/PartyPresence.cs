@@ -150,6 +150,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
     public void LeaveFief()
     {
         gameObject.layer = LayerMask.NameToLayer("Interactable");
+        if (gameObject == GameManager.Instance.player) gameObject.layer = LayerMask.NameToLayer("Player");
         SetTransparency(gameObject, 1.0f);
     }
     internal bool IsInFief()

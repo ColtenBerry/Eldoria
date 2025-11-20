@@ -71,11 +71,21 @@ public static class CombatSimulator
             .Where(pc => pc != null)
             .ToList();
 
-        List<PartyController> defenders = nearbyPresences
+        List<PartyController> defenders = new();
+        Castle c = targetFief as Castle;
+        if (c != null)
+        {
+            defenders.AddRange(c.GetAlliedPartyControllers());
+        }
+        else
+        {
+            Debug.LogWarning("StartSiegeBattle: targetFief is not a Castle, skipping allied garrison.");
+        }
+        defenders.AddRange(nearbyPresences
             .Where(p => p.Lord.Faction == defendingFaction)
             .Select(p => p.GetComponent<PartyController>())
             .Where(pc => pc != null)
-            .ToList();
+            .ToList());
         PartyController garrison = targetFief.GetComponent<PartyController>();
         if (garrison != null)
         {
@@ -99,12 +109,14 @@ public static class CombatSimulator
             .Select(p => p.GetComponent<PartyController>())
             .Where(pc => pc != null)
             .ToList();
-
-        List<PartyController> defenders = nearbyPresences
+        List<PartyController> defenders = new();
+        Castle c = targetFief as Castle;
+        defenders.AddRange(c.GetAlliedPartyControllers());
+        defenders.AddRange(nearbyPresences
             .Where(p => p.Lord.Faction == defendingFaction)
             .Select(p => p.GetComponent<PartyController>())
             .Where(pc => pc != null)
-            .ToList();
+            .ToList());
 
         var enemyName = defenders.FirstOrDefault()?.name ?? "Unknown";
 
@@ -133,6 +145,15 @@ public static class CombatSimulator
         return UnityEngine.Object.FindObjectsOfType<PartyPresence>()
             .Where(p =>
                 Vector3.Distance(p.transform.position, battleLocation) <= radius && p != GameManager.Instance.player.GetComponent<PartyPresence>())
+            .ToList();
+    }
+
+    public static List<PartyPresence> GetGarrisonParties(Vector3 battleLocation)
+    {
+        float radius = 1f;
+        return UnityEngine.Object.FindObjectsOfType<PartyPresence>()
+            .Where(p =>
+                Vector3.Distance(p.transform.position, battleLocation) <= radius && p.gameObject.layer == null)
             .ToList();
     }
 

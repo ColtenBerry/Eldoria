@@ -40,10 +40,10 @@ public class UIManager : MonoBehaviour
         TimeGate.PauseTime();
     }
 
-    public void OpenWaitingMenu(string key)
+    public void OpenWaitingMenu(WaitingMenuContext ctx)
     {
         waitingMenuController.gameObject.SetActive(true);
-        waitingMenuController.OpenMenu(key);
+        waitingMenuController.OpenMenu(ctx);
         InputGate.OnMenuOpened?.Invoke();
         TimeGate.ResumeTime(); // the interaction menu pauses time so we must resume it
     }

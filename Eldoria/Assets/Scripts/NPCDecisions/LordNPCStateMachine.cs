@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum NPCIntent
@@ -104,6 +105,15 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         Debug.Log("execute if close");
         ExecuteIntentIfClose();
     }
+    protected override void FixedUpdate()
+    {
+        base.FixedUpdate();
+        if (currentState != NPCState.Idle && isSieging)
+        {
+            // end siege
+            EndSiege(currentOrder.TargetObject as Castle);
+        }
+    }
 
 
     private List<Settlement> unPatrolledLands = new();
@@ -193,10 +203,13 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             currentPath.Clear();
             GeneratePathTo(objective.transform.position);
 
-            if (partyPresence.IsInFief())
+            if (isInFief)
             {
-                partyPresence.LeaveFief();
+                LeaveFief();
             }
+
+            if (previousIntent == NPCIntent.SiegeCastle && previousObjective is Castle)
+                EndSiege(previousObjective.GetComponent<Castle>());
 
             previousIntent = currentIntent;
             previousObjective = objective;
@@ -231,6 +244,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
                     if (castle != null)
                     {
                         Debug.Log("npc intent thing reached on castle: " + castle.name);
+                        if (isSieging) break;
                         SiegeCastle(castle);
                     }
                     else
@@ -251,7 +265,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         else
         {
             MoveTowardsNextTileInPath();
-            Debug.Log("Current path count: " + currentPath.Count);
+            // Debug.Log("Current path count: " + currentPath.Count);
         }
     }
 
@@ -273,7 +287,11 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             if (!castle.isUnderSiege)
             {
                 // join castle in defense
-                partyPresence.WaitInFief();
+                EnterFief();
+            }
+            else
+            {
+                // just wait nearby i guess?
             }
         }
         else if (fief is Village)
@@ -357,15 +375,69 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         }
     }
 
+    private bool isSieging = false;
+
     private void SiegeCastle(Castle castle)
     {
         Debug.Log("lordnpcstatemachine sieging castle name: " + castle.name);
         castle.StartSiege(partyController, false);
-        factionWarManager.ClearOrder(currentLord);
-        currentOrder = null;
+        isSieging = true;
+    }
+
+    public void EndSiege(Castle castle)
+    {
+        isSieging = false;
+        castle.EndSiege();
+    }
+    private bool isInFief = false;
+    private Castle fief = null;
+    private void EnterFief()
+    {
+        fief = objective.GetComponent<Castle>();
+        if (fief == null)
+        {
+            Debug.LogWarning("Expected fief to be a castle");
+            return;
+        }
+        if (fief.isUnderSiege)
+        {
+            Debug.LogWarning("Cannot enter fief that is under siege");
+            return;
+        }
+        fief.AddParty(selfPresence);
+        partyPresence.WaitInFief();
+        isInFief = true;
+    }
+    private void LeaveFief()
+    {
+        if (fief.isUnderSiege)
+        {
+            Debug.LogWarning("Cannot leave fief that is under siege");
+            return;
+        }
+        fief.RemoveParty(selfPresence);
+        partyPresence.LeaveFief();
+        isInFief = false;
+        fief = null;
     }
     protected override void ExecuteTransitionActions()
     {
+        currentPath.Clear();
+        GeneratePathTo(objective.transform.position);
+        if (isSieging && currentState != NPCState.Idle)
+        {
+            // Defensive check: make sure objective is a castle
+            if (objective != null && objective.TryGetComponent<Castle>(out var castle))
+            {
+                Debug.Log("Siege ended due to state transition: " + castle.name);
+            }
+            else
+            {
+                // If no castle reference, just clear the flag
+                isSieging = false;
+                Debug.LogWarning("Siege flag cleared but no castle found.");
+            }
+        }
     }
 
     private NPCIntent ResolveAttackIntent(IInteractable target)

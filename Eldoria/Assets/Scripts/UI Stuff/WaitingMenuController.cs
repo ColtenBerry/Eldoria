@@ -28,20 +28,44 @@ public class WaitingMenuController : MonoBehaviour
 
         stopButton.onClick.AddListener(() =>
         {
+            if (ctx.isSieging)
+            {
+                ctx.Fief.EndSiege();
+            }
+
+            else
+            {
+                if (ctx.Fief.isUnderSiege)
+                {
+                    Debug.Log("Fief is under siege, cannot leave!");
+                    return;
+
+                }
+                GameManager.Instance.player.GetComponent<PartyPresence>().LeaveFief();
+            }
+            ctx.Fief.RemoveParty(GameManager.Instance.player.GetComponent<PartyPresence>());
             UIManager.Instance.CloseAllMenus();
-            GameManager.Instance.player.GetComponent<PartyPresence>().LeaveFief();
         });
     }
 
-    public void OpenMenu(string key)
+    WaitingMenuContext ctx;
+
+    public void OpenMenu(WaitingMenuContext source)
     {
-        if (key == "wait")
+        if (source is not WaitingMenuContext)
         {
-            keyText.text = "Waiting: ";
+            Debug.LogWarning("PrisonerAndLootMenuContext expected as source");
+            return;
         }
-        else if (key == "siege")
+        ctx = source as WaitingMenuContext;
+
+        if (ctx.isSieging)
         {
             keyText.text = "Sieging: ";
+        }
+        else
+        {
+            keyText.text = "Waiting: ";
         }
     }
     private void IncrementTick(int i)
@@ -51,4 +75,16 @@ public class WaitingMenuController : MonoBehaviour
 
     }
 
+}
+
+public class WaitingMenuContext
+{
+    public bool isSieging;
+    public Castle Fief;
+
+    public WaitingMenuContext(bool isSieging, Castle Fief)
+    {
+        this.isSieging = isSieging;
+        this.Fief = Fief;
+    }
 }
