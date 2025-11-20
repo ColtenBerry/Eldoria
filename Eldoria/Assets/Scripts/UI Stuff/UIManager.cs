@@ -48,9 +48,9 @@ public class UIManager : MonoBehaviour
         TimeGate.ResumeTime(); // the interaction menu pauses time so we must resume it
     }
 
-    public void OpenInteractionMenu(List<InteractionOption> options, IInteractable interactable)
+    public void OpenInteractionMenu(List<InteractionOption> options)
     {
-        interactionMenuUI.ShowOptions(options, interactable);
+        interactionMenuUI.ShowOptions(options);
         interactionMenuUI.gameObject.SetActive(true);
         InputGate.OnMenuOpened?.Invoke();
         TimeGate.PauseTime();

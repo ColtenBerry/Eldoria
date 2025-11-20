@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     private bool isMoving = false;
     private bool isFolowingInteractable = false;
     private Transform targetInteractable;
-    private IInteractable pendingInteraction;
+    private GameObject pendingInteraction;
     private MovementController movementController;
 
     private void OnEnable()
@@ -57,13 +57,25 @@ public class PlayerController : MonoBehaviour
                 {
                     isFolowingInteractable = false;
                     // pendingInteraction.Interact();
-                    List<InteractionOption> options = pendingInteraction.GetInteractionOptions();
+                    List<InteractionOption> options = GetAllInteractables(pendingInteraction);
                     // display the options
-                    UIManager.Instance.OpenInteractionMenu(options, pendingInteraction);
+                    UIManager.Instance.OpenInteractionMenu(options);
                 }
             }
 
         }
+    }
+
+    private List<InteractionOption> GetAllInteractables(GameObject interactable)
+    {
+        var interactables = interactable.GetComponents<IInteractable>();
+        List<InteractionOption> allOptions = new();
+
+        foreach (var i in interactables)
+        {
+            allOptions.AddRange(i.GetInteractionOptions());
+        }
+        return allOptions;
     }
 
     private void SetTargetPosition(Vector2 selectedPos)
@@ -72,12 +84,12 @@ public class PlayerController : MonoBehaviour
         isMoving = true;
         targetPosition = selectedPos;
     }
-    private void SetTargetInteractable(IInteractable interactable)
+    private void SetTargetInteractable(GameObject interactable)
     {
         isFolowingInteractable = true;
         isMoving = true;
         pendingInteraction = interactable;
-        targetInteractable = (interactable as MonoBehaviour)?.transform;
+        targetInteractable = interactable.transform;
     }
 
     private void RequestMove(Vector3 targetPosition)

@@ -13,8 +13,7 @@ public class Village : Settlement
         List<InteractionOption> options = new();
 
         if (FactionsManager.Instance.AreEnemies(GetFaction(), FactionsManager.Instance.GetFactionByName("Player"))) options.Add(new InteractionOption("Raid", () => Debug.Log("Attempting to Raid")));
-        options.Add(new InteractionOption("Trade", () => Debug.Log("Attempting to Trade"), "trade"));
-        options.Add(new InteractionOption("Recruit", () => Debug.Log("Attempting to Recruit"), "recruit"));
+        options.Add(new InteractionOption("Trade", () => UIManager.Instance.OpenSubMenu("trade")));
         options.Add(new InteractionOption("Leave", () =>
         {
             UIManager.Instance.CloseAllMenus();

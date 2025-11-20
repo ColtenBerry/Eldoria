@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Settlement))]
-public class RecruitmentSource : MonoBehaviour
+public class RecruitmentSource : MonoBehaviour, IInteractable
 {
     [SerializeField] private List<UnitData> spawnableUnits = new(); // possible spawns
 
@@ -52,4 +52,16 @@ public class RecruitmentSource : MonoBehaviour
         recruitableUnits.Remove(unit);
     }
 
+    public void Interact()
+    {
+        //
+    }
+
+    public List<InteractionOption> GetInteractionOptions()
+    {
+        List<InteractionOption> options = new();
+        options.Add(new InteractionOption("Recruit", () => UIManager.Instance.OpenSubMenu("recruit", this)));
+        return options;
+
+    }
 }

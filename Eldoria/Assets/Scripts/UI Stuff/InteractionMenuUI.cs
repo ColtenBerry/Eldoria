@@ -19,7 +19,7 @@ public class InteractionMenuUI : MonoBehaviour
         // Optionally re-enable HUD buttons here if needed
     }
 
-    public void ShowOptions(List<InteractionOption> options, IInteractable source)
+    public void ShowOptions(List<InteractionOption> options)
     {
         // Clear previous buttons
         foreach (Transform child in buttonContainer)
@@ -36,12 +36,6 @@ public class InteractionMenuUI : MonoBehaviour
             button.onClick.AddListener(() =>
             {
                 option.callback?.Invoke();
-
-                if (!string.IsNullOrEmpty(option.subMenuName))
-                {
-                    UIManager.Instance.OpenSubMenu(option.subMenuName, source);
-                }
-
                 CloseMenu();
             });
         }

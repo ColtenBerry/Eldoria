@@ -52,7 +52,7 @@ public class TouchManager : MonoBehaviour
                 var interactable = hit.collider.GetComponent<IInteractable>();
                 if (interactable != null)
                 {
-                    InputEvents.SelectInteractable(interactable);
+                    InputEvents.SelectInteractable(hit.collider.gameObject);
                 }
             }
             else InputEvents.OnLocationSelected(inputPos);
@@ -83,8 +83,8 @@ public static class InputEvents
         // Debug.Log("invoked the input position action");
         OnInputPosition?.Invoke(position);
     }
-    public static event Action<IInteractable> OnInteractableSelected;
-    public static void SelectInteractable(IInteractable interactable)
+    public static event Action<GameObject> OnInteractableSelected;
+    public static void SelectInteractable(GameObject interactable)
     {
         OnInteractableSelected?.Invoke(interactable);
     }
