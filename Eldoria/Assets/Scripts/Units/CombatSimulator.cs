@@ -61,7 +61,7 @@ public static class CombatSimulator
         return result;
     }
 
-    public static CombatResult StartSiegeBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction, Settlement targetFief)
+    public static CombatResult StartSiegeBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction, SiegeController targetFief)
     {
         List<PartyPresence> nearbyPresences = GetNearbyParties(location, RANGE);
 
@@ -72,15 +72,11 @@ public static class CombatSimulator
             .ToList();
 
         List<PartyController> defenders = new();
-        Castle c = targetFief as Castle;
-        if (c != null)
-        {
-            defenders.AddRange(c.GetAlliedPartyControllers());
-        }
-        else
-        {
-            Debug.LogWarning("StartSiegeBattle: targetFief is not a Castle, skipping allied garrison.");
-        }
+
+        defenders.AddRange(targetFief.GetAlliedPartyControllers());
+
+
+
         defenders.AddRange(nearbyPresences
             .Where(p => p.Lord.Faction == defendingFaction)
             .Select(p => p.GetComponent<PartyController>())
@@ -94,13 +90,13 @@ public static class CombatSimulator
 
         CombatResult result = SimulateBattle(attackers, defenders);
         CombatOutcomeProcessor.ApplyCombatResult(result, attackers, defenders);
-        CombatOutcomeProcessor.ProcessAutoResolveResult(result, attackers, defenders, true, targetFief);
+        CombatOutcomeProcessor.ProcessAutoResolveResult(result, attackers, defenders, true, targetFief.Settlement);
         return result;
     }
 
 
 
-    public static void StartSiegeBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction, Settlement targetFief, bool isPlayerAttacking)
+    public static void StartSiegeBattle(Vector3 location, Faction attackingFaction, Faction defendingFaction, SiegeController targetFief, bool isPlayerAttacking)
     {
         List<PartyPresence> nearbyPresences = GetNearbyParties(location, RANGE);
 
@@ -110,8 +106,7 @@ public static class CombatSimulator
             .Where(pc => pc != null)
             .ToList();
         List<PartyController> defenders = new();
-        Castle c = targetFief as Castle;
-        defenders.AddRange(c.GetAlliedPartyControllers());
+        defenders.AddRange(targetFief.GetAlliedPartyControllers());
         defenders.AddRange(nearbyPresences
             .Where(p => p.Lord.Faction == defendingFaction)
             .Select(p => p.GetComponent<PartyController>())
@@ -133,7 +128,7 @@ public static class CombatSimulator
             isPlayerAttacking: isPlayerAttacking,
             enemyName: enemyName,
             isSiegeBattle: true,
-            fiefUnderSiege: targetFief
+            fiefUnderSiege: targetFief.Settlement
         );
 
         UIManager.Instance.OpenCombatMenu(ctx);
@@ -147,16 +142,6 @@ public static class CombatSimulator
                 Vector3.Distance(p.transform.position, battleLocation) <= radius && p != GameManager.Instance.player.GetComponent<PartyPresence>())
             .ToList();
     }
-
-    public static List<PartyPresence> GetGarrisonParties(Vector3 battleLocation)
-    {
-        float radius = 1f;
-        return UnityEngine.Object.FindObjectsOfType<PartyPresence>()
-            .Where(p =>
-                Vector3.Distance(p.transform.position, battleLocation) <= radius && p.gameObject.layer == null)
-            .ToList();
-    }
-
 
     /// <summary>
     /// Simulates the battle itself

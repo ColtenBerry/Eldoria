@@ -42,6 +42,7 @@ public class UIManager : MonoBehaviour
 
     public void OpenWaitingMenu(WaitingMenuContext ctx)
     {
+        CloseAllMenus();
         waitingMenuController.gameObject.SetActive(true);
         waitingMenuController.OpenMenu(ctx);
         InputGate.OnMenuOpened?.Invoke();
@@ -50,6 +51,7 @@ public class UIManager : MonoBehaviour
 
     public void OpenInteractionMenu(List<InteractionOption> options)
     {
+        CloseAllMenus();
         interactionMenuUI.ShowOptions(options);
         interactionMenuUI.gameObject.SetActive(true);
         InputGate.OnMenuOpened?.Invoke();

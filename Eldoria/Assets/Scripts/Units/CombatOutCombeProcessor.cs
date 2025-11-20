@@ -156,7 +156,7 @@ public static class CombatOutcomeProcessor
         {
             if (isSiegeBattle)
             {
-                TerritoryManager.Instance.RegisterOwnership(fief, defenders.First().GetComponent<PartyPresence>().Lord);
+                // TerritoryManager.Instance.RegisterOwnership(fief, defenders.First().GetComponent<PartyPresence>().Lord);
 
                 foreach (var party in attackers)
                     NotifyAndDestroyParty(party);
@@ -203,14 +203,14 @@ public static class CombatOutcomeProcessor
                         defenders[0].PartyMembers.Clear();
 
                     for (int i = 1; i < defenders.Count; i++)
-                        Object.Destroy(defenders[i].gameObject);
+                        NotifyAndDestroyParty(defenders[i]);
                 }
                 else
                 {
                     foreach (var party in attackers)
                     {
                         // TODO: if party is player, handle differently
-                        Object.Destroy(party.gameObject);
+                        NotifyAndDestroyParty(party);
                     }
                 }
             }
@@ -219,7 +219,7 @@ public static class CombatOutcomeProcessor
                 foreach (var party in losers)
                 {
                     // TODO: if party is player, handle differently
-                    Object.Destroy(party.gameObject);
+                    NotifyAndDestroyParty(party);
                 }
             }
 
@@ -246,7 +246,7 @@ public static class CombatOutcomeProcessor
             foreach (var party in losers)
             {
                 // TODO: if party is player, handle differently
-                Object.Destroy(party.gameObject);
+                NotifyAndDestroyParty(party);
             }
         }
         LogMessage(losers.First().gameObject.name, winners.First().gameObject.name);
@@ -255,6 +255,7 @@ public static class CombatOutcomeProcessor
 
     private static void NotifyAndDestroyParty(PartyController party)
     {
+
         PartyPresence presence = party.GetComponent<PartyPresence>();
         if (presence == null)
         {
@@ -266,7 +267,22 @@ public static class CombatOutcomeProcessor
         factionWarManager = FactionsManager.Instance.GetWarManager(lord.Faction);
         factionWarManager.NotifyPartyDestroyed(lord);
 
-        GameObject.Destroy(party.gameObject);
+        if (party.gameObject != GameManager.Instance.player)
+        {
+            GameObject.Destroy(party.gameObject);
+        }
+
+        else
+        {
+            Debug.Log("PlayerDeath");
+            // handle player death
+            if (TerritoryManager.Instance.GetSettlementsOf(GameManager.Instance.PlayerProfile).Count > 0)
+                party.gameObject.transform.position = TerritoryManager.Instance.GetSettlementsOf(GameManager.Instance.PlayerProfile).First().gameObject.transform.position;
+            else
+            {
+                party.gameObject.transform.position = new Vector3(0, 0);
+            }
+        }
     }
 
     public static void LogMessage(string loserName, string winnerName)

@@ -111,7 +111,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         if (currentState != NPCState.Idle && isSieging)
         {
             // end siege
-            EndSiege(currentOrder.TargetObject as Castle);
+            EndSiege(currentOrder.TargetObject as SiegeController);
         }
     }
 
@@ -209,7 +209,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             }
 
             if (previousIntent == NPCIntent.SiegeCastle && previousObjective is Castle)
-                EndSiege(previousObjective.GetComponent<Castle>());
+                EndSiege(previousObjective.GetComponent<SiegeController>());
 
             previousIntent = currentIntent;
             previousObjective = objective;
@@ -240,7 +240,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
                     PatrolLand(settlement);
                     break;
                 case NPCIntent.SiegeCastle:
-                    Castle castle = objective.GetComponent<Castle>();
+                    SiegeController castle = objective.GetComponent<SiegeController>();
                     if (castle != null)
                     {
                         Debug.Log("npc intent thing reached on castle: " + castle.name);
@@ -280,11 +280,12 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             currentOrder = null;
             return;
         }
-        if (fief is Castle)
+        fief.TryGetComponent<SiegeController>(out SiegeController sc);
+
+        if (sc != null)
         {
-            Castle castle = (Castle)fief;
             // defend castle logic
-            if (!castle.isUnderSiege)
+            if (!sc.IsUnderSiege)
             {
                 // join castle in defense
                 EnterFief();
@@ -294,6 +295,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
                 // just wait nearby i guess?
             }
         }
+
         else if (fief is Village)
         {
             // defend village logic
@@ -377,29 +379,29 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
     private bool isSieging = false;
 
-    private void SiegeCastle(Castle castle)
+    private void SiegeCastle(SiegeController castle)
     {
         Debug.Log("lordnpcstatemachine sieging castle name: " + castle.name);
         castle.StartSiege(partyController, false);
         isSieging = true;
     }
 
-    public void EndSiege(Castle castle)
+    public void EndSiege(SiegeController castle)
     {
         isSieging = false;
         castle.EndSiege();
     }
     private bool isInFief = false;
-    private Castle fief = null;
+    private SiegeController fief = null;
     private void EnterFief()
     {
-        fief = objective.GetComponent<Castle>();
+        fief = objective.GetComponent<SiegeController>();
         if (fief == null)
         {
             Debug.LogWarning("Expected fief to be a castle");
             return;
         }
-        if (fief.isUnderSiege)
+        if (fief.IsUnderSiege)
         {
             Debug.LogWarning("Cannot enter fief that is under siege");
             return;
@@ -410,7 +412,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     }
     private void LeaveFief()
     {
-        if (fief.isUnderSiege)
+        if (fief.IsUnderSiege)
         {
             Debug.LogWarning("Cannot leave fief that is under siege");
             return;

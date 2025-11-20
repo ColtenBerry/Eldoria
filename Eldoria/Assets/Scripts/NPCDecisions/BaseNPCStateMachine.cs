@@ -92,6 +92,11 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
 
         foreach (var enemy in nearbyEnemies)
         {
+            if (enemy == null)
+            {
+                nearbyEnemies.Remove(enemy);
+                continue;
+            }
             float dist = Vector3.Distance(transform.position, enemy.transform.position);
             if (dist < closestDistance)
             {
