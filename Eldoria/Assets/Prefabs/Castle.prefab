@@ -152,6 +152,7 @@ GameObject:
   - component: {fileID: 4912614907078719588}
   - component: {fileID: 95579121599768841}
   - component: {fileID: 5336798432802789564}
+  - component: {fileID: 1438559700895056109}
   m_Layer: 6
   m_Name: Castle
   m_TagString: Untagged
@@ -324,6 +325,22 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7a9f90855101e8c43b198a9b4ff6a70c, type: 2}
   defenseBonus: 20
   parties: []
+--- !u!114 &1438559700895056109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4395130446511347997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 569e3e6505fc3c541a86a7a4198defc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnableUnits:
+  - {fileID: 11400000, guid: 7a9f90855101e8c43b198a9b4ff6a70c, type: 2}
+  - {fileID: 11400000, guid: 076a4459812c2714fac4c9e403624368, type: 2}
+  recruitableUnits: []
 --- !u!1 &4413917565010120050
 GameObject:
   m_ObjectHideFlags: 0
