@@ -38,30 +38,10 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
             isPlayerAttacking = ctx.isPlayerAttacking;
             isSiegeBattle = ctx.isSiegeBattle;
             fief = ctx.fiefUnderSiege;
-            if (isPlayerAttacking)
-            {
-                attackingPartyControllers = new List<PartyController>
-                {
-                    playerPartyController
-                };
-                attackingPartyControllers.AddRange(ctx.friendlyParties);
-                defendingPartyControllers = ctx.enemyParties;
-                attackingText.text = "Player";
-                defendingText.text = ctx.enemyName;
-
-            }
-            else if (!isPlayerAttacking)
-            {
-                defendingPartyControllers = new List<PartyController>
-                {
-                    playerPartyController
-                };
-                defendingPartyControllers.AddRange(ctx.friendlyParties);
-                attackingPartyControllers = ctx.enemyParties;
-                attackingText.text = ctx.enemyName;
-                defendingText.text = "Player";
-
-            }
+            attackingPartyControllers = ctx.attackingParties;
+            defendingPartyControllers = ctx.defendingParties;
+            attackingText.text = ctx.attackingParties.FirstOrDefault().name;
+            defendingText.text = ctx.defendingParties.FirstOrDefault().name;
 
         }
         else
@@ -143,17 +123,17 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
 public class CombatMenuContext
 {
-    public List<PartyController> friendlyParties;
-    public List<PartyController> enemyParties;
+    public List<PartyController> attackingParties;
+    public List<PartyController> defendingParties;
     public bool isSiegeBattle;
     public bool isPlayerAttacking;
     public Settlement fiefUnderSiege;
     public string enemyName;
 
-    public CombatMenuContext(List<PartyController> friendlyParties, List<PartyController> enemyParties, bool isPlayerAttacking, string enemyName, bool isSiegeBattle = false, Settlement fiefUnderSiege = null)
+    public CombatMenuContext(List<PartyController> attackingParties, List<PartyController> defendingParties, bool isPlayerAttacking, string enemyName, bool isSiegeBattle = false, Settlement fiefUnderSiege = null)
     {
-        this.friendlyParties = friendlyParties;
-        this.enemyParties = enemyParties;
+        this.attackingParties = attackingParties;
+        this.defendingParties = defendingParties;
         this.isPlayerAttacking = isPlayerAttacking;
         this.enemyName = enemyName;
         this.isSiegeBattle = isSiegeBattle;

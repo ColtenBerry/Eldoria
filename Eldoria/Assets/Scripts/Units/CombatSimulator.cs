@@ -25,11 +25,21 @@ public static class CombatSimulator
             .Where(controller => controller != null)
             .ToList();
 
+        if (isPlayerAttacking)
+        {
+            attackers.Insert(0, GameManager.Instance.player.GetComponent<PartyController>());
+        }
+
+        else
+        {
+            defenders.Insert(0, GameManager.Instance.player.GetComponent<PartyController>());
+        }
+
 
         var enemyName = defenders.FirstOrDefault()?.name ?? "Unknown";
         CombatMenuContext ctx = new CombatMenuContext(
-            friendlyParties: isPlayerAttacking ? attackers : defenders,
-            enemyParties: isPlayerAttacking ? defenders : attackers,
+            attackingParties: attackers,
+            defendingParties: defenders,
             isPlayerAttacking: isPlayerAttacking,
             enemyName: enemyName
 
@@ -113,7 +123,17 @@ public static class CombatSimulator
             .Where(pc => pc != null)
             .ToList());
 
-        var enemyName = defenders.FirstOrDefault()?.name ?? "Unknown";
+        if (isPlayerAttacking)
+        {
+            attackers.Insert(0, GameManager.Instance.player.GetComponent<PartyController>());
+        }
+
+        else
+        {
+            defenders.Insert(0, GameManager.Instance.player.GetComponent<PartyController>());
+        }
+
+        var enemyName = isPlayerAttacking ? defenders.FirstOrDefault()?.name ?? "Unknown" : attackers.FirstOrDefault()?.name ?? "Unknown";
 
         PartyController garrison = targetFief.GetComponent<PartyController>();
         if (garrison != null)
@@ -123,8 +143,8 @@ public static class CombatSimulator
 
 
         CombatMenuContext ctx = new CombatMenuContext(
-            friendlyParties: isPlayerAttacking ? attackers : defenders,
-            enemyParties: isPlayerAttacking ? defenders : attackers,
+            attackingParties: attackers,
+            defendingParties: defenders,
             isPlayerAttacking: isPlayerAttacking,
             enemyName: enemyName,
             isSiegeBattle: true,
@@ -139,7 +159,7 @@ public static class CombatSimulator
     {
         return UnityEngine.Object.FindObjectsOfType<PartyPresence>()
             .Where(p =>
-                Vector3.Distance(p.transform.position, battleLocation) <= radius && p != GameManager.Instance.player.GetComponent<PartyPresence>())
+                Vector3.Distance(p.transform.position, battleLocation) <= radius && p != GameManager.Instance.player.GetComponent<PartyPresence>() && p.gameObject.layer == LayerMask.NameToLayer("Interactable"))
             .ToList();
     }
 

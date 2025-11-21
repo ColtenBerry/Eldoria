@@ -119,8 +119,11 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
             }
             else if (parties.Contains(GameManager.Instance.player.GetComponent<PartyPresence>()))
             {
+                siegeAttacker.TryGetComponent<LordNPCStateMachine>(out var stateMachine);
+
                 UIManager.Instance.CloseAllMenus();
                 CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, settlement.GetFaction(), this, false);
+                stateMachine.EndSiege(this);
                 EndSiege();
             }
 
@@ -225,8 +228,8 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
     {
         // open wait menu
         AddParty(GameManager.Instance.player.GetComponent<PartyPresence>());
-        UIManager.Instance.OpenWaitingMenu(new WaitingMenuContext(false, this));
         GameManager.Instance.player.GetComponent<PartyPresence>().WaitInFief();
+        UIManager.Instance.OpenWaitingMenu(new WaitingMenuContext(false, this));
     }
 
 }
