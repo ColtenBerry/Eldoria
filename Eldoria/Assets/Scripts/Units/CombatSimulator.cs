@@ -275,19 +275,20 @@ public static class CombatSimulator
 
     private static void SimulateAttack(UnitInstance attacker, UnitInstance defender)
     {
-        // defender stats
         int defence = defender.Defence;
         float defMoral = defender.Moral - 50;
         float totalDefence = ApplyBonus(defence, defMoral);
 
-        // attacker stats
         int attack = attacker.Attack;
         int attMoral = attacker.Moral - 50;
         float totalAttack = ApplyBonus(attack, attMoral);
 
-        // get damage
-        float damage = totalAttack - totalDefence;
-        int damageRounded = Mathf.Max(0, (int)Math.Round(damage));
+        // percentage reduction
+        float reductionFactor = totalDefence / (totalDefence + 50f);
+        float rawDamage = totalAttack * (1 - reductionFactor);
+
+        // minimum chip damage
+        int damageRounded = Mathf.Max(1, (int)Math.Round(rawDamage));
 
         defender.TakeDamage(damageRounded);
     }

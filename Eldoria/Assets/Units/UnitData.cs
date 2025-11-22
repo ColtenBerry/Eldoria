@@ -24,4 +24,7 @@ public class UnitData : ScriptableObject
 
     public int foodConsumptionPerDay = 1; // maybe monsters eat more. idk, just an idea but i can change this when i want
 
+    [Header("Image")]
+    public Sprite sprite;
+
 }

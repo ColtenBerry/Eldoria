@@ -10,6 +10,8 @@ public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
     public Transform prisonerParent;
     public PartyMemberUI partyMemberUIPrefab; //Prefab for unit display
 
+    [SerializeField] private Image spriteImage;
+
     public Button upgradeButton;
 
     private UnitInstance selectedUnit;
@@ -47,6 +49,8 @@ public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
 
     private void RefreshUI()
     {
+        spriteImage.sprite = null;
+        spriteImage.color = new Color(spriteImage.color.r, spriteImage.color.g, spriteImage.color.b, 0.0f);
         upgradeButton.interactable = false;
         // Clear old UI
         foreach (Transform go in partyParent)
@@ -81,17 +85,23 @@ public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
         }
     }
 
+    private void UpdateSpriteImage()
+    {
+        spriteImage.color = new Color(spriteImage.color.r, spriteImage.color.g, spriteImage.color.b, 1.0f);
+        spriteImage.sprite = selectedUnit.baseData.sprite;
+    }
+
     public void OnCardClicked(UnitInstance unit)
     {
+        selectedUnit = unit;
         if (unit.CanUpgrade)
         {
             upgradeButton.interactable = true;
-            selectedUnit = unit;
         }
         else
         {
             upgradeButton.interactable = false;
-            selectedUnit = null;
         }
+        UpdateSpriteImage();
     }
 }

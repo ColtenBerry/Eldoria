@@ -10,9 +10,11 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
 
     [SerializeField] private TextMeshProUGUI previousTroopTextName;
     [SerializeField] private TextMeshProUGUI previousTroopTextStats;
+    [SerializeField] private Image previousTroopImage;
     [SerializeField] private TextMeshProUGUI upgradedTroopTextName;
     [SerializeField] private TextMeshProUGUI upgradedTroopTextStats;
     [SerializeField] private TextMeshProUGUI upgradeCostText;
+    [SerializeField] private Image upgradedTroopImage;
     [SerializeField] private Button closeMenuButton;
 
     private UnitData currentUnitSelected;
@@ -62,6 +64,7 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
         currentUnitSelected = upgradeData.unitOptions.First();
         PopulateUpgradeOptionInfo(currentUnitSelected);
         PopulateUpgradeOptions(upgradeData.unitOptions);
+        previousTroopImage.sprite = upgradeData.previousUnit.baseData.sprite;
 
     }
 
@@ -114,6 +117,7 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
 
         currentUnitSelected = selectedOption.GetUnitData();
         PopulateUpgradeOptionInfo(currentUnitSelected);
+        upgradedTroopImage.sprite = currentUnitSelected.sprite;
     }
 
 

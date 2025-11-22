@@ -24,3 +24,5 @@ MonoBehaviour:
   recruitmentCost: 50
   upkeepCostPerWeek: 5
   upgradeCost: 100
+  foodConsumptionPerDay: 1
+  sprite: {fileID: -2151193157882705245, guid: 892ba033cb18b42419b9b0b23e3a3402, type: 3}
