@@ -6,6 +6,8 @@ using Microsoft.Unity.VisualStudio.Editor;
 public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
 {
     public TMP_Text nameText;
+    [SerializeField] private UnityEngine.UI.Image healthBar;
+    [SerializeField] private UnityEngine.UI.Image experienceBar;
     public TMP_Text healthText;
     public TMP_Text experienceText;
     public GameObject upgradeIndicator;
@@ -20,14 +22,15 @@ public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
         nameText.text = member.UnitName;
         unit = member;
         healthText.text = $"Health: {member.Health} / {member.MaxHealth}";
+        healthBar.fillAmount = (float)member.Health / member.MaxHealth;
         sprite.sprite = member.baseData.sprite;
 
         if (unit.Health == 0)
         {
             gameObject.GetComponent<UnityEngine.UI.Image>().color = Color.red;
         }
-
-        experienceText.text = member.CurrentExperience.ToString();
+        experienceBar.fillAmount = (float)member.CurrentExperience / member.ExperienceToNextLevel;
+        experienceText.text = $"{member.CurrentExperience} / {member.ExperienceToNextLevel}";
         if (member.CanUpgrade)
         {
             Debug.Log("party member can upgrade");
