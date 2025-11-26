@@ -1,11 +1,13 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Village : Settlement
 {
+    [SerializeField] private TextMeshProUGUI nameText;
     public override void ApplyVisuals()
     {
-        // do nothing
+        nameText.text = gameObject.name;
     }
 
     public override List<InteractionOption> GetInteractionOptions()
