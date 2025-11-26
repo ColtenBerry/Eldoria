@@ -8,7 +8,22 @@ public class RecruitmentSource : MonoBehaviour, IInteractable
 
     [SerializeField] private List<UnitInstance> recruitableUnits = new(); // actual list of recruits
 
+    void Start()
+    {
+        TickManager.Instance.OnWeekPassed += RepopulateRecruitableUnits;
+    }
+
+    void OnDisable()
+    {
+        TickManager.Instance.OnWeekPassed -= RepopulateRecruitableUnits;
+    }
+
     void Awake()
+    {
+        CalculatePotentiallyRecruitableUnits();
+    }
+
+    private void RepopulateRecruitableUnits(int i)
     {
         CalculatePotentiallyRecruitableUnits();
     }
