@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 937cf62c1b05fbd4289096b87d4e3b9c, type: 3}
+  m_Name: Dragan Snowfang
+  m_EditorClassIdentifier: 
+  unitName: Dragan Snowfang
+  health: 10
+  attack: 5
+  defence: 5
+  moral: 5
+  level: 1
+  experience: 0
+  experienceToNextLevel: 50
+  upgradeOptions: []
+  recruitmentCost: 0
+  upkeepCostPerWeek: 0
+  upgradeCost: 0
+  foodConsumptionPerDay: 1
+  sprite: {fileID: 0}
+  strength: 1
+  agility: 1
+  intelligence: 1
+  charisma: 1
+  endurance: 1

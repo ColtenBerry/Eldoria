@@ -83,15 +83,19 @@ public static class CombatSimulator
 
         List<PartyController> defenders = new();
 
-        defenders.AddRange(targetFief.GetAlliedPartyControllers());
+        var defenderSet = new HashSet<PartyController>();
 
+        defenderSet.UnionWith(targetFief.GetAlliedPartyControllers());
 
+        defenderSet.UnionWith(
+            nearbyPresences
+                .Where(p => p.Lord.Faction == defendingFaction)
+                .Select(p => p.GetComponent<PartyController>())
+                .Where(pc => pc != null)
+        );
 
-        defenders.AddRange(nearbyPresences
-            .Where(p => p.Lord.Faction == defendingFaction)
-            .Select(p => p.GetComponent<PartyController>())
-            .Where(pc => pc != null)
-            .ToList());
+        defenders = defenderSet.ToList();
+
         PartyController garrison = targetFief.GetComponent<PartyController>();
         if (garrison != null)
         {
@@ -116,12 +120,19 @@ public static class CombatSimulator
             .Where(pc => pc != null)
             .ToList();
         List<PartyController> defenders = new();
-        defenders.AddRange(targetFief.GetAlliedPartyControllers());
-        defenders.AddRange(nearbyPresences
-            .Where(p => p.Lord.Faction == defendingFaction)
-            .Select(p => p.GetComponent<PartyController>())
-            .Where(pc => pc != null)
-            .ToList());
+        var defenderSet = new HashSet<PartyController>();
+
+        defenderSet.UnionWith(targetFief.GetAlliedPartyControllers());
+
+        defenderSet.UnionWith(
+            nearbyPresences
+                .Where(p => p.Lord.Faction == defendingFaction)
+                .Select(p => p.GetComponent<PartyController>())
+                .Where(pc => pc != null)
+        );
+
+        defenders = defenderSet.ToList();
+
 
         if (isPlayerAttacking)
         {
@@ -158,9 +169,16 @@ public static class CombatSimulator
     public static List<PartyPresence> GetNearbyParties(Vector3 battleLocation, float radius)
     {
         return UnityEngine.Object.FindObjectsOfType<PartyPresence>()
-            .Where(p =>
-                Vector3.Distance(p.transform.position, battleLocation) <= radius && p != GameManager.Instance.player.GetComponent<PartyPresence>() && p.gameObject.layer == LayerMask.NameToLayer("Interactable"))
-            .ToList();
+    .Where(p =>
+        Vector3.Distance(p.transform.position, battleLocation) <= radius &&
+        p != GameManager.Instance.player.GetComponent<PartyPresence>())
+    .Select(p =>
+    {
+        p.gameObject.layer = LayerMask.NameToLayer("Interactable"); // enforce layer
+        return p;
+    })
+    .ToList();
+
     }
 
     /// <summary>

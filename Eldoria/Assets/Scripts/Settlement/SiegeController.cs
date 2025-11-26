@@ -232,4 +232,20 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
         UIManager.Instance.OpenWaitingMenu(new WaitingMenuContext(false, this));
     }
 
+    public int GetTotalDefenderStrength()
+    {
+        int strength = 0;
+        foreach (UnitInstance unit in garrisonController.PartyMembers)
+        {
+            strength += ((unit.Attack + unit.Defence) * unit.Health);
+        }
+        foreach (PartyPresence presence in parties)
+        {
+            strength += presence.GetStrengthEstimate();
+        }
+
+
+        return strength;
+    }
+
 }

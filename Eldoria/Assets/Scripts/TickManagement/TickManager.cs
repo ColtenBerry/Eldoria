@@ -57,7 +57,7 @@ public class TickManager : MonoBehaviour
         TickCount++;
         OnTick?.Invoke(TickCount);
 
-        if (TickCount % ticksPerDay == 0)
+        if (TickCount > 2 && TickCount % ticksPerDay == 0)
         {
             DayCount++;
             OnDayPassed?.Invoke(DayCount);

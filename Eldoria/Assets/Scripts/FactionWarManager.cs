@@ -26,23 +26,16 @@ public class FactionWarManager : MonoBehaviour
             TickManager.Instance.OnTick -= OnTick;
     }
 
-    private void Start()
-    {
-    }
-
     private void OnTick(int tick)
     {
         tickCounter++;
         if (tickCounter >= strategicTickInterval)
         {
             tickCounter = 0;
-            IssueAttackOrders();
+            IssueStrategicOrders();
         }
     }
 
-    /// <summary>
-    /// Called when a lord's party is destroyed. Adds them to the respawn queue.
-    /// </summary>
     public void NotifyPartyDestroyed(LordProfile lord)
     {
         if (!pendingRespawns.Contains(lord))
@@ -52,17 +45,13 @@ public class FactionWarManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called by a settlement when it is besieged. Triggers immediate defensive orders.
-    /// </summary>
     public void NotifySettlementUnderSiege(Settlement settlement)
     {
         if (settlement.GetFaction() != owningFaction) return;
 
-        Debug.Log($"⚠️ {settlement.name} is under siege! Notifying nearby lords to defend.");
+        Debug.Log($"⚠️ {settlement.name} is under siege! Prioritizing defense.");
 
         LordProfile owner = TerritoryManager.Instance.GetLordOf(settlement);
-        Debug.Log($"Owner of {settlement.name} is {owner.Lord.UnitName}");
         if (owner != null && owner.ActiveParty != null)
         {
             AssignDefendOrder(owner, settlement);
@@ -71,7 +60,7 @@ public class FactionWarManager : MonoBehaviour
         List<LordProfile> nearbyLords = LordRegistry.Instance
             .GetLordsOfFaction(owningFaction)
             .Where(l => l != owner && l.ActiveParty != null)
-            .Where(l => Vector3.Distance(l.ActiveParty.transform.position, settlement.transform.position) < 100f)
+            .Where(l => Vector3.Distance(l.ActiveParty.transform.position, settlement.transform.position) < 150f)
             .ToList();
 
         foreach (var lord in nearbyLords)
@@ -93,7 +82,7 @@ public class FactionWarManager : MonoBehaviour
         }
     }
 
-    private void IssueAttackOrders()
+    private void IssueStrategicOrders()
     {
         List<LordProfile> availableLords = FactionsManager.Instance.GetLordsOfFaction(owningFaction)
             .Where(l => l.ActiveParty != null && !issuedOrders.ContainsKey(l))
@@ -101,34 +90,124 @@ public class FactionWarManager : MonoBehaviour
 
         if (availableLords.Count == 0) return;
 
-        List<Settlement> enemyCastles = FactionsManager.Instance.GetEnemiesOf(owningFaction)
-            .SelectMany(f => TerritoryManager.Instance.GetSettlementsOfFaction(f))
-            .Where(s => s is Castle)
+        // --- Step 1: Prioritize defense ---
+        List<Settlement> threatenedSettlements = TerritoryManager.Instance.GetSettlementsOfFaction(owningFaction)
+            .Where(s => s.TryGetComponent<SiegeController>(out var sc) && sc.IsUnderSiege)
             .ToList();
 
-        foreach (var lord in availableLords)
+        if (threatenedSettlements.Count > 0)
         {
-            Vector3 lordPos = lord.ActiveParty.transform.position;
+            Debug.Log($"⚠️ Defense priority: {threatenedSettlements.Count} settlements under siege.");
+            foreach (var settlement in threatenedSettlements)
+            {
+                List<LordProfile> defenders = availableLords
+                    .OrderBy(l => Vector3.Distance(l.ActiveParty.transform.position, settlement.transform.position))
+                    .Take(3)
+                    .ToList();
 
-            List<Settlement> closestTargets = enemyCastles
-                .OrderBy(s => Vector3.Distance(s.transform.position, lordPos))
-                .Take(5)
+                foreach (var lord in defenders)
+                {
+                    AssignDefendOrder(lord, settlement);
+                    availableLords.Remove(lord);
+                }
+            }
+        }
+
+        if (availableLords.Count == 0) return;
+
+        // --- Step 2: Consider attacks ---
+        List<SiegeController> enemySieges = FactionsManager.Instance.GetEnemiesOf(owningFaction)
+    .SelectMany(f => TerritoryManager.Instance.GetSettlementsOfFaction(f))
+    .OfType<Castle>() // only castles
+    .Select(c => c.GetComponent<SiegeController>()) // grab the SiegeController
+    .Where(sc => sc != null) // filter out castles without one
+    .ToList();
+
+
+        foreach (SiegeController target in enemySieges)
+        {
+            if (availableLords.Count == 0) break;
+
+            int defenderStrength = target.GetTotalDefenderStrength();
+            Debug.Log($"🔍 Evaluating {target.name}: defenders={defenderStrength}");
+
+            List<LordProfile> nearbyLords = availableLords
+                .Where(l => Vector3.Distance(l.ActiveParty.transform.position, target.transform.position) < 300f)
+                .OrderBy(l => Vector3.Distance(l.ActiveParty.transform.position, target.transform.position))
                 .ToList();
 
-            if (closestTargets.Count == 0) continue;
+            int friendlyStrength = 0;
+            List<LordProfile> assignedForce = new();
 
-            Settlement target = closestTargets[Random.Range(0, closestTargets.Count)];
-            Debug.Log($"Target Castle name is {target.name}");
-            Debug.Log($"Chosen lord name is {lord.Lord.UnitName}");
-            FactionOrder attackOrder = new FactionOrder(FactionOrderType.Attack, target.gameObject.transform.position, target);
-            issuedOrders[lord] = attackOrder;
-
-            LordNPCStateMachine stateMachine = lord.ActiveParty.GetComponent<LordNPCStateMachine>();
-            if (stateMachine != null)
+            foreach (var lord in nearbyLords)
             {
-                stateMachine.currentOrder = attackOrder;
-                Debug.Log($"⚔️ Assigned attack order to {lord.Lord.UnitName} targeting {target.name}");
+                int strength = lord.ActiveParty.GetStrengthEstimate();
+                friendlyStrength += strength;
+                assignedForce.Add(lord);
+                Debug.Log($"➕ Adding {lord.Lord.UnitName} (strength={strength}), total={friendlyStrength}");
+
+                if (friendlyStrength >= defenderStrength * 2.5f) break; // 2.5 : 1 ratio
             }
+
+            float ratio = defenderStrength > 0 ? (float)friendlyStrength / defenderStrength : 999f;
+            Debug.Log($"📊 Final ratio vs {target.name}: {ratio:F2} ({friendlyStrength} vs {defenderStrength})");
+
+            if (ratio >= 2.0f && assignedForce.Count >= 3)
+            {
+                foreach (var lord in assignedForce)
+                {
+                    AssignAttackOrder(lord, target.Settlement);
+                    availableLords.Remove(lord);
+                }
+                Debug.Log($"⚔️ Attack launched on {target.name} with {assignedForce.Count} lords.");
+            }
+            else
+            {
+                Debug.Log($"❌ Attack aborted on {target.name}: insufficient force.");
+            }
+        }
+
+        // --- Step 3: Fallback tasks ---
+        foreach (var lord in availableLords)
+        {
+            AssignFallbackOrder(lord);
+        }
+    }
+
+    private void AssignAttackOrder(LordProfile lord, Settlement target)
+    {
+        FactionOrder attackOrder = new FactionOrder(FactionOrderType.Attack, target.transform.position, target);
+        issuedOrders[lord] = attackOrder;
+
+        LordNPCStateMachine stateMachine = lord.ActiveParty.GetComponent<LordNPCStateMachine>();
+        if (stateMachine != null)
+        {
+            stateMachine.currentOrder = attackOrder;
+            Debug.Log($"⚔️ Assigned attack order to {lord.Lord.UnitName} targeting {target.name}");
+        }
+    }
+
+    private void AssignFallbackOrder(LordProfile lord)
+    {
+        int roll = Random.Range(0, 3);
+        Settlement home = TerritoryManager.Instance.GetSettlementsOf(lord).FirstOrDefault();
+
+        if (roll == 0 && home != null)
+        {
+            AssignDefendOrder(lord, home);
+        }
+        else if (roll == 1 && home != null)
+        {
+            FactionOrder patrolOrder = new FactionOrder(FactionOrderType.Defend, home.transform.position, home);
+            issuedOrders[lord] = patrolOrder;
+            var stateMachine = lord.ActiveParty.GetComponent<LordNPCStateMachine>();
+            if (stateMachine != null) stateMachine.currentOrder = patrolOrder;
+            Debug.Log($"🚶 Assigned patrol order to {lord.Lord.UnitName} around {home.name}");
+        }
+        else
+        {
+            issuedOrders[lord] = null; // idle / develop lands
+            Debug.Log($"🌾 {lord.Lord.UnitName} is idle, developing lands.");
         }
     }
 
@@ -139,5 +218,4 @@ public class FactionWarManager : MonoBehaviour
             Debug.Log($"🧹 Cleared order for {lord.Lord.UnitName}");
         }
     }
-
 }

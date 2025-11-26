@@ -12,12 +12,15 @@ public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
     private ICardHandler<UnitInstance> handler;
     private UnitInstance unit;
 
+    [SerializeField] private UnityEngine.UI.Image sprite;
+
     public void Setup(UnitInstance member, ICardHandler<UnitInstance> handler)
     {
         this.handler = handler;
         nameText.text = member.UnitName;
         unit = member;
         healthText.text = $"Health: {member.Health} / {member.MaxHealth}";
+        sprite.sprite = member.baseData.sprite;
 
         if (unit.Health == 0)
         {

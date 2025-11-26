@@ -151,11 +151,13 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             previousIntent = currentIntent;
             objective = targetGO;
 
+
+            if (wasWaiting && partyPresence != null)
+                LeaveFief(previousObjective.GetComponent<SiegeController>());
+
             // fix: remember the objective so future checks see that we've already applied it
             previousObjective = objective;
 
-            if (wasWaiting && partyPresence != null)
-                partyPresence.LeaveFief();
         }
         Debug.Log("Intent: " + currentIntent);
         Debug.Log("Target location: " + currentOrder.TargetLocation);
@@ -205,10 +207,10 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
             if (isInFief)
             {
-                LeaveFief();
+                LeaveFief(previousObjective.GetComponent<SiegeController>());
             }
 
-            if (previousIntent == NPCIntent.SiegeCastle && previousObjective is Castle)
+            if (previousIntent == NPCIntent.SiegeCastle && previousObjective is SiegeController)
                 EndSiege(previousObjective.GetComponent<SiegeController>());
 
             previousIntent = currentIntent;
@@ -233,7 +235,9 @@ public class LordNPCStateMachine : BaseNPCStateMachine
                     Recruit(source);
                     break;
                 case NPCIntent.WaitInFief:
-                    partyPresence.WaitInFief();
+                    SiegeController sc = objective.GetComponent<SiegeController>();
+                    if (sc == null) Debug.LogError("siegecontroller is null");
+                    WaitInFief(sc);
                     break;
                 case NPCIntent.PatrolTerritory:
                     var settlement = objective.GetComponent<Settlement>();
@@ -276,8 +280,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         if (nearbyEnemies.Count == 0)
         {
             Debug.Log("no nearby enemies to defend against");
-            factionWarManager.ClearOrder(currentLord);
-            currentOrder = null;
+            ClearOrder();
             return;
         }
         fief.TryGetComponent<SiegeController>(out SiegeController sc);
@@ -288,7 +291,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             if (!sc.IsUnderSiege)
             {
                 // join castle in defense
-                EnterFief();
+                EnterFief(sc);
             }
             else
             {
@@ -396,15 +399,13 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             if (sc.Settlement.GetFaction() == currentLord.Faction)
             {
                 // castle must be conquered
-                currentOrder = null;
+                ClearOrder();
             }
         }
     }
     private bool isInFief = false;
-    private SiegeController fief = null;
-    private void EnterFief()
+    private void EnterFief(SiegeController fief)
     {
-        fief = objective.GetComponent<SiegeController>();
         if (fief == null)
         {
             Debug.LogWarning("Expected fief to be a castle");
@@ -419,7 +420,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         partyPresence.WaitInFief();
         isInFief = true;
     }
-    private void LeaveFief()
+    private void LeaveFief(SiegeController fief)
     {
         if (fief.IsUnderSiege)
         {
@@ -429,7 +430,6 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         fief.RemoveParty(selfPresence);
         partyPresence.LeaveFief();
         isInFief = false;
-        fief = null;
     }
     protected override void ExecuteTransitionActions()
     {
@@ -522,6 +522,21 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         }
 
         return closest;
+    }
+
+
+    private void ClearOrder()
+    {
+        currentOrder = null;
+        factionWarManager.ClearOrder(currentLord);
+    }
+
+    private void WaitInFief(SiegeController sc)
+    {
+        // add to seige parties
+        sc.AddParty(selfPresence);
+        // set visuals
+        selfPresence.WaitInFief();
     }
 
 }
