@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 594945796930282310}
   - component: {fileID: 1984388218478705353}
   - component: {fileID: 3440840643969678072}
-  - component: {fileID: 891917359992634282}
   - component: {fileID: 3324451947471942248}
+  - component: {fileID: 891917359992634282}
   - component: {fileID: 3481923640385796753}
   m_Layer: 6
   m_Name: VillagePrefab
@@ -138,20 +138,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &891917359992634282
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2584458911012735913}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12edb98756b711346975c69489a60efb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prosperity: 100
-  nameText: {fileID: 4212406075247228916}
 --- !u!114 &3324451947471942248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -167,6 +153,20 @@ MonoBehaviour:
   spawnableUnits:
   - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
   recruitableUnits: []
+--- !u!114 &891917359992634282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2584458911012735913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12edb98756b711346975c69489a60efb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prosperity: 100
+  nameText: {fileID: 4212406075247228916}
 --- !u!114 &3481923640385796753
 MonoBehaviour:
   m_ObjectHideFlags: 0

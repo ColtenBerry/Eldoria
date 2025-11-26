@@ -148,11 +148,11 @@ GameObject:
   m_Component:
   - component: {fileID: 7398767843841124068}
   - component: {fileID: 1878633514371896724}
-  - component: {fileID: 4760188784419831982}
   - component: {fileID: 4912614907078719588}
-  - component: {fileID: 95579121599768841}
   - component: {fileID: 5336798432802789564}
   - component: {fileID: 1438559700895056109}
+  - component: {fileID: 95579121599768841}
+  - component: {fileID: 4760188784419831982}
   m_Layer: 6
   m_Name: Castle
   m_TagString: Untagged
@@ -233,20 +233,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &4760188784419831982
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4395130446511347997}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fad092dd347466e42b08c648eadd6185, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prosperity: 0
-  boundVillages: []
 --- !u!61 &4912614907078719588
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -293,20 +279,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &95579121599768841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4395130446511347997}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ddc52e735894034abacf6565ccf310c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  partyMembers: []
-  partyID: 
 --- !u!114 &5336798432802789564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -341,6 +313,34 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7a9f90855101e8c43b198a9b4ff6a70c, type: 2}
   - {fileID: 11400000, guid: 076a4459812c2714fac4c9e403624368, type: 2}
   recruitableUnits: []
+--- !u!114 &95579121599768841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4395130446511347997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ddc52e735894034abacf6565ccf310c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  partyMembers: []
+  partyID: 
+--- !u!114 &4760188784419831982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4395130446511347997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fad092dd347466e42b08c648eadd6185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prosperity: 0
+  boundVillages: []
 --- !u!1 &4413917565010120050
 GameObject:
   m_ObjectHideFlags: 0
