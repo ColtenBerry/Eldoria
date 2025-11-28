@@ -26,7 +26,6 @@ public class PartyController : MonoBehaviour
     [Header("Party Identity")]
     [SerializeField] private string partyID;
     public string PartyID => partyID;
-
     private bool isHealing = false;
 
 
@@ -112,7 +111,11 @@ public class PartyController : MonoBehaviour
         }
         return totalConsumptionPerDay;
     }
-
+    private bool isStarving = false;
+    public void SetIsStarving(bool b)
+    {
+        isStarving = b;
+    }
     public void HandleStarvation(int foodShortage)
     {
         // for now lets just redudce health by 1 for each unit. later we can include foodshortage
@@ -132,6 +135,7 @@ public class PartyController : MonoBehaviour
 
     public void SetIsHealing(bool b)
     {
+        if (isStarving) return;
         isHealing = b;
 
         if (b)

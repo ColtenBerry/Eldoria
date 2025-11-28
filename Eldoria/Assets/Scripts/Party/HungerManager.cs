@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class HungerManager : MonoBehaviour
 {
-    private PartyController partyController;
+    private PartyPresence partyPresence;
     private InventoryManager inventoryManager;
 
     private void Awake()
     {
-        partyController = GetComponent<PartyController>();
+        partyPresence = GetComponent<PartyPresence>();
         inventoryManager = GetComponent<InventoryManager>();
     }
     private bool subscribed = false;
@@ -37,7 +37,7 @@ public class HungerManager : MonoBehaviour
 
     private void HandleDailyFoodConsumption(int dayCount)
     {
-        int foodConsumption = partyController.CalculateFoodConsumption();
+        int foodConsumption = partyPresence.PartyController.CalculateFoodConsumption();
 
         List<ItemStack> foodStacks = inventoryManager.GetAllItems().FindAll(stack => stack.item.category == ItemCategory.Food);
 
@@ -55,9 +55,10 @@ public class HungerManager : MonoBehaviour
                 break;
             }
         }
+        partyPresence.PartyController.SetIsStarving(foodConsumption > 0);
         if (foodConsumption > 0)
         {
-            partyController.HandleStarvation(foodConsumption);
+            partyPresence.PartyController.HandleStarvation(foodConsumption);
         }
     }
 }

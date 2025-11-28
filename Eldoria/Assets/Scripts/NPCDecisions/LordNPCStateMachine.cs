@@ -92,6 +92,14 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     /// <summary>
     /// Idle Behavior determines what behavior to call when no immediate threat or easy target is presented
     /// </summary>
+    /// 
+    /// 
+
+    private void Start()
+    {
+        TickManager.Instance.OnWeekPassed += ResetPatrolledLands;
+    }
+
     protected override void SetIdleBehavior()
     {
         if (currentOrder != null)
@@ -342,7 +350,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         unPatrolledLands.Remove(land);
     }
 
-    private void ResetPatrolledLands()
+    private void ResetPatrolledLands(int i)
     {
         unPatrolledLands.Clear();
         unPatrolledLands.AddRange(TerritoryManager.Instance.GetSettlementsOf(currentLord));
