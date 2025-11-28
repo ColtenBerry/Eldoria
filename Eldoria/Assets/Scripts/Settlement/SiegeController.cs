@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-public class SiegeController : MonoBehaviour, ISiegable, IInteractable
+public class SiegeController : MonoBehaviour, IInteractable
 {
     private int siegeTicksRemaining;
     private PartyPresence siegeAttacker;
@@ -10,49 +10,24 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
 
     public bool IsUnderSiege => siegeTicksRemaining > 0;
 
-    private PartyController garrisonController;
-
-    public PartyController GarrisonController => garrisonController;
-
-    [SerializeField] private List<UnitData> startingGarrisonUnits;
-
-
     [SerializeField] private int defenseBonus = 20;
 
     [SerializeField] private List<PartyPresence> parties;
     public List<PartyPresence> Parties => parties;
 
 
-    private Settlement settlement;
-    public Settlement Settlement => settlement;
+    private SiegeableSettlement settlement;
+    public SiegeableSettlement Settlement => settlement;
+
 
 
 
     void Awake()
     {
-        settlement = GetComponent<Settlement>();
+        settlement = GetComponent<SiegeableSettlement>();
         if (settlement == null)
-            Debug.LogError("SiegeController requires a Settlement component");
-
-        garrisonController = GetComponent<PartyController>();
-        if (settlement == null)
-            Debug.LogError("SiegeController requires a partycontroller component");
+            Debug.LogError("SiegeController requires a siegable Settlement component");
     }
-
-    public void Start()
-    {
-        InitializeGarrison();
-    }
-
-    public void InitializeGarrison()
-    {
-        foreach (UnitData unitData in startingGarrisonUnits)
-        {
-            garrisonController.AddUnit(new UnitInstance(unitData));
-        }
-        garrisonController.SetIsHealing(true);
-    }
-
 
     public void StartSiege(PartyPresence attacker, bool isPlayer)
     {
@@ -214,7 +189,7 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
 
             options.Add(new InteractionOption("Manage Garrison", () =>
             {
-                UIManager.Instance.OpenSubMenu("garrison", new PartyTransferMenuContext(garrisonController, GameManager.Instance.player.GetComponent<PartyController>()));
+                UIManager.Instance.OpenSubMenu("garrison", new PartyTransferMenuContext(settlement.GarrisonParty, GameManager.Instance.player.GetComponent<PartyController>()));
             }));
 
             options.Add(new InteractionOption("Sell Prisoners", () =>
@@ -239,7 +214,7 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
     public int GetTotalDefenderStrength()
     {
         int strength = 0;
-        foreach (UnitInstance unit in garrisonController.PartyMembers)
+        foreach (UnitInstance unit in settlement.GarrisonParty.PartyMembers)
         {
             strength += ((unit.Attack + unit.Defence) * unit.Health);
         }

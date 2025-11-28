@@ -7,7 +7,7 @@ public abstract class Settlement : MonoBehaviour, IInteractable
     [SerializeField] protected int prosperity;
 
 
-    public virtual void Start()
+    protected virtual void Start()
     {
         settlementName = gameObject.name;
     }

@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class Castle : Settlement, IHasBoundVillages
+[RequireComponent(typeof(PartyController))]
+public class Castle : SiegeableSettlement, IHasBoundVillages
 {
-
-
 
     // bound villages
 
@@ -18,12 +17,16 @@ public class Castle : Settlement, IHasBoundVillages
     public List<Village> BoundVillages => boundVillages;
 
     // siege
-    private SiegeController siegeController;
+
+    private void Awake()
+    {
+        garrison = GetComponent<PartyController>();
+        if (garrison == null)
+            Debug.LogError("SiegeController requires a partycontroller component");
+    }
 
 
-
-
-    public override void Start()
+    protected override void Start()
     {
         base.Start();
         ApplyVisuals();
@@ -41,7 +44,6 @@ public class Castle : Settlement, IHasBoundVillages
         castleNameText.text = gameObject.name;
     }
 
-
     public override List<InteractionOption> GetInteractionOptions()
     {
         List<InteractionOption> options = new();
@@ -57,5 +59,14 @@ public class Castle : Settlement, IHasBoundVillages
         Debug.Log("Attempting interaction with castle");
     }
 
+    int FINALEXPERIENCEAMOUNT = 5;
 
+    public override void AwardGarrisonXP(int tickCount)
+    {
+        int finalAmount = FINALEXPERIENCEAMOUNT;
+        foreach (UnitInstance unit in garrison.PartyMembers)
+        {
+            unit.GainExperience(finalAmount);
+        }
+    }
 }
