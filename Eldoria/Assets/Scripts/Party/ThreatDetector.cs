@@ -9,6 +9,8 @@ public class ThreatDetector : MonoBehaviour
     private CircleCollider2D detectionCollider;
     [SerializeField] private LayerMask detectionLayerMask;
 
+    private Dictionary<PartyPresence, string> relationshipMap = new();
+
     void Awake()
     {
         npc = GetComponentInParent<BaseNPCStateMachine>();
@@ -27,27 +29,32 @@ public class ThreatDetector : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-
-    }
-
     void OnTriggerEnter2D(Collider2D other)
     {
         if ((detectionLayerMask.value & (1 << other.gameObject.layer)) == 0) return;
         if (other.gameObject == self.gameObject) return;
-        Debug.Log("Enter");
+
         PartyPresence otherPresence = other.GetComponent<PartyPresence>();
         if (otherPresence == null) return;
 
+        string relation;
         if (FactionsManager.Instance.AreEnemies(self.Lord.Faction, otherPresence.Lord.Faction))
+        {
+            relation = "Enemy";
             npc.OnThreatDetected(otherPresence);
+        }
         else if (FactionsManager.Instance.AreAllied(self.Lord.Faction, otherPresence.Lord.Faction))
+        {
+            relation = "Ally";
             npc.OnFriendDetected(otherPresence);
+        }
+        else
+        {
+            relation = "Neutral";
+        }
+
+        relationshipMap[otherPresence] = relation; // <-- critical fix
     }
-
-
-    private Dictionary<PartyPresence, string> relationshipMap = new();
 
     void OnTriggerStay2D(Collider2D other)
     {
@@ -55,13 +62,7 @@ public class ThreatDetector : MonoBehaviour
 
         PartyPresence otherPresence = other.GetComponent<PartyPresence>();
         if (otherPresence == null) return;
-
-        if ((detectionLayerMask.value & (1 << other.gameObject.layer)) == 0)
-        {
-            npc.OnThreatExited(otherPresence);
-            npc.OnFriendExited(otherPresence);
-            return;
-        }
+        if ((detectionLayerMask.value & (1 << other.gameObject.layer)) == 0) return; // <-- just ignore
 
         string newRelation;
         if (FactionsManager.Instance.AreEnemies(self.Lord.Faction, otherPresence.Lord.Faction))
@@ -83,7 +84,6 @@ public class ThreatDetector : MonoBehaviour
             relationshipMap[otherPresence] = newRelation;
         }
     }
-
 
     void OnTriggerExit2D(Collider2D other)
     {

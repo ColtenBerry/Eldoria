@@ -111,6 +111,11 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         if (currentState != NPCState.Idle && isSieging)
         {
             // end siege
+            if (currentOrder == null)
+            {
+                Debug.LogWarning("current order is null... warning");
+                return;
+            }
             EndSiege(currentOrder.TargetObject as SiegeController);
         }
     }
@@ -211,7 +216,14 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             }
 
             if (previousIntent == NPCIntent.SiegeCastle && previousObjective is SiegeController)
+            {
+                if (previousObjective == null)
+                {
+                    Debug.LogWarning("previous objective is null...");
+                    return;
+                }
                 EndSiege(previousObjective.GetComponent<SiegeController>());
+            }
 
             previousIntent = currentIntent;
             previousObjective = objective;
@@ -283,12 +295,12 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             ClearOrder();
             return;
         }
-        fief.TryGetComponent<SiegeController>(out SiegeController sc);
+        fief.TryGetComponent(out SiegeController sc);
 
         if (sc != null)
         {
             // defend castle logic
-            if (!sc.IsUnderSiege)
+            if (!sc.IsUnderSiege && sc.Settlement.GetFaction() == currentLord.Faction)
             {
                 // join castle in defense
                 EnterFief(sc);
@@ -384,14 +396,24 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
     private void SiegeCastle(SiegeController castle)
     {
+        if (castle.Settlement.GetFaction() == currentLord.Faction)
+        {
+            Debug.Log("Attempting to siege castle of same faction! breaking");
+            CompleteOrder();
+            return;
+        }
         Debug.Log("lordnpcstatemachine sieging castle name: " + castle.name);
-        castle.StartSiege(partyController, false);
+        castle.StartSiege(selfPresence, false);
         isSieging = true;
     }
 
     public void EndSiege(SiegeController castle)
     {
         isSieging = false;
+        if (castle == null)
+        {
+            return;
+        }
         castle.EndSiege();
 
         if (objective.TryGetComponent<SiegeController>(out var sc))
@@ -399,7 +421,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             if (sc.Settlement.GetFaction() == currentLord.Faction)
             {
                 // castle must be conquered
-                ClearOrder();
+                CompleteOrder();
             }
         }
     }
@@ -433,22 +455,14 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     }
     protected override void ExecuteTransitionActions()
     {
-        currentPath.Clear();
-        GeneratePathTo(objective.transform.position);
-        if (isSieging && currentState != NPCState.Idle)
+        if (isSieging)
         {
-            // Defensive check: make sure objective is a castle
-            if (objective != null && objective.TryGetComponent<Castle>(out var castle))
-            {
-                Debug.Log("Siege ended due to state transition: " + castle.name);
-            }
-            else
-            {
-                // If no castle reference, just clear the flag
-                isSieging = false;
-                Debug.LogWarning("Siege flag cleared but no castle found.");
-            }
+            objective.TryGetComponent(out SiegeController sc);
+            EndSiege(sc);
         }
+        currentPath.Clear();
+        if (objective == null) return;
+        GeneratePathTo(objective.transform.position);
     }
 
     private NPCIntent ResolveAttackIntent(IInteractable target)
@@ -529,6 +543,11 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     {
         currentOrder = null;
         factionWarManager.ClearOrder(currentLord);
+    }
+
+    private void CompleteOrder()
+    {
+        factionWarManager.CompleteOrder(currentOrder);
     }
 
     private void WaitInFief(SiegeController sc)

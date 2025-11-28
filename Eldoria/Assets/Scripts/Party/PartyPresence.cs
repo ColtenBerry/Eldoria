@@ -19,6 +19,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
     }
 
     private SpawnerManager spawner;
+    public PartyController PartyController => partyController;
 
     void Awake()
     {
@@ -146,6 +147,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
         gameObject.layer = LayerMask.NameToLayer("");
         SetTransparency(gameObject, 0.0f);
         partyController.SetIsHealing(true);
+        GetComponent<CircleCollider2D>().isTrigger = false;
     }
 
     public void LeaveFief()
@@ -154,6 +156,7 @@ public class PartyPresence : MonoBehaviour, IInteractable
         if (gameObject == GameManager.Instance.player) gameObject.layer = LayerMask.NameToLayer("Player");
         SetTransparency(gameObject, 1.0f);
         partyController.SetIsHealing(false);
+        GetComponent<CircleCollider2D>().isTrigger = true;
     }
     internal bool IsInFief()
     {

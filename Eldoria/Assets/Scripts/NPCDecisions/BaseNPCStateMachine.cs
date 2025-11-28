@@ -62,6 +62,7 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
 
     protected void FleeFromGroup()
     {
+        if (selfPresence.IsInFief()) return; // don't flee if in a fief
         if (nearbyEnemies.Count == 0)
         {
             currentState = NPCState.Idle;
@@ -81,6 +82,7 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
 
     protected void ChaseClosestEnemy()
     {
+        if (selfPresence.IsInFief()) return; // don't chase if in fief
         if (nearbyEnemies.Count == 0)
         {
             currentState = NPCState.Idle;
@@ -190,11 +192,9 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
 
         if (ratio > strengthPercent)
             currentState = NPCState.Fleeing;
-        else if (ratio < -strengthPercent)
-            currentState = NPCState.Chasing;
         else
         {
-            currentState = NPCState.Idle;
+            currentState = NPCState.Chasing;
         }
     }
 

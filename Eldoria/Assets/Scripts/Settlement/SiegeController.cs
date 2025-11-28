@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class SiegeController : MonoBehaviour, ISiegable, IInteractable
 {
     private int siegeTicksRemaining;
-    private PartyController siegeAttacker;
+    private PartyPresence siegeAttacker;
     private bool siegeByPlayer;
 
     public bool IsUnderSiege => siegeTicksRemaining > 0;
@@ -54,14 +54,14 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
     }
 
 
-    public void StartSiege(PartyController attacker, bool isPlayer)
+    public void StartSiege(PartyPresence attacker, bool isPlayer)
     {
         if (IsUnderSiege)
         {
             Debug.Log($"{settlement.name} is already under siege.");
             return;
         }
-
+        FactionsManager.Instance.GetWarManager(Settlement.GetFaction()).NotifySettlementUnderSiege(Settlement);
         siegeAttacker = attacker;
         siegeByPlayer = isPlayer;
         siegeTicksRemaining = GetSiegeTicks();
@@ -78,12 +78,16 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
 
     public void EndSiege()
     {
+        if (siegeAttacker == null) return;
         Debug.Log($"{settlement.name} siege ended.");
+        FactionsManager.Instance.GetWarManager(siegeAttacker.Lord.Faction).CancelDefense(Settlement);
+
         siegeAttacker = null;
         siegeByPlayer = false;
         siegeTicksRemaining = 0;
 
         TickManager.Instance.OnTick -= HandleTick;
+
     }
 
     public int GetSiegeTicks()
@@ -187,7 +191,7 @@ public class SiegeController : MonoBehaviour, ISiegable, IInteractable
         {
             options.Add(new InteractionOption("Besiege Castle", () =>
             {
-                PartyController controller = GameManager.Instance.player.GetComponent<PartyController>();
+                PartyPresence controller = GameManager.Instance.player.GetComponent<PartyPresence>();
                 if (controller == null)
                 {
                     Debug.Log("No player party controller found");
