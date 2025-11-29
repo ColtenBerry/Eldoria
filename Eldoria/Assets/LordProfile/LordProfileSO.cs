@@ -11,7 +11,7 @@ public class LordProfileSO : ScriptableObject
     public Faction faction;
 
     [Header("Starting Units")]
-    public List<UnitData> startingUnits;
+    public SoldierGroup startingSoldiers;
 
     [Header("Economy")]
     public int startingGold = 5000;

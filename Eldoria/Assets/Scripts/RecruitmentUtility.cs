@@ -1,11 +1,11 @@
 using UnityEngine;
 public static class RecruitmentUtility
 {
-    public static bool TryRecruitUnit(UnitInstance unit, PartyController party, LordProfile lord, RecruitmentSource source)
+    public static bool TryRecruitUnit(SoldierInstance unit, PartyController party, LordProfile lord, RecruitmentSource source)
     {
-        if (!lord.TrySpendGold(unit.baseData.recruitmentCost))
+        if (!lord.TrySpendGold(unit.unitData.recruitmentCost))
         {
-            Debug.Log($"❌ {lord.Lord.UnitName} can't afford {unit.UnitName} ({unit.baseData.recruitmentCost} gold)");
+            Debug.Log($"❌ {lord.Lord.UnitName} can't afford {unit.UnitName} ({unit.unitData.recruitmentCost} gold)");
             return false;
         }
 
@@ -16,7 +16,7 @@ public static class RecruitmentUtility
         }
 
         source.recruitUnit(unit);
-        Debug.Log($"✅ {lord.Lord.UnitName} recruited {unit.UnitName} for {unit.baseData.recruitmentCost} gold");
+        Debug.Log($"✅ {lord.Lord.UnitName} recruited {unit.UnitName} for {unit.unitData.recruitmentCost} gold");
         return true;
     }
 }

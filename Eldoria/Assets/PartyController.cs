@@ -8,11 +8,11 @@ public class PartyController : MonoBehaviour
     [Header("Party Settings")]
     // public List<UnitData> startingUnits;
     [SerializeField]
-    private List<UnitInstance> partyMembers = new();
+    private List<SoldierInstance> partyMembers = new();
 
     [HideInInspector] int maxPartyMembers = 20;
 
-    public List<UnitInstance> PartyMembers => partyMembers;
+    public List<SoldierInstance> PartyMembers => partyMembers;
     public int MaxPartyMembers => maxPartyMembers;
 
     public delegate void PartyChanged(); //This fcrces any listener to only activate void events? 
@@ -20,7 +20,7 @@ public class PartyController : MonoBehaviour
 
 
     [Header("Prisoner Section")]
-    public List<UnitInstance> Prisoners { get; private set; } = new();
+    public List<SoldierInstance> Prisoners { get; private set; } = new();
     public event Action OnPrisonersUpdated;
 
     [Header("Party Identity")]
@@ -43,7 +43,7 @@ public class PartyController : MonoBehaviour
 
     }
 
-    public bool AddUnit(UnitInstance unit)
+    public bool AddUnit(SoldierInstance unit)
     {
         if (partyMembers.Count == maxPartyMembers)
         {
@@ -56,7 +56,7 @@ public class PartyController : MonoBehaviour
         return true;
     }
 
-    public void RemoveUnit(UnitInstance member)
+    public void RemoveUnit(SoldierInstance member)
     {
         PartyMembers.Remove(member);
         OnPartyUpdated?.Invoke();
@@ -67,13 +67,13 @@ public class PartyController : MonoBehaviour
         maxPartyMembers = num;
     }
 
-    public void AddPrisoner(UnitInstance prisoner)
+    public void AddPrisoner(SoldierInstance prisoner)
     {
         Prisoners.Add(prisoner);
         OnPrisonersUpdated?.Invoke();
     }
 
-    public void ReleasePrisoner(UnitInstance prisoner)
+    public void ReleasePrisoner(SoldierInstance prisoner)
     {
         if (Prisoners.Remove(prisoner))
             OnPrisonersUpdated?.Invoke();
@@ -87,9 +87,9 @@ public class PartyController : MonoBehaviour
     public int CalculateWeeklyUpkeep()
     {
         int totalUpkeep = 0;
-        foreach (UnitInstance unit in PartyMembers)
+        foreach (SoldierInstance unit in PartyMembers)
         {
-            totalUpkeep += unit.baseData.upkeepCostPerWeek;
+            totalUpkeep += unit.unitData.upkeepCostPerWeek;
         }
         return totalUpkeep;
     }
@@ -107,7 +107,7 @@ public class PartyController : MonoBehaviour
         int totalConsumptionPerDay = 0;
         foreach (UnitInstance unit in PartyMembers)
         {
-            totalConsumptionPerDay += unit.baseData.foodConsumptionPerDay;
+            totalConsumptionPerDay += unit.unitData.foodConsumptionPerDay;
         }
         return totalConsumptionPerDay;
     }
@@ -119,7 +119,7 @@ public class PartyController : MonoBehaviour
     public void HandleStarvation(int foodShortage)
     {
         // for now lets just redudce health by 1 for each unit. later we can include foodshortage
-        foreach (UnitInstance unit in PartyMembers)
+        foreach (SoldierInstance unit in PartyMembers)
         {
             unit.TakeDamage(1);
         }

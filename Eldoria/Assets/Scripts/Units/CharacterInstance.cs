@@ -20,10 +20,12 @@ public class CharacterInstance : UnitInstance
     public int Intelligence => intelligence;
     public int Charisma => charisma;
     public int Endurance => endurance;
+    public CharacterData characterData;
 
 
     public CharacterInstance(CharacterData data) : base(data)
     {
+        this.characterData = data;
         strength = data.strength;
         agility = data.agility;
         intelligence = data.intelligence;
@@ -41,6 +43,23 @@ public class CharacterInstance : UnitInstance
         intelligence += 1;
         charisma += 1;
         endurance += 1;
+    }
+
+    public override UnitInstance Clone()
+    {
+        return new CharacterInstance(characterData)
+        {
+            unitName = unitName,
+            currentLevel = currentLevel,
+            currentExperience = currentExperience,
+            experienceToNextLevel = experienceToNextLevel,
+            health = health,
+            maxHealth = maxHealth,
+            attack = attack,
+            defence = defence,
+            moral = moral,
+            idString = idString
+        };
     }
 
 }

@@ -397,11 +397,11 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             return;
         }
 
-        List<UnitInstance> recruits = new List<UnitInstance>(source.GetRecruitableUnits());
+        List<SoldierInstance> recruits = new List<SoldierInstance>(source.GetRecruitableUnits());
 
         for (int i = recruits.Count - 1; i >= 0; i--)
         {
-            UnitInstance unit = recruits[i];
+            SoldierInstance unit = recruits[i];
             Debug.Log("Attempting to recruit: " + unit.UnitName);
 
             if (partyController.AddUnit(unit))

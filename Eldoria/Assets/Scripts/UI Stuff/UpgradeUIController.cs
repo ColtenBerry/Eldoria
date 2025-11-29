@@ -57,14 +57,14 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
             return;
         }
 
-        previousTroopTextName.text = upgradeData.previousUnit.baseData.unitName;
-        string[] lines = { $"Health: {upgradeData.previousUnit.baseData.health}", $"Attack: {upgradeData.previousUnit.baseData.attack}", $"Defense: {upgradeData.previousUnit.baseData.defence}" };
+        previousTroopTextName.text = upgradeData.previousUnit.unitData.unitName;
+        string[] lines = { $"Health: {upgradeData.previousUnit.unitData.health}", $"Attack: {upgradeData.previousUnit.unitData.attack}", $"Defense: {upgradeData.previousUnit.unitData.defence}" };
         previousTroopTextStats.text = string.Join("\n", lines);
 
         currentUnitSelected = upgradeData.unitOptions.First();
         PopulateUpgradeOptionInfo(currentUnitSelected);
         PopulateUpgradeOptions(upgradeData.unitOptions);
-        previousTroopImage.sprite = upgradeData.previousUnit.baseData.sprite;
+        previousTroopImage.sprite = upgradeData.previousUnit.unitData.sprite;
 
     }
 

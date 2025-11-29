@@ -9,21 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37df71987e15abe41b4e136ad2482ce6, type: 3}
+  m_Script: {fileID: 11500000, guid: a0bf6cf2f4151924681999b6b9d4b225, type: 3}
   m_Name: Swordsman
   m_EditorClassIdentifier: 
   unitName: Swordsman
   health: 20
-  attack: 3
-  defence: 3
+  attack: 2
+  defence: 4
   moral: 10
   level: 1
   experience: 0
   experienceToNextLevel: 50
-  upgradeOptions:
-  - {fileID: 11400000, guid: 54ece14cb0bf84c42a3feef23b491306, type: 2}
+  upgradeOptions: []
   recruitmentCost: 200
   upkeepCostPerWeek: 5
-  upgradeCost: 100
+  upgradeCost: 250
   foodConsumptionPerDay: 1
   sprite: {fileID: -2299687460360013530, guid: e4189b16fcd01244aac379b64a8da486, type: 3}

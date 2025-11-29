@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Linq;
 
-public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
+public class PartyUI : MonoBehaviour, ICardHandler<SoldierInstance>
 {
     public PartyController partyController;
     public Transform partyParent; // e.g. a Vertical Layout Group
@@ -39,10 +39,10 @@ public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
             // open upgrade menu. 
 
             // get all upgradable units:
-            List<UnitInstance> upgradableUnits = partyController.PartyMembers.Where(unit => unit.CanUpgrade).ToList();
+            List<SoldierInstance> upgradableUnits = partyController.PartyMembers.Where(unit => unit.CanUpgrade).ToList();
 
             // open upgrade menu with new units
-            UpgradeObject upgradeObject = new UpgradeObject(selectedUnit, selectedUnit.baseData.upgradeOptions);
+            UpgradeObject upgradeObject = new UpgradeObject(selectedUnit, selectedUnit.unitData.upgradeOptions);
             UIManager.Instance.OpenUpgradeUnitMenu(upgradeObject);
         });
     }
@@ -88,10 +88,10 @@ public class PartyUI : MonoBehaviour, ICardHandler<UnitInstance>
     private void UpdateSpriteImage()
     {
         spriteImage.color = new Color(spriteImage.color.r, spriteImage.color.g, spriteImage.color.b, 1.0f);
-        spriteImage.sprite = selectedUnit.baseData.sprite;
+        spriteImage.sprite = selectedUnit.unitData.sprite;
     }
 
-    public void OnCardClicked(UnitInstance unit)
+    public void OnCardClicked(SoldierInstance unit)
     {
         selectedUnit = unit;
         if (unit.CanUpgrade)

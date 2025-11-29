@@ -11,19 +11,19 @@ public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
     public TMP_Text healthText;
     public TMP_Text experienceText;
     public GameObject upgradeIndicator;
-    private ICardHandler<UnitInstance> handler;
-    private UnitInstance unit;
+    private ICardHandler<SoldierInstance> handler;
+    private SoldierInstance unit;
 
     [SerializeField] private UnityEngine.UI.Image sprite;
 
-    public void Setup(UnitInstance member, ICardHandler<UnitInstance> handler)
+    public void Setup(SoldierInstance member, ICardHandler<SoldierInstance> handler)
     {
         this.handler = handler;
         nameText.text = member.UnitName;
         unit = member;
         healthText.text = $"Health: {member.Health} / {member.MaxHealth}";
         healthBar.fillAmount = (float)member.Health / member.MaxHealth;
-        sprite.sprite = member.baseData.sprite;
+        sprite.sprite = member.unitData.sprite;
 
         if (unit.Health == 0)
         {

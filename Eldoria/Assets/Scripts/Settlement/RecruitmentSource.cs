@@ -4,9 +4,9 @@ using UnityEngine;
 [RequireComponent(typeof(Settlement))]
 public class RecruitmentSource : MonoBehaviour, IInteractable
 {
-    [SerializeField] private List<UnitData> spawnableUnits = new(); // possible spawns
+    [SerializeField] private List<SoldierData> spawnableUnits = new(); // possible spawns
 
-    [SerializeField] private List<UnitInstance> recruitableUnits = new(); // actual list of recruits
+    [SerializeField] private List<SoldierInstance> recruitableUnits = new(); // actual list of recruits
 
     void Start()
     {
@@ -28,7 +28,7 @@ public class RecruitmentSource : MonoBehaviour, IInteractable
         CalculatePotentiallyRecruitableUnits();
     }
 
-    public List<UnitInstance> GetRecruitableUnits()
+    public List<SoldierInstance> GetRecruitableUnits()
     {
         return recruitableUnits;
     }
@@ -54,7 +54,7 @@ public class RecruitmentSource : MonoBehaviour, IInteractable
             UnitData randUnit = spawnableUnits[Random.Range(0, spawnableUnits.Count)];
 
             // creat instance
-            UnitInstance randUnitInstance = new UnitInstance(randUnit);
+            SoldierInstance randUnitInstance = new SoldierInstance(randUnit);
 
             // add unit to list
             recruitableUnits.Add(randUnitInstance);
@@ -62,7 +62,7 @@ public class RecruitmentSource : MonoBehaviour, IInteractable
 
     }
 
-    public void recruitUnit(UnitInstance unit)
+    public void recruitUnit(SoldierInstance unit)
     {
         recruitableUnits.Remove(unit);
     }

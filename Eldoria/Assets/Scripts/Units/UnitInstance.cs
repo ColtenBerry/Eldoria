@@ -1,31 +1,32 @@
 
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
-public class UnitInstance
+public abstract class UnitInstance
 {
-    public UnitData baseData;
+    public UnitData unitData;
 
     [SerializeField]
-    private string unitName;
+    protected string unitName;
     [SerializeField]
-    private int currentExperience;
+    protected int currentExperience;
     [SerializeField]
-    private int currentLevel;
+    protected int currentLevel;
     [SerializeField]
-    private int health;
+    protected int health;
     [SerializeField]
-    private int maxHealth;
+    protected int maxHealth;
     [SerializeField]
-    private int attack;
+    protected int attack;
     [SerializeField]
-    private int defence;
+    protected int defence;
     [SerializeField]
-    private int moral;
+    protected int moral;
     [SerializeField]
-    private int experienceToNextLevel;
-    [SerializeField] private bool canUpgrade;
+    protected int experienceToNextLevel;
+    [SerializeField] protected bool canUpgrade;
 
 
     public string UnitName => unitName; // effectively makes this readonly but public? 
@@ -41,7 +42,7 @@ public class UnitInstance
     public bool CanUpgrade => canUpgrade;
 
 
-    [SerializeField] private string idString;
+    [SerializeField] protected string idString;
 
     public Guid ID
     {
@@ -56,7 +57,7 @@ public class UnitInstance
     public UnitInstance(UnitData data)
     {
         ID = Guid.NewGuid();
-        baseData = data;
+        unitData = data;
         unitName = data.unitName;
         currentLevel = data.level;
         currentExperience = data.experience;
@@ -69,22 +70,24 @@ public class UnitInstance
         canUpgrade = false;
     }
 
-    public UnitInstance Clone()
-    {
-        return new UnitInstance(baseData)
-        {
-            unitName = unitName,
-            currentLevel = currentLevel,
-            currentExperience = currentExperience,
-            experienceToNextLevel = experienceToNextLevel,
-            health = health,
-            maxHealth = maxHealth,
-            attack = attack,
-            defence = defence,
-            moral = moral,
-            idString = idString
-        };
-    }
+    public abstract UnitInstance Clone();
+
+    // public UnitInstance Clone()
+    // {
+    //     return new UnitInstance(baseData)
+    //     {
+    //         unitName = unitName,
+    //         currentLevel = currentLevel,
+    //         currentExperience = currentExperience,
+    //         experienceToNextLevel = experienceToNextLevel,
+    //         health = health,
+    //         maxHealth = maxHealth,
+    //         attack = attack,
+    //         defence = defence,
+    //         moral = moral,
+    //         idString = idString
+    //     };
+    // }
 
 
 
@@ -121,7 +124,7 @@ public class UnitInstance
         currentLevel++;
         //currentExperience = 0;
 
-        if (baseData.upgradeOptions != null && baseData.upgradeOptions.Count > 0)
+        if (unitData.upgradeOptions != null && unitData.upgradeOptions.Count > 0)
         {
             canUpgrade = true;
             Debug.Log("Can upgrade is true");
@@ -129,7 +132,7 @@ public class UnitInstance
     }
     public void ApplyUpgrade(UnitData newData)
     {
-        baseData = newData;
+        unitData = newData;
         unitName = newData.unitName;
         attack = newData.attack;
         defence = newData.defence;

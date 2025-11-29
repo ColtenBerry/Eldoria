@@ -14,11 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lordData: {fileID: 11400000, guid: 169e9ddb22524eb46ac2fce7c9f2a800, type: 2}
   faction: {fileID: 11400000, guid: 4aa8fb3f6aad8ae4d811bbfb6a8326d3, type: 2}
-  startingUnits:
-  - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
-  - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
-  - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
-  - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
-  - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
-  - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
+  startingSoldiers: {fileID: 11400000, guid: 0d8371928cf34304b8d8c31afd9b9012, type: 2}
   startingGold: 5000

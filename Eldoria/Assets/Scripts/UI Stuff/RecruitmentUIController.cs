@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHandler<UnitInstance>
+public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHandler<SoldierInstance>
 {
     [SerializeField] private Transform recruitOptionsParent;
     [SerializeField] private Transform potentialRecruitParent;
@@ -14,8 +14,8 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
 
     [SerializeField] private Button confirmButton;
 
-    private List<UnitInstance> recruitOptions = new();
-    private List<UnitInstance> potentialRecruits = new();
+    private List<SoldierInstance> recruitOptions = new();
+    private List<SoldierInstance> potentialRecruits = new();
     private RecruitmentSource recruitmentSource;
     private int accumulatedCost = 0;
 
@@ -24,7 +24,7 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
         confirmButton.onClick.AddListener(() =>
         {
             // add troops to party
-            foreach (UnitInstance unit in potentialRecruits)
+            foreach (SoldierInstance unit in potentialRecruits)
             {
                 RecruitmentUtility.TryRecruitUnit(unit, playerParty, GameManager.Instance.PlayerProfile, recruitmentSource);
             }
@@ -90,7 +90,7 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
             Destroy(child.gameObject);
 
         // populate recruitoptions
-        foreach (UnitInstance recruit in recruitOptions)
+        foreach (SoldierInstance recruit in recruitOptions)
         {
             var card = Instantiate(recruitPrefab, recruitOptionsParent);
 
@@ -103,7 +103,7 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
             Destroy(recruit.gameObject);
         }
 
-        foreach (UnitInstance recruit in potentialRecruits)
+        foreach (SoldierInstance recruit in potentialRecruits)
         {
             var card = Instantiate(recruitPrefab, potentialRecruitParent);
 
@@ -122,20 +122,20 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
         }
     }
 
-    public void OnCardClicked(UnitInstance unit)
+    public void OnCardClicked(SoldierInstance unit)
     {
 
         if (potentialRecruits.Contains(unit))
         {
             potentialRecruits.Remove(unit);
             recruitOptions.Add(unit);
-            accumulatedCost -= unit.baseData.recruitmentCost;
+            accumulatedCost -= unit.unitData.recruitmentCost;
         }
         else if (recruitOptions.Contains(unit))
         {
             potentialRecruits.Add(unit);
             recruitOptions.Remove(unit);
-            accumulatedCost += unit.baseData.recruitmentCost;
+            accumulatedCost += unit.unitData.recruitmentCost;
         }
         else
         {

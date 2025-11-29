@@ -4,7 +4,7 @@ using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICardHandler<UnitInstance>, ICardHandler<ItemStack>
+public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICardHandler<SoldierInstance>, ICardHandler<ItemStack>
 {
     [SerializeField] private Transform potentialPrisonersGrid;
     [SerializeField] private Transform currentPrisonersGrid;
@@ -20,8 +20,8 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
 
 
     [SerializeField] private Button confirmButton;
-    private List<UnitInstance> currentPrisonerList = new();
-    private List<UnitInstance> potentialPrisonerList = new();
+    private List<SoldierInstance> currentPrisonerList = new();
+    private List<SoldierInstance> potentialPrisonerList = new();
 
     public List<ItemStack> currentLootList = new();
     public List<ItemStack> potentialLootList = new();
@@ -48,7 +48,7 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
             // update player prisoners
             playerPartyController.ClearPrisoners();
 
-            foreach (UnitInstance prisoner in currentPrisonerList)
+            foreach (SoldierInstance prisoner in currentPrisonerList)
             {
                 playerPartyController.AddPrisoner(prisoner);
             }
@@ -111,7 +111,7 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
         PopulateLootGrid(currentLootGrid, currentLootList);
     }
 
-    private void PopulatePrisonerGrid(Transform grid, List<UnitInstance> units)
+    private void PopulatePrisonerGrid(Transform grid, List<SoldierInstance> units)
     {
         // clear the grid
         foreach (Transform child in grid)
@@ -120,7 +120,7 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
         }
 
         // populate the grid
-        foreach (UnitInstance unit in units)
+        foreach (SoldierInstance unit in units)
         {
             var thing = Instantiate(unitPrefab, grid);
             // setup thing
@@ -163,7 +163,7 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
 
     }
 
-    public void OnCardClicked(UnitInstance data)
+    public void OnCardClicked(SoldierInstance data)
     {
         if (currentPrisonerList.Contains(data))
         {
@@ -189,11 +189,11 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
 
 public class PrisonerAndLootMenuContext
 {
-    public List<UnitInstance> potentialPrisoners;
+    public List<SoldierInstance> potentialPrisoners;
     public int goldEarned;
     public List<ItemStack> potentialLoot;
 
-    public PrisonerAndLootMenuContext(List<UnitInstance> potentialPrisoners, int goldEarned, List<ItemStack> potentialLoot)
+    public PrisonerAndLootMenuContext(List<SoldierInstance> potentialPrisoners, int goldEarned, List<ItemStack> potentialLoot)
     {
         this.potentialPrisoners = potentialPrisoners;
         this.goldEarned = goldEarned;

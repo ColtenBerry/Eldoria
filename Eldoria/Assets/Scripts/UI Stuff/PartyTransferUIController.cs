@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PartyTransferUIController : MonoBehaviour, IMenuWithSource, ICardHandler<UnitInstance>
+public class PartyTransferUIController : MonoBehaviour, IMenuWithSource, ICardHandler<SoldierInstance>
 {
 
     [SerializeField] private Transform otherPartyGrid;
@@ -16,8 +16,8 @@ public class PartyTransferUIController : MonoBehaviour, IMenuWithSource, ICardHa
     private PartyController playerParty;
     private PartyController otherParty;
 
-    private List<UnitInstance> otherPartyPotentialResult = new();
-    private List<UnitInstance> playerPartyPotentialResult = new();
+    private List<SoldierInstance> otherPartyPotentialResult = new();
+    private List<SoldierInstance> playerPartyPotentialResult = new();
 
     public void Awake()
     {
@@ -52,8 +52,8 @@ public class PartyTransferUIController : MonoBehaviour, IMenuWithSource, ICardHa
             otherPartyNameText.text = otherParty.gameObject.name;
             playerPartyNameText.text = playerParty.gameObject.name;
 
-            otherPartyPotentialResult = new List<UnitInstance>(otherParty.PartyMembers);
-            playerPartyPotentialResult = new List<UnitInstance>(playerParty.PartyMembers);
+            otherPartyPotentialResult = new List<SoldierInstance>(otherParty.PartyMembers);
+            playerPartyPotentialResult = new List<SoldierInstance>(playerParty.PartyMembers);
 
             PopulateGrids();
         }
@@ -88,7 +88,7 @@ public class PartyTransferUIController : MonoBehaviour, IMenuWithSource, ICardHa
             itemController.Setup(member, this);
         }
     }
-    public void OnCardClicked(UnitInstance unit)
+    public void OnCardClicked(SoldierInstance unit)
     {
         if (playerPartyPotentialResult.Contains(unit))
         {

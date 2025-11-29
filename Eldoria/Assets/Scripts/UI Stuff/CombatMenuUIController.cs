@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHandler<UnitInstance>
+public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHandler<SoldierInstance>
 {
     [SerializeField] private Transform attackingUnitsGrid;
     [SerializeField] private Transform defendingUnitsGrid;
@@ -80,11 +80,11 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
 
         // Flatten all units from each party controller
-        List<UnitInstance> attackingUnits = attackingPartyControllers
+        List<SoldierInstance> attackingUnits = attackingPartyControllers
             .SelectMany(party => party.PartyMembers)
             .ToList();
 
-        List<UnitInstance> defendingUnits = defendingPartyControllers
+        List<SoldierInstance> defendingUnits = defendingPartyControllers
             .SelectMany(party => party.PartyMembers)
             .ToList();
 
@@ -94,7 +94,7 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
 
     }
 
-    private void PopulateGrid(Transform grid, List<UnitInstance> units)
+    private void PopulateGrid(Transform grid, List<SoldierInstance> units)
     {
         // clear the grid
         foreach (Transform child in grid)
@@ -103,7 +103,7 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
         }
 
         // populate the grid
-        foreach (UnitInstance unit in units)
+        foreach (SoldierInstance unit in units)
         {
             var thing = Instantiate(unitPrefab, grid);
             // setup thing
@@ -112,7 +112,7 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
         }
     }
 
-    public void OnCardClicked(UnitInstance data)
+    public void OnCardClicked(SoldierInstance data)
     {
         // do nothing
     }

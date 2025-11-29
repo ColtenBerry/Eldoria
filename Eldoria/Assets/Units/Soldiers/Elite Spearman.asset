@@ -9,20 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37df71987e15abe41b4e136ad2482ce6, type: 3}
-  m_Name: EliteSpearman
+  m_Script: {fileID: 11500000, guid: a0bf6cf2f4151924681999b6b9d4b225, type: 3}
+  m_Name: Elite Spearman
   m_EditorClassIdentifier: 
   unitName: Elite Spearman
-  health: 10
+  health: 20
   attack: 6
   defence: 2
   moral: 10
   level: 1
   experience: 0
-  experienceToNextLevel: 100
+  experienceToNextLevel: 50
   upgradeOptions: []
   recruitmentCost: 500
   upkeepCostPerWeek: 10
-  upgradeCost: 250
+  upgradeCost: 500
   foodConsumptionPerDay: 1
   sprite: {fileID: -4399920723594308487, guid: 72d6948044d7c08459107656ad017ed0, type: 3}

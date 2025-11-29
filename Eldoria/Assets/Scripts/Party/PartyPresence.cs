@@ -39,10 +39,10 @@ public class PartyPresence : MonoBehaviour, IInteractable
 
     private void InitializeParty()
     {
-        foreach (UnitData unit in lord.StartingUnits)
+        foreach (SoldierData unit in lord.StartingUnits)
         {
             Debug.Log("adding unit: presence");
-            partyController.AddUnit(new UnitInstance(unit));
+            partyController.AddUnit(new SoldierInstance(unit));
         }
         FactionsManager.Instance.RegisterParty(this);
     }

@@ -151,8 +151,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnableUnits:
-  - {fileID: 11400000, guid: 4de9901f8fe7bcd45ba0c770ad3445a3, type: 2}
-  recruitableUnits: []
+  - {fileID: 11400000, guid: 27aed1ef317da074b8c259d49948590e, type: 2}
 --- !u!114 &891917359992634282
 MonoBehaviour:
   m_ObjectHideFlags: 0

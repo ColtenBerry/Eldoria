@@ -8,14 +8,14 @@ public class LordProfile
     private CharacterInstance lord;
     private PartyPresence activeParty;
     private Faction faction;
-    private List<UnitData> startingUnits;
+    private List<SoldierData> startingUnits;
     private int goldAmount;
 
     public CharacterInstance Lord => lord;
     public PartyPresence ActiveParty => activeParty;
     public Faction Faction => faction;
     public int GoldAmount => goldAmount;
-    public List<UnitData> StartingUnits => startingUnits;
+    public List<SoldierData> StartingUnits => startingUnits;
 
     public LordProfileSO SourceData { get; private set; }
 
@@ -28,7 +28,7 @@ public class LordProfile
 
         faction = data.faction;
 
-        startingUnits = data.startingUnits;
+        startingUnits = data.startingSoldiers.soldiers;
         goldAmount = data.startingGold;
         SourceData = data;
     }

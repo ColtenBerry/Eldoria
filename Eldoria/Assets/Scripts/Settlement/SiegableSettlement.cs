@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(SiegeController))]
 public abstract class SiegableSettlement : Settlement
 {
-    [SerializeField] private List<UnitData> startingGarrisonUnits;
+    [SerializeField] private SoldierGroup garrisonStartingGroup;
 
     protected PartyController garrison;
 
@@ -29,9 +29,9 @@ public abstract class SiegableSettlement : Settlement
 
     protected virtual void InitializeGarrison()
     {
-        foreach (UnitData unitData in startingGarrisonUnits)
+        foreach (SoldierData unitData in garrisonStartingGroup.soldiers)
         {
-            garrison.AddUnit(new UnitInstance(unitData));
+            garrison.AddUnit(new SoldierInstance(unitData));
         }
         garrison.SetIsHealing(true);
     }

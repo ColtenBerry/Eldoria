@@ -35,13 +35,13 @@ public static class CombatOutcomeProcessor
 
     }
 
-    private static List<UnitInstance> GetDefeatedUnits(List<UnitInstance> simulatedUnits)
+    private static List<SoldierInstance> GetDefeatedUnits(List<SoldierInstance> simulatedUnits)
     {
         return simulatedUnits.Where(u => u.Health <= 0).ToList();
     }
 
 
-    public static List<UnitInstance> ReturnPrisoners(List<PartyController> losingParties)
+    public static List<SoldierInstance> ReturnPrisoners(List<PartyController> losingParties)
     {
         return losingParties
                 .SelectMany(party => party.PartyMembers)
@@ -49,11 +49,11 @@ public static class CombatOutcomeProcessor
     }
 
 
-    private static void ApplyDamage(List<UnitInstance> simulatedUnits, PartyController party, double surviveChance)
+    private static void ApplyDamage(List<SoldierInstance> simulatedUnits, PartyController party, double surviveChance)
     {
         Debug.Log("Applying to Party IDs: " + string.Join(",", party.PartyMembers.Select(u => u.ID)));
 
-        List<UnitInstance> toRemove = new();
+        List<SoldierInstance> toRemove = new();
 
         foreach (var simulated in simulatedUnits)
         {
@@ -93,7 +93,7 @@ public static class CombatOutcomeProcessor
     }
 
 
-    private static void RewardExperience(List<UnitInstance> simulatedUnits, PartyController party, List<UnitInstance> defeatedEnemies)
+    private static void RewardExperience(List<SoldierInstance> simulatedUnits, PartyController party, List<SoldierInstance> defeatedEnemies)
     {
         int totalXP = defeatedEnemies.Sum(enemy => CalculateXPFromUnit(enemy));
         var survivors = simulatedUnits.Where(u => u.Health > 0).ToList();
@@ -112,7 +112,7 @@ public static class CombatOutcomeProcessor
     }
 
 
-    private static int CalculateXPFromUnit(UnitInstance enemy)
+    private static int CalculateXPFromUnit(SoldierInstance enemy)
     {
         int statSum = enemy.Attack + enemy.Defence + enemy.Moral;
         return Mathf.Max(1, statSum / 10); // tweak divisor to scale difficulty
@@ -187,7 +187,7 @@ public static class CombatOutcomeProcessor
 
         if (playerWon)
         {
-            List<UnitInstance> prisoners = ReturnPrisoners(losers);
+            List<SoldierInstance> prisoners = ReturnPrisoners(losers);
             PrisonerAndLootMenuContext ctx = new PrisonerAndLootMenuContext(prisoners, goldEarned, potentialLoot);
 
             UIManager.Instance.OpenSubMenu("prisoners", ctx);
@@ -304,7 +304,7 @@ public static class CombatOutcomeProcessor
     /// <param name="enemy"></param>
     /// <param name="DIVISOR"></param>
     /// <returns></returns>
-    private static int CalculateValueFromUnit(UnitInstance enemy, int DIVISOR = 5)
+    private static int CalculateValueFromUnit(SoldierInstance enemy, int DIVISOR = 5)
     {
         int statSum = enemy.Attack + enemy.Defence + enemy.Health;
         Debug.Log("health: " + enemy.Health);

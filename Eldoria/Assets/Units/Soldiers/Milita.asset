@@ -9,23 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37df71987e15abe41b4e136ad2482ce6, type: 3}
-  m_Name: MilitiaSpearman
+  m_Script: {fileID: 11500000, guid: a0bf6cf2f4151924681999b6b9d4b225, type: 3}
+  m_Name: Milita
   m_EditorClassIdentifier: 
-  unitName: Militia Spearman
-  health: 10
-  attack: 2
+  unitName: Militiaman
+  health: 20
+  attack: 1
   defence: 1
-  moral: 50
+  moral: 10
   level: 1
-  experience: 49
+  experience: 0
   experienceToNextLevel: 50
-  upgradeOptions:
-  - {fileID: 11400000, guid: 076a4459812c2714fac4c9e403624368, type: 2}
-  - {fileID: 11400000, guid: 7a9f90855101e8c43b198a9b4ff6a70c, type: 2}
-  - {fileID: 11400000, guid: 1c85444d706e50c4fbe7fd070b05948a, type: 2}
+  upgradeOptions: []
   recruitmentCost: 10
   upkeepCostPerWeek: 1
-  upgradeCost: 10
+  upgradeCost: 100
   foodConsumptionPerDay: 1
   sprite: {fileID: -4518853377557969270, guid: 43e37bca5ca1af44d81e66766a7271e1, type: 3}

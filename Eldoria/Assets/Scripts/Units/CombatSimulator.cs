@@ -191,15 +191,15 @@ public static class CombatSimulator
     {
         var result = new CombatResult
         {
-            AttackerUnits = new List<UnitInstance>(),
-            DefenderUnits = new List<UnitInstance>(),
-            PartyUnitMap = new Dictionary<string, List<UnitInstance>>()
+            AttackerUnits = new List<SoldierInstance>(),
+            DefenderUnits = new List<SoldierInstance>(),
+            PartyUnitMap = new Dictionary<string, List<SoldierInstance>>()
         };
 
         // Clone attacker units and track origin
         foreach (var party in attackers)
         {
-            var clones = party.PartyMembers.Select(u => u.Clone()).ToList();
+            var clones = party.PartyMembers.Select(u => (SoldierInstance)u.Clone()).ToList();
             result.AttackerUnits.AddRange(clones);
             result.PartyUnitMap[party.PartyID] = clones;
         }
@@ -207,7 +207,7 @@ public static class CombatSimulator
         // Clone defender units and track origin
         foreach (var party in defenders)
         {
-            var clones = party.PartyMembers.Select(u => u.Clone()).ToList();
+            var clones = party.PartyMembers.Select(u => (SoldierInstance)u.Clone()).ToList();
             result.DefenderUnits.AddRange(clones);
             result.PartyUnitMap[party.PartyID] = clones;
         }
@@ -231,7 +231,7 @@ public static class CombatSimulator
         if (simulated != null)
             return simulated;
 
-        var clone = original.Clone();
+        var clone = (SoldierInstance)original.Clone();
         clone.SetHealth(0);
         return clone;
     })
@@ -245,7 +245,7 @@ public static class CombatSimulator
                 if (simulated != null)
                     return simulated;
 
-                var clone = original.Clone();
+                var clone = (SoldierInstance)original.Clone();
                 clone.SetHealth(0);
                 return clone;
             })
@@ -346,9 +346,9 @@ public static class CombatSimulator
 
 public class CombatResult
 {
-    public List<UnitInstance> AttackerUnits;
-    public List<UnitInstance> DefenderUnits;
+    public List<SoldierInstance> AttackerUnits;
+    public List<SoldierInstance> DefenderUnits;
     public bool AttackersWin;
 
-    public Dictionary<string, List<UnitInstance>> PartyUnitMap = new();
+    public Dictionary<string, List<SoldierInstance>> PartyUnitMap = new();
 }

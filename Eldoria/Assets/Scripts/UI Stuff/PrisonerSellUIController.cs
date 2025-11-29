@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PrisonerSellUIController : MonoBehaviour, ICardHandler<UnitInstance>, IMenuWithSource
+public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInstance>, IMenuWithSource
 {
 
     [SerializeField] private Transform currentPrisonersParent;
@@ -14,8 +14,8 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<UnitInstance
 
     [SerializeField] private Button confirmButton;
 
-    private List<UnitInstance> curentPrisoners = new();
-    private List<UnitInstance> prisonersToSell = new();
+    private List<SoldierInstance> curentPrisoners = new();
+    private List<SoldierInstance> prisonersToSell = new();
     private int accumulatedCost = 0;
 
     void Awake()
@@ -23,7 +23,7 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<UnitInstance
         confirmButton.onClick.AddListener(() =>
         {
             // remove sold prisoners from party
-            foreach (UnitInstance prisoner in prisonersToSell)
+            foreach (SoldierInstance prisoner in prisonersToSell)
             {
                 playerParty.ReleasePrisoner(prisoner);
             }
@@ -73,13 +73,13 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<UnitInstance
             Destroy(recruit.gameObject);
         }
 
-        foreach (UnitInstance recruit in curentPrisoners)
+        foreach (SoldierInstance recruit in curentPrisoners)
         {
             var card = Instantiate(prisonerPrefab, currentPrisonersParent);
 
             card.GetComponent<PartyMemberUI>().Setup(recruit, this);
         }
-        foreach (UnitInstance recruit in prisonersToSell)
+        foreach (SoldierInstance recruit in prisonersToSell)
         {
             var card = Instantiate(prisonerPrefab, prisonersToSellParent);
 
@@ -89,20 +89,20 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<UnitInstance
 
     }
 
-    public void OnCardClicked(UnitInstance unit)
+    public void OnCardClicked(SoldierInstance unit)
     {
 
         if (curentPrisoners.Contains(unit))
         {
             curentPrisoners.Remove(unit);
             prisonersToSell.Add(unit);
-            accumulatedCost += CalculateCost(unit.baseData);
+            accumulatedCost += CalculateCost(unit.unitData);
         }
         else if (prisonersToSell.Contains(unit))
         {
             prisonersToSell.Remove(unit);
             curentPrisoners.Add(unit);
-            accumulatedCost -= CalculateCost(unit.baseData);
+            accumulatedCost -= CalculateCost(unit.unitData);
         }
         else
         {
