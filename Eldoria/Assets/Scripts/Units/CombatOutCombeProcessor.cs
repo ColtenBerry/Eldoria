@@ -304,9 +304,9 @@ public static class CombatOutcomeProcessor
     /// <param name="enemy"></param>
     /// <param name="DIVISOR"></param>
     /// <returns></returns>
-    private static int CalculateValueFromUnit(SoldierInstance enemy, int DIVISOR = 5)
+    private static int CalculateValueFromUnit(SoldierInstance enemy, int DIVISOR = 2)
     {
-        int statSum = enemy.Attack + enemy.Defence + enemy.Health;
+        int statSum = enemy.Attack + enemy.Defence + enemy.Health + enemy.Moral;
         Debug.Log("health: " + enemy.Health);
         Debug.Log("stat sum: " + statSum);
         int baseGold = Mathf.Max(1, statSum / DIVISOR);
@@ -319,7 +319,7 @@ public static class CombatOutcomeProcessor
         return Mathf.Max(1, randomizedGold);
     }
 
-    private static int CalculateValueFromPartyList(List<PartyController> parties, int DIVISOR = 5)
+    private static int CalculateValueFromPartyList(List<PartyController> parties, int DIVISOR = 2)
     {
         int totalLootValue = 0;
         foreach (var party in parties)
