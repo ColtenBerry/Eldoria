@@ -42,7 +42,7 @@ public class RecruitmentSource : MonoBehaviour, IInteractable
         int prosperity = GetComponent<Settlement>().GetProsperity();
 
         // get total # units
-        int totalUnitsRecruitable = prosperity / 100;
+        int totalUnitsRecruitable = prosperity / 200;
 
         if (totalUnitsRecruitable < 2) totalUnitsRecruitable = 2; // set min
         if (totalUnitsRecruitable > 20) totalUnitsRecruitable = 20; // set max

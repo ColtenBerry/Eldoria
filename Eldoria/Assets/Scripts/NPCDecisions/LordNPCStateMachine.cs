@@ -102,6 +102,10 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
     protected override void SetIdleBehavior()
     {
+        Debug.Log($"{currentLord.Lord.UnitName} setIdleBehavior: [SetIdleBehavior] currentOrder: {(currentOrder == null ? "null" : currentOrder.Type.ToString())}, " +
+          $"currentIntent: {currentIntent}, previousIntent: {previousIntent}, " +
+          $"objective: {(objective == null ? "null" : objective.name)}, " +
+          $"previousObjective: {(previousObjective == null ? "null" : previousObjective.name)}");
         if (currentOrder != null)
         {
             EvaluateFactionOrder();
@@ -110,7 +114,6 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         {
             EvaluateLocalIntent();
         }
-        Debug.Log("execute if close");
         ExecuteIntentIfClose();
     }
     protected override void FixedUpdate()
@@ -124,7 +127,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
                 Debug.LogWarning("current order is null... warning");
                 return;
             }
-            EndSiege(currentOrder.TargetObject as SiegeController);
+            EndSiege(currentOrder.TargetObject as SiegableSettlement);
         }
     }
 
@@ -132,10 +135,13 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     private List<Settlement> unPatrolledLands = new();
 
     private GameObject previousObjective;
-    private GameObject objective;
+    [SerializeField] private GameObject objective;
 
     private void EvaluateFactionOrder()
     {
+        Debug.Log($"[EvaluateFactionOrder] {currentLord.Lord.UnitName} Evaluating order for {currentLord.Lord.UnitName}. " +
+                  $"OrderType={currentOrder.Type}, TargetObject={currentOrder.TargetObject}, " +
+                  $"TargetLocation={currentOrder.TargetLocation}");
         if (currentOrder == null) return;
 
         currentIntent = currentOrder.Type switch
@@ -166,7 +172,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
 
             if (wasWaiting && partyPresence != null)
-                LeaveFief(previousObjective.GetComponent<SiegeController>());
+                LeaveFief(previousObjective.GetComponent<SiegableSettlement>());
 
             // fix: remember the objective so future checks see that we've already applied it
             previousObjective = objective;
@@ -180,6 +186,11 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
     private void EvaluateLocalIntent()
     {
+
+        Debug.Log($"{currentLord.Lord.UnitName} EvaluateLocalIntent: [EvaluateLocalIntent] Deciding local intent. " +
+          $"Lord: {currentLord.Lord.UnitName}, ShouldDefend: {ShouldDefendFief()}, " +
+          $"ShouldRecruit: {ShouldRecruit()}, ShouldPatrol: {ShouldPatrol()}");
+
         if (currentLord == null) return;
 
 
@@ -220,17 +231,17 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
             if (isInFief)
             {
-                LeaveFief(previousObjective.GetComponent<SiegeController>());
+                LeaveFief(previousObjective.GetComponent<SiegableSettlement>());
             }
 
-            if (previousIntent == NPCIntent.SiegeCastle && previousObjective is SiegeController)
+            if (previousIntent == NPCIntent.SiegeCastle && previousObjective is SiegableSettlement)
             {
                 if (previousObjective == null)
                 {
                     Debug.LogWarning("previous objective is null...");
                     return;
                 }
-                EndSiege(previousObjective.GetComponent<SiegeController>());
+                EndSiege(previousObjective.GetComponent<SiegableSettlement>());
             }
 
             previousIntent = currentIntent;
@@ -255,7 +266,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
                     Recruit(source);
                     break;
                 case NPCIntent.WaitInFief:
-                    SiegeController sc = objective.GetComponent<SiegeController>();
+                    SiegableSettlement sc = objective.GetComponent<SiegableSettlement>();
                     if (sc == null) Debug.LogError("siegecontroller is null");
                     WaitInFief(sc);
                     break;
@@ -264,7 +275,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
                     PatrolLand(settlement);
                     break;
                 case NPCIntent.SiegeCastle:
-                    SiegeController castle = objective.GetComponent<SiegeController>();
+                    SiegableSettlement castle = objective.GetComponent<SiegableSettlement>();
                     if (castle != null)
                     {
                         Debug.Log("npc intent thing reached on castle: " + castle.name);
@@ -303,15 +314,15 @@ public class LordNPCStateMachine : BaseNPCStateMachine
             ClearOrder();
             return;
         }
-        fief.TryGetComponent(out SiegeController sc);
+        fief.TryGetComponent(out SiegableSettlement sc);
 
         if (sc != null)
         {
             // defend castle logic
-            if (!sc.IsUnderSiege && sc.Settlement.GetFaction() == currentLord.Faction)
+            if (!sc.SiegeController.IsUnderSiege && sc.GetFaction() == currentLord.Faction)
             {
                 // join castle in defense
-                EnterFief(sc);
+                EnterFief(fief as SiegableSettlement);
             }
             else
             {
@@ -402,31 +413,31 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
     private bool isSieging = false;
 
-    private void SiegeCastle(SiegeController castle)
+    private void SiegeCastle(SiegableSettlement castle)
     {
-        if (castle.Settlement.GetFaction() == currentLord.Faction)
+        if (castle.GetFaction() == currentLord.Faction)
         {
             Debug.Log("Attempting to siege castle of same faction! breaking");
             CompleteOrder();
             return;
         }
         Debug.Log("lordnpcstatemachine sieging castle name: " + castle.name);
-        castle.StartSiege(selfPresence, false);
+        castle.OnSiegeStart(selfPresence, false);
         isSieging = true;
     }
 
-    public void EndSiege(SiegeController castle)
+    public void EndSiege(SiegableSettlement castle)
     {
         isSieging = false;
         if (castle == null)
         {
             return;
         }
-        castle.EndSiege();
+        castle.OnSiegeEnd();
 
-        if (objective.TryGetComponent<SiegeController>(out var sc))
+        if (objective.TryGetComponent<SiegableSettlement>(out var sc))
         {
-            if (sc.Settlement.GetFaction() == currentLord.Faction)
+            if (sc.GetFaction() == currentLord.Faction)
             {
                 // castle must be conquered
                 CompleteOrder();
@@ -434,14 +445,14 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         }
     }
     private bool isInFief = false;
-    private void EnterFief(SiegeController fief)
+    private void EnterFief(SiegableSettlement fief)
     {
         if (fief == null)
         {
             Debug.LogWarning("Expected fief to be a castle");
             return;
         }
-        if (fief.IsUnderSiege)
+        if (fief.SiegeController.IsUnderSiege)
         {
             Debug.LogWarning("Cannot enter fief that is under siege");
             return;
@@ -450,9 +461,9 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         partyPresence.WaitInFief();
         isInFief = true;
     }
-    private void LeaveFief(SiegeController fief)
+    private void LeaveFief(SiegableSettlement fief)
     {
-        if (fief.IsUnderSiege)
+        if (fief.SiegeController.IsUnderSiege)
         {
             Debug.LogWarning("Cannot leave fief that is under siege");
             return;
@@ -465,11 +476,16 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     {
         if (isSieging)
         {
-            objective.TryGetComponent(out SiegeController sc);
+            objective.TryGetComponent(out SiegableSettlement sc);
             EndSiege(sc);
         }
+
         currentPath.Clear();
-        if (objective == null) return;
+        if (objective == null)
+        {
+            Debug.LogWarning("generatepathto will not run here!");
+            return;
+        }
         GeneratePathTo(objective.transform.position);
     }
 
@@ -492,6 +508,10 @@ public class LordNPCStateMachine : BaseNPCStateMachine
 
     private void GeneratePathTo(Vector3 destination)
     {
+        if (destination == null)
+        {
+            Debug.LogWarning("Destination is null!");
+        }
         List<Vector3> path = PathfindingManager.Instance.FindPath(transform.position, destination);
 
         // If a valid path was found, add the exact destination as the final step
@@ -510,6 +530,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         else
         {
             currentPath = new Queue<Vector3>();
+            Debug.LogWarning("New current path is empty!");
         }
     }
 
@@ -558,12 +579,14 @@ public class LordNPCStateMachine : BaseNPCStateMachine
         factionWarManager.CompleteOrder(currentOrder);
     }
 
-    private void WaitInFief(SiegeController sc)
+    private void WaitInFief(SiegableSettlement sc)
     {
         // add to seige parties
         sc.AddParty(selfPresence);
         // set visuals
         selfPresence.WaitInFief();
+        // set bool
+        isInFief = true;
     }
 
 }

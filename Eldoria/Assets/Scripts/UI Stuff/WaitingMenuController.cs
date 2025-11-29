@@ -30,12 +30,12 @@ public class WaitingMenuController : MonoBehaviour
         {
             if (ctx.isSieging)
             {
-                ctx.Fief.EndSiege();
+                ctx.Fief.OnSiegeEnd();
             }
 
             else
             {
-                if (ctx.Fief.IsUnderSiege)
+                if (ctx.Fief.SiegeController.IsUnderSiege)
                 {
                     Debug.Log("Fief is under siege, cannot leave!");
                     return;
@@ -80,9 +80,9 @@ public class WaitingMenuController : MonoBehaviour
 public class WaitingMenuContext
 {
     public bool isSieging;
-    public SiegeController Fief;
+    public SiegableSettlement Fief;
 
-    public WaitingMenuContext(bool isSieging, SiegeController Fief)
+    public WaitingMenuContext(bool isSieging, SiegableSettlement Fief)
     {
         this.isSieging = isSieging;
         this.Fief = Fief;

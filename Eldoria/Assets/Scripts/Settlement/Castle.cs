@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(PartyController))]
-public class Castle : SiegeableSettlement, IHasBoundVillages
+public class Castle : SiegableSettlement, IHasBoundVillages
 {
 
     // bound villages

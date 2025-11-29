@@ -12,19 +12,15 @@ public class SiegeController : MonoBehaviour, IInteractable
 
     [SerializeField] private int defenseBonus = 20;
 
-    [SerializeField] private List<PartyPresence> parties;
-    public List<PartyPresence> Parties => parties;
-
-
-    private SiegeableSettlement settlement;
-    public SiegeableSettlement Settlement => settlement;
+    private SiegableSettlement settlement;
+    public SiegableSettlement Settlement => settlement;
 
 
 
 
     void Awake()
     {
-        settlement = GetComponent<SiegeableSettlement>();
+        settlement = GetComponent<SiegableSettlement>();
         if (settlement == null)
             Debug.LogError("SiegeController requires a siegable Settlement component");
     }
@@ -47,7 +43,7 @@ public class SiegeController : MonoBehaviour, IInteractable
 
         if (siegeByPlayer)
         {
-            UIManager.Instance.OpenWaitingMenu(new WaitingMenuContext(true, this));
+            UIManager.Instance.OpenWaitingMenu(new WaitingMenuContext(true, settlement));
         }
     }
 
@@ -96,13 +92,13 @@ public class SiegeController : MonoBehaviour, IInteractable
                 CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, settlement.GetFaction(), this, true);
                 EndSiege();
             }
-            else if (parties.Contains(GameManager.Instance.player.GetComponent<PartyPresence>()))
+            else if (Settlement.Parties.Contains(GameManager.Instance.player.GetComponent<PartyPresence>()))
             {
                 siegeAttacker.TryGetComponent<LordNPCStateMachine>(out var stateMachine);
 
                 UIManager.Instance.CloseAllMenus();
                 CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, settlement.GetFaction(), this, false);
-                stateMachine.EndSiege(this);
+                stateMachine.EndSiege(Settlement);
                 EndSiege();
             }
 
@@ -111,7 +107,7 @@ public class SiegeController : MonoBehaviour, IInteractable
                 Debug.Log("starting siege battle");
                 siegeAttacker.TryGetComponent<LordNPCStateMachine>(out var stateMachine);
                 CombatSimulator.StartSiegeBattle(transform.position, siegeAttacker.GetComponent<PartyPresence>().Lord.Faction, settlement.GetFaction(), this);
-                stateMachine.EndSiege(this);
+                stateMachine.EndSiege(Settlement);
                 EndSiege();
 
             }
@@ -123,23 +119,11 @@ public class SiegeController : MonoBehaviour, IInteractable
 
     }
 
-    public void AddParty(PartyPresence party)
-    {
-        if (parties.Contains(party)) return;
-        parties.Add(party);
-    }
-
-    public void RemoveParty(PartyPresence party)
-    {
-        if (!parties.Contains(party)) return;
-
-        parties.Remove(party);
-    }
 
     public List<PartyController> GetAlliedPartyControllers()
     {
         List<PartyController> lst = new();
-        foreach (PartyPresence p in parties)
+        foreach (PartyPresence p in settlement.Parties)
         {
             if (FactionsManager.Instance.AreAllied(settlement.GetFaction(), p.Lord.Faction))
             {
@@ -197,20 +181,11 @@ public class SiegeController : MonoBehaviour, IInteractable
                 UIManager.Instance.OpenSubMenu("prisoner_sell", null);
             }));
 
-            options.Add(new InteractionOption("Wait Inside", () => WaitInsideCastle()));
+            options.Add(new InteractionOption("Wait Inside", () => Settlement.WaitInsideCastle()));
         }
 
         return options;
     }
-
-    private void WaitInsideCastle()
-    {
-        // open wait menu
-        AddParty(GameManager.Instance.player.GetComponent<PartyPresence>());
-        GameManager.Instance.player.GetComponent<PartyPresence>().WaitInFief();
-        UIManager.Instance.OpenWaitingMenu(new WaitingMenuContext(false, this));
-    }
-
     public int GetTotalDefenderStrength()
     {
         int strength = 0;
@@ -218,7 +193,7 @@ public class SiegeController : MonoBehaviour, IInteractable
         {
             strength += ((unit.Attack + unit.Defence) * unit.Health);
         }
-        foreach (PartyPresence presence in parties)
+        foreach (PartyPresence presence in settlement.Parties)
         {
             strength += presence.GetStrengthEstimate();
         }

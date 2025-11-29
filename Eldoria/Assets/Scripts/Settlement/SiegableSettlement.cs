@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 [RequireComponent(typeof(SiegeController))]
-public abstract class SiegeableSettlement : Settlement
+public abstract class SiegableSettlement : Settlement
 {
     [SerializeField] private List<UnitData> startingGarrisonUnits;
 
@@ -11,15 +11,20 @@ public abstract class SiegeableSettlement : Settlement
 
     public PartyController GarrisonParty => garrison;
 
-    [SerializeField] protected SiegeController siegeController;
+    protected SiegeController siegeController;
 
-    public PartyController SiegeController => SiegeController;
+    public SiegeController SiegeController => siegeController;
+
+    [SerializeField] private List<PartyPresence> parties;
+    public List<PartyPresence> Parties => parties;
+
 
     protected override void Start()
     {
         base.Start();
         InitializeGarrison();
         TickManager.Instance.OnWeekPassed += AwardGarrisonXP;
+        siegeController = GetComponent<SiegeController>();
     }
 
     protected virtual void InitializeGarrison()
@@ -54,6 +59,29 @@ public abstract class SiegeableSettlement : Settlement
     {
         siegeController.EndSiege();
     }
+
+    public void AddParty(PartyPresence party)
+    {
+        if (parties.Contains(party)) return;
+        parties.Add(party);
+    }
+
+    public void RemoveParty(PartyPresence party)
+    {
+        if (!parties.Contains(party)) return;
+
+        parties.Remove(party);
+    }
+
+    public void WaitInsideCastle()
+    {
+        // open wait menu
+        AddParty(GameManager.Instance.player.GetComponent<PartyPresence>());
+        GameManager.Instance.player.GetComponent<PartyPresence>().WaitInFief();
+        UIManager.Instance.OpenWaitingMenu(new WaitingMenuContext(false, this));
+    }
+
+
 
 
 }
