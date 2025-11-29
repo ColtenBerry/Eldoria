@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37df71987e15abe41b4e136ad2482ce6, type: 3}
+  m_Name: Spearman
+  m_EditorClassIdentifier: 
+  unitName: Spearman
+  health: 20
+  attack: 5
+  defence: 1
+  moral: 10
+  level: 1
+  experience: 0
+  experienceToNextLevel: 50
+  upgradeOptions:
+  - {fileID: 11400000, guid: 273a859593347354ab7345aa479c0916, type: 2}
+  recruitmentCost: 200
+  upkeepCostPerWeek: 5
+  upgradeCost: 100
+  foodConsumptionPerDay: 1
+  sprite: {fileID: 3641454295741865334, guid: cdeb8c4f19c23964290e9450fb6ddd1c, type: 3}

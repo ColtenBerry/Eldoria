@@ -291,12 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbe942e939e00884383b01a44e7195ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingGarrisonUnits:
-  - {fileID: 11400000, guid: 076a4459812c2714fac4c9e403624368, type: 2}
-  - {fileID: 11400000, guid: 076a4459812c2714fac4c9e403624368, type: 2}
-  - {fileID: 11400000, guid: 7a9f90855101e8c43b198a9b4ff6a70c, type: 2}
   defenseBonus: 20
-  parties: []
 --- !u!114 &1438559700895056109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,6 +307,9 @@ MonoBehaviour:
   spawnableUnits:
   - {fileID: 11400000, guid: 7a9f90855101e8c43b198a9b4ff6a70c, type: 2}
   - {fileID: 11400000, guid: 076a4459812c2714fac4c9e403624368, type: 2}
+  - {fileID: 11400000, guid: 273a859593347354ab7345aa479c0916, type: 2}
+  - {fileID: 11400000, guid: 54ece14cb0bf84c42a3feef23b491306, type: 2}
+  - {fileID: 11400000, guid: 1c85444d706e50c4fbe7fd070b05948a, type: 2}
   recruitableUnits: []
 --- !u!114 &95579121599768841
 MonoBehaviour:
@@ -340,6 +338,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prosperity: 0
+  startingGarrisonUnits: []
+  parties: []
   boundVillages: []
 --- !u!1 &4413917565010120050
 GameObject:

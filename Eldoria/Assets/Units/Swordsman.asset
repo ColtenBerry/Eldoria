@@ -20,9 +20,10 @@ MonoBehaviour:
   level: 1
   experience: 0
   experienceToNextLevel: 50
-  upgradeOptions: []
-  recruitmentCost: 50
+  upgradeOptions:
+  - {fileID: 11400000, guid: 54ece14cb0bf84c42a3feef23b491306, type: 2}
+  recruitmentCost: 200
   upkeepCostPerWeek: 5
   upgradeCost: 100
   foodConsumptionPerDay: 1
-  sprite: {fileID: -2151193157882705245, guid: 892ba033cb18b42419b9b0b23e3a3402, type: 3}
+  sprite: {fileID: -2299687460360013530, guid: e4189b16fcd01244aac379b64a8da486, type: 3}
