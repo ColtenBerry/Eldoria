@@ -119,17 +119,7 @@ public abstract class UnitInstance
         if (health > maxHealth) health = maxHealth;
     }
 
-    protected virtual void LevelUp()
-    {
-        currentLevel++;
-        //currentExperience = 0;
-
-        if (unitData.upgradeOptions != null && unitData.upgradeOptions.Count > 0)
-        {
-            canUpgrade = true;
-            Debug.Log("Can upgrade is true");
-        }
-    }
+    protected abstract void LevelUp();
     public void ApplyUpgrade(UnitData newData)
     {
         unitData = newData;

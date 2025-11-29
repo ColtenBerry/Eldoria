@@ -89,7 +89,7 @@ public class PartyController : MonoBehaviour
         int totalUpkeep = 0;
         foreach (SoldierInstance unit in PartyMembers)
         {
-            totalUpkeep += unit.unitData.upkeepCostPerWeek;
+            totalUpkeep += unit.soldierData.upkeepCostPerWeek;
         }
         return totalUpkeep;
     }
@@ -105,9 +105,9 @@ public class PartyController : MonoBehaviour
     public int CalculateFoodConsumption()
     {
         int totalConsumptionPerDay = 0;
-        foreach (UnitInstance unit in PartyMembers)
+        foreach (SoldierInstance unit in PartyMembers)
         {
-            totalConsumptionPerDay += unit.unitData.foodConsumptionPerDay;
+            totalConsumptionPerDay += unit.soldierData.foodConsumptionPerDay;
         }
         return totalConsumptionPerDay;
     }

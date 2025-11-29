@@ -23,7 +23,7 @@ public class PartyMemberUI : MonoBehaviour, IPointerClickHandler
         unit = member;
         healthText.text = $"Health: {member.Health} / {member.MaxHealth}";
         healthBar.fillAmount = (float)member.Health / member.MaxHealth;
-        sprite.sprite = member.unitData.sprite;
+        sprite.sprite = member.soldierData.sprite;
 
         if (unit.Health == 0)
         {

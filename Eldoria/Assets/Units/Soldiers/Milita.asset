@@ -18,11 +18,13 @@ MonoBehaviour:
   defence: 1
   moral: 10
   level: 1
-  experience: 0
+  experience: 50
   experienceToNextLevel: 50
-  upgradeOptions: []
   recruitmentCost: 10
   upkeepCostPerWeek: 1
   upgradeCost: 100
   foodConsumptionPerDay: 1
   sprite: {fileID: -4518853377557969270, guid: 43e37bca5ca1af44d81e66766a7271e1, type: 3}
+  upgradeOptions:
+  - {fileID: 11400000, guid: 6bcf995cbe7184f40b3c4a24d7c5c113, type: 2}
+  - {fileID: 11400000, guid: c1da032c369139640aeced86eb3a4284, type: 2}

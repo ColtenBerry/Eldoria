@@ -51,7 +51,7 @@ public class RecruitmentSource : MonoBehaviour, IInteractable
         for (int i = 0; i < totalUnitsRecruitable; i++)
         {
             // pick a unit at random
-            UnitData randUnit = spawnableUnits[Random.Range(0, spawnableUnits.Count)];
+            SoldierData randUnit = spawnableUnits[Random.Range(0, spawnableUnits.Count)];
 
             // creat instance
             SoldierInstance randUnitInstance = new SoldierInstance(randUnit);

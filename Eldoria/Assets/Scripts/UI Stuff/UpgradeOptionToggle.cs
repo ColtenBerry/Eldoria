@@ -6,20 +6,20 @@ public class UpgradeOptionToggle : MonoBehaviour
 {
     [SerializeField] private Text label;
     private Toggle toggle;
-    private UnitData data;
+    private SoldierData data;
 
 
     void Awake()
     {
         toggle = GetComponent<Toggle>();
     }
-    public void Initialize(UnitData data, ToggleGroup group)
+    public void Initialize(SoldierData data, ToggleGroup group)
     {
         this.data = data;
         label.text = data.unitName;
         toggle.group = group;
     }
-    public UnitData GetUnitData()
+    public SoldierData GetUnitData()
     {
         return data;
     }

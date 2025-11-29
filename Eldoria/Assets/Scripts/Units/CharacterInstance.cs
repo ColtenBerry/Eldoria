@@ -36,7 +36,6 @@ public class CharacterInstance : UnitInstance
 
     protected override void LevelUp()
     {
-        base.LevelUp();
         // Custom stat scaling logic
         strength += 1;
         agility += 1;

@@ -129,13 +129,13 @@ public class RecruitmentUIController : MenuController, IMenuWithSource, ICardHan
         {
             potentialRecruits.Remove(unit);
             recruitOptions.Add(unit);
-            accumulatedCost -= unit.unitData.recruitmentCost;
+            accumulatedCost -= unit.soldierData.recruitmentCost;
         }
         else if (recruitOptions.Contains(unit))
         {
             potentialRecruits.Add(unit);
             recruitOptions.Remove(unit);
-            accumulatedCost += unit.unitData.recruitmentCost;
+            accumulatedCost += unit.soldierData.recruitmentCost;
         }
         else
         {

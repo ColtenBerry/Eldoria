@@ -96,13 +96,13 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInsta
         {
             curentPrisoners.Remove(unit);
             prisonersToSell.Add(unit);
-            accumulatedCost += CalculateCost(unit.unitData);
+            accumulatedCost += CalculateCost(unit.soldierData);
         }
         else if (prisonersToSell.Contains(unit))
         {
             prisonersToSell.Remove(unit);
             curentPrisoners.Add(unit);
-            accumulatedCost -= CalculateCost(unit.unitData);
+            accumulatedCost -= CalculateCost(unit.soldierData);
         }
         else
         {

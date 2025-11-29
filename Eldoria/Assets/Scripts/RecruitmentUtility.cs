@@ -3,9 +3,9 @@ public static class RecruitmentUtility
 {
     public static bool TryRecruitUnit(SoldierInstance unit, PartyController party, LordProfile lord, RecruitmentSource source)
     {
-        if (!lord.TrySpendGold(unit.unitData.recruitmentCost))
+        if (!lord.TrySpendGold(unit.soldierData.recruitmentCost))
         {
-            Debug.Log($"❌ {lord.Lord.UnitName} can't afford {unit.UnitName} ({unit.unitData.recruitmentCost} gold)");
+            Debug.Log($"❌ {lord.Lord.UnitName} can't afford {unit.UnitName} ({unit.soldierData.recruitmentCost} gold)");
             return false;
         }
 
@@ -16,7 +16,7 @@ public static class RecruitmentUtility
         }
 
         source.recruitUnit(unit);
-        Debug.Log($"✅ {lord.Lord.UnitName} recruited {unit.UnitName} for {unit.unitData.recruitmentCost} gold");
+        Debug.Log($"✅ {lord.Lord.UnitName} recruited {unit.UnitName} for {unit.soldierData.recruitmentCost} gold");
         return true;
     }
 }

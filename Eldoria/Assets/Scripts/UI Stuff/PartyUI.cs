@@ -14,7 +14,7 @@ public class PartyUI : MonoBehaviour, ICardHandler<SoldierInstance>
 
     public Button upgradeButton;
 
-    private UnitInstance selectedUnit;
+    private SoldierInstance selectedUnit;
 
     //private List<PartyMemberUI> activeUIElements = new();
 
@@ -42,7 +42,7 @@ public class PartyUI : MonoBehaviour, ICardHandler<SoldierInstance>
             List<SoldierInstance> upgradableUnits = partyController.PartyMembers.Where(unit => unit.CanUpgrade).ToList();
 
             // open upgrade menu with new units
-            UpgradeObject upgradeObject = new UpgradeObject(selectedUnit, selectedUnit.unitData.upgradeOptions);
+            UpgradeObject upgradeObject = new UpgradeObject(selectedUnit, selectedUnit.soldierData.upgradeOptions);
             UIManager.Instance.OpenUpgradeUnitMenu(upgradeObject);
         });
     }
@@ -88,7 +88,7 @@ public class PartyUI : MonoBehaviour, ICardHandler<SoldierInstance>
     private void UpdateSpriteImage()
     {
         spriteImage.color = new Color(spriteImage.color.r, spriteImage.color.g, spriteImage.color.b, 1.0f);
-        spriteImage.sprite = selectedUnit.unitData.sprite;
+        spriteImage.sprite = selectedUnit.soldierData.sprite;
     }
 
     public void OnCardClicked(SoldierInstance unit)

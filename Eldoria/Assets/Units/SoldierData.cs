@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -5,5 +6,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SoldierData", menuName = "Scriptable Objects/SoldierData")]
 public class SoldierData : UnitData
 {
+    public List<SoldierData> upgradeOptions;
 
 }

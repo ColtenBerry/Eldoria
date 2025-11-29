@@ -17,7 +17,7 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
     [SerializeField] private Image upgradedTroopImage;
     [SerializeField] private Button closeMenuButton;
 
-    private UnitData currentUnitSelected;
+    private SoldierData currentUnitSelected;
     private UpgradeObject upgradeData;
 
     [SerializeField] private Transform upgradeOptionsLayout;
@@ -57,14 +57,14 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
             return;
         }
 
-        previousTroopTextName.text = upgradeData.previousUnit.unitData.unitName;
-        string[] lines = { $"Health: {upgradeData.previousUnit.unitData.health}", $"Attack: {upgradeData.previousUnit.unitData.attack}", $"Defense: {upgradeData.previousUnit.unitData.defence}" };
+        previousTroopTextName.text = upgradeData.previousUnit.soldierData.unitName;
+        string[] lines = { $"Health: {upgradeData.previousUnit.soldierData.health}", $"Attack: {upgradeData.previousUnit.soldierData.attack}", $"Defense: {upgradeData.previousUnit.soldierData.defence}" };
         previousTroopTextStats.text = string.Join("\n", lines);
 
         currentUnitSelected = upgradeData.unitOptions.First();
         PopulateUpgradeOptionInfo(currentUnitSelected);
         PopulateUpgradeOptions(upgradeData.unitOptions);
-        previousTroopImage.sprite = upgradeData.previousUnit.unitData.sprite;
+        previousTroopImage.sprite = upgradeData.previousUnit.soldierData.sprite;
 
     }
 
@@ -75,14 +75,14 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
         upgradedTroopTextStats.text = string.Join("\n", lines);
     }
 
-    private void PopulateUpgradeOptions(List<UnitData> options)
+    private void PopulateUpgradeOptions(List<SoldierData> options)
     {
         foreach (Transform child in upgradeOptionsLayout)
         {
             Destroy(child.gameObject);
         }
 
-        foreach (UnitData unitData in options)
+        foreach (SoldierData unitData in options)
         {
             UpgradeOptionToggle newToggle = Instantiate(toggleOptionPrefab, upgradeOptionsLayout);
             newToggle.Initialize(unitData, upgradeOptionsToggleGroup);
@@ -128,10 +128,10 @@ public class UpgradeUIController : MonoBehaviour, IMenuWithSource
 
 public class UpgradeObject
 {
-    public UnitInstance previousUnit;
-    public List<UnitData> unitOptions;
+    public SoldierInstance previousUnit;
+    public List<SoldierData> unitOptions;
 
-    public UpgradeObject(UnitInstance previousUnit, List<UnitData> unitOptions)
+    public UpgradeObject(SoldierInstance previousUnit, List<SoldierData> unitOptions)
     {
         this.previousUnit = previousUnit;
         this.unitOptions = unitOptions;
