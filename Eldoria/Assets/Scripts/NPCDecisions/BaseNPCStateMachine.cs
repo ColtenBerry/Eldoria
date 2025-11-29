@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,7 +14,10 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
     protected MovementController movementController;
     protected PartyPresence selfPresence;
     [SerializeField] protected float strengthPercent = 0.25f; // difference in strength to change behavior
-
+    [SerializeField] protected float maxChaseDistance = 10f;
+    [SerializeField] protected float ignoreTime = 10f;
+    protected Vector3 chaseOrigin;
+    private Dictionary<PartyPresence, float> ignoreUntil = new();
 
 
     protected virtual void Awake()
@@ -56,7 +60,16 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
     }
 
     protected abstract void SetIdleBehavior();
-    protected abstract void ExecuteTransitionActions(); // for actions that need to be taken when changing states
+
+    // for actions that need to be taken when changing states
+    protected virtual void ExecuteTransitionActions()
+    {
+        if (currentState == NPCState.Chasing)
+        {
+            chaseOrigin = transform.position;
+            Debug.Log($"{selfPresence.Lord.Lord.UnitName} started chasing from {chaseOrigin}");
+        }
+    }
 
     protected Vector3 targetDirection;
 
@@ -109,6 +122,15 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
 
         if (closest != null)
         {
+            // check chase distance
+            float chaseDistance = Vector3.Distance(chaseOrigin, transform.position);
+            if (chaseDistance > maxChaseDistance)
+            {
+                Debug.Log($"{selfPresence.Lord.Lord.UnitName} abandoning chase after {chaseDistance:F1} units.");
+                ignoreUntil[closest] = Time.time + 10f;
+                currentState = NPCState.Idle;
+                return;
+            }
             targetDirection = (closest.transform.position);
             RequestMove(targetDirection);
         }
@@ -154,6 +176,12 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
 
     public void OnThreatDetected(PartyPresence enemyPresence)
     {
+        // ignore if i already chased them forever. 
+        if (ignoreUntil.TryGetValue(enemyPresence, out float until) && Time.time < until)
+        {
+            Debug.Log($"{name} ignoring {enemyPresence.Lord.Lord.UnitName} until {until}");
+            return;
+        }
         if (!nearbyEnemies.Contains(enemyPresence))
             nearbyEnemies.Add(enemyPresence);
     }

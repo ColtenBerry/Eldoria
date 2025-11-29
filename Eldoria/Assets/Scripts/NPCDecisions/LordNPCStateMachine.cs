@@ -474,6 +474,7 @@ public class LordNPCStateMachine : BaseNPCStateMachine
     }
     protected override void ExecuteTransitionActions()
     {
+        base.ExecuteTransitionActions();
         if (isSieging)
         {
             objective.TryGetComponent(out SiegableSettlement sc);

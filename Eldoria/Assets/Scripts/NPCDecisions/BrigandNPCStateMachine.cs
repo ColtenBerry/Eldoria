@@ -63,6 +63,7 @@ public class BrigandNPCStateMachine : BaseNPCStateMachine
 
     protected override void ExecuteTransitionActions()
     {
+        base.ExecuteTransitionActions();
         if (currentState == NPCState.Idle)
         {
             origin = transform.position;
