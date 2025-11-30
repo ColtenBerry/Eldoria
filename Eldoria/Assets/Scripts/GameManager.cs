@@ -68,6 +68,7 @@ public class GameManager : MonoBehaviour
 
     public void SpawnParty(LordProfile lordProfile)
     {
+        Debug.Log("attempting to respawn");
         Vector3 spawnPoint = TerritoryManager.Instance.GetSettlementsOf(lordProfile)[0].gameObject.transform.position;
 
         // no territories
@@ -81,7 +82,7 @@ public class GameManager : MonoBehaviour
         {
             return; // don't spawn i guess
         }
-
+        Debug.Log("spawn point set");
         GameObject newParty = Instantiate(partyPrefab, spawnPoint, Quaternion.identity);
         PartyPresence partyPresence = newParty.GetComponent<PartyPresence>();
 
@@ -94,6 +95,7 @@ public class GameManager : MonoBehaviour
         FactionsManager.Instance.RegisterParty(partyPresence);
 
         newParty.SetActive(true);
+        Debug.Log($"{lordProfile.Lord.UnitName} has been respawned at {spawnPoint}");
     }
 
 

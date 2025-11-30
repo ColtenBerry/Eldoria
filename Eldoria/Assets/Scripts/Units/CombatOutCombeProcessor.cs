@@ -123,6 +123,7 @@ public static class CombatOutcomeProcessor
                     if (warManager == null)
                     {
                         // faction must have been a bandit
+                        Debug.LogWarning("bandit was defeated");
                     }
                     else
                     {
