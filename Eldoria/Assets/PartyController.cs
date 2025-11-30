@@ -20,7 +20,7 @@ public class PartyController : MonoBehaviour
 
 
     [Header("Prisoner Section")]
-    public List<SoldierInstance> Prisoners { get; private set; } = new();
+    public List<UnitInstance> Prisoners { get; private set; } = new();
     public event Action OnPrisonersUpdated;
 
     [Header("Party Identity")]
@@ -67,13 +67,13 @@ public class PartyController : MonoBehaviour
         maxPartyMembers = num;
     }
 
-    public void AddPrisoner(SoldierInstance prisoner)
+    public void AddPrisoner(UnitInstance prisoner)
     {
         Prisoners.Add(prisoner);
         OnPrisonersUpdated?.Invoke();
     }
 
-    public void ReleasePrisoner(SoldierInstance prisoner)
+    public void ReleasePrisoner(UnitInstance prisoner)
     {
         if (Prisoners.Remove(prisoner))
             OnPrisonersUpdated?.Invoke();

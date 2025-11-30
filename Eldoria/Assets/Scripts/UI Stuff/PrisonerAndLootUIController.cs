@@ -4,13 +4,14 @@ using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICardHandler<SoldierInstance>, ICardHandler<ItemStack>
+public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICardHandler<SoldierInstance>, ICardHandler<ItemStack>, ICardHandler<CharacterInstance>
 {
     [SerializeField] private Transform potentialPrisonersGrid;
     [SerializeField] private Transform currentPrisonersGrid;
     [SerializeField] private Transform potentialLootGrid;
     [SerializeField] private Transform currentLootGrid;
     [SerializeField] private GameObject unitPrefab;
+    [SerializeField] private CharacterUI characterPrefab;
     [SerializeField] private GameObject itemPrefab;
     [SerializeField] private TextMeshProUGUI goldEarnedText;
 
@@ -20,8 +21,8 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
 
 
     [SerializeField] private Button confirmButton;
-    private List<SoldierInstance> currentPrisonerList = new();
-    private List<SoldierInstance> potentialPrisonerList = new();
+    private List<UnitInstance> currentPrisonerList = new();
+    private List<UnitInstance> potentialPrisonerList = new();
 
     public List<ItemStack> currentLootList = new();
     public List<ItemStack> potentialLootList = new();
@@ -111,7 +112,7 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
         PopulateLootGrid(currentLootGrid, currentLootList);
     }
 
-    private void PopulatePrisonerGrid(Transform grid, List<SoldierInstance> units)
+    private void PopulatePrisonerGrid(Transform grid, List<UnitInstance> units)
     {
         // clear the grid
         foreach (Transform child in grid)
@@ -120,11 +121,20 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
         }
 
         // populate the grid
-        foreach (SoldierInstance unit in units)
+        foreach (UnitInstance unit in units)
         {
-            var thing = Instantiate(unitPrefab, grid);
             // setup thing
-            thing.GetComponent<PartyMemberUI>().Setup(unit, this);
+
+            if (unit is SoldierInstance soldier)
+            {
+                var thing = Instantiate(unitPrefab, grid);
+                thing.GetComponent<PartyMemberUI>().Setup(soldier, this);
+            }
+            else if (unit is CharacterInstance character)
+            {
+                var thing = Instantiate(characterPrefab, grid);
+                thing.Setup(character, this);
+            }
 
         }
     }
@@ -184,16 +194,32 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
         goldEarned = amount;
         goldEarnedText.text = "Gold Earned: " + goldEarned.ToString();
     }
+
+    public void OnCardClicked(CharacterInstance data)
+    {
+        if (currentPrisonerList.Contains(data))
+        {
+            currentPrisonerList.Remove(data);
+            potentialPrisonerList.Add(data);
+        }
+        else if (potentialPrisonerList.Contains(data))
+        {
+            potentialPrisonerList.Remove(data);
+            currentPrisonerList.Add(data);
+        }
+
+        PopulatePrisonerGrids();
+    }
 }
 
 
 public class PrisonerAndLootMenuContext
 {
-    public List<SoldierInstance> potentialPrisoners;
+    public List<UnitInstance> potentialPrisoners;
     public int goldEarned;
     public List<ItemStack> potentialLoot;
 
-    public PrisonerAndLootMenuContext(List<SoldierInstance> potentialPrisoners, int goldEarned, List<ItemStack> potentialLoot)
+    public PrisonerAndLootMenuContext(List<UnitInstance> potentialPrisoners, int goldEarned, List<ItemStack> potentialLoot)
     {
         this.potentialPrisoners = potentialPrisoners;
         this.goldEarned = goldEarned;

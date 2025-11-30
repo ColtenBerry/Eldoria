@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Linq;
 
-public class PartyUI : MonoBehaviour, ICardHandler<SoldierInstance>
+public class PartyUI : MonoBehaviour, ICardHandler<SoldierInstance>, ICardHandler<CharacterInstance>
 {
     public PartyController partyController;
     public Transform partyParent; // e.g. a Vertical Layout Group
     public Transform prisonerParent;
     public PartyMemberUI partyMemberUIPrefab; //Prefab for unit display
+    public CharacterUI characterUIPrefab; // prefab for character display
 
     [SerializeField] private Image spriteImage;
 
@@ -77,11 +78,18 @@ public class PartyUI : MonoBehaviour, ICardHandler<SoldierInstance>
         foreach (Transform child in prisonerParent)
             Destroy(child.gameObject);
 
-        foreach (var prisoner in partyController.Prisoners)
+        foreach (UnitInstance prisoner in partyController.Prisoners)
         {
-            var ui = Instantiate(partyMemberUIPrefab, prisonerParent);
-            ui.GetComponent<PartyMemberUI>().Setup(prisoner, this);
-            // Optional: visually tag as prisoner
+            if (prisoner is SoldierInstance soldier)
+            {
+                var ui = Instantiate(partyMemberUIPrefab, prisonerParent);
+                ui.GetComponent<PartyMemberUI>().Setup(soldier, this);
+            }
+            else if (prisoner is CharacterInstance character)
+            {
+                CharacterUI ui = Instantiate(characterUIPrefab, prisonerParent);
+                ui.Setup(character, this);
+            }
         }
     }
 
@@ -103,5 +111,10 @@ public class PartyUI : MonoBehaviour, ICardHandler<SoldierInstance>
             upgradeButton.interactable = false;
         }
         UpdateSpriteImage();
+    }
+
+    public void OnCardClicked(CharacterInstance data)
+    {
+        // do nothing?
     }
 }

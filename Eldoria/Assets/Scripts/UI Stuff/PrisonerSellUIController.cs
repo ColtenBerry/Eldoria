@@ -3,19 +3,20 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInstance>, IMenuWithSource
+public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInstance>, ICardHandler<CharacterInstance>, IMenuWithSource
 {
 
     [SerializeField] private Transform currentPrisonersParent;
     [SerializeField] private Transform prisonersToSellParent;
     [SerializeField] private GameObject prisonerPrefab;
+    [SerializeField] private CharacterUI characterPrefab;
     private PartyController playerParty;
     [SerializeField] private TextMeshProUGUI accumulatedCostText;
 
     [SerializeField] private Button confirmButton;
 
-    private List<SoldierInstance> curentPrisoners = new();
-    private List<SoldierInstance> prisonersToSell = new();
+    private List<UnitInstance> curentPrisoners = new();
+    private List<UnitInstance> prisonersToSell = new();
     private int accumulatedCost = 0;
 
     void Awake()
@@ -23,9 +24,17 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInsta
         confirmButton.onClick.AddListener(() =>
         {
             // remove sold prisoners from party
-            foreach (SoldierInstance prisoner in prisonersToSell)
+            foreach (UnitInstance prisoner in prisonersToSell)
             {
-                playerParty.ReleasePrisoner(prisoner);
+                if (prisoner is SoldierInstance soldier)
+                {
+                    playerParty.ReleasePrisoner(soldier);
+                }
+                else if (prisoner is CharacterInstance character)
+                {
+                    playerParty.ReleasePrisoner(prisoner);
+                    Debug.Log("Selling Character!");
+                }
             }
 
             prisonersToSell.Clear();
@@ -89,6 +98,8 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInsta
 
     }
 
+
+    // TODO: same code for each, maybe centralize? 
     public void OnCardClicked(SoldierInstance unit)
     {
 
@@ -121,4 +132,27 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInsta
     }
 
 
+
+    public void OnCardClicked(CharacterInstance data)
+    {
+        if (curentPrisoners.Contains(data))
+        {
+            curentPrisoners.Remove(data);
+            prisonersToSell.Add(data);
+            accumulatedCost += CalculateCost(data.characterData);
+        }
+        else if (prisonersToSell.Contains(data))
+        {
+            prisonersToSell.Remove(data);
+            curentPrisoners.Add(data);
+            accumulatedCost -= CalculateCost(data.characterData);
+        }
+        else
+        {
+            Debug.Log("Seemingly impossible result reached...");
+        }
+
+        PopulateGrids();
+        UpdateAccumulatedCostText();
+    }
 }
