@@ -120,7 +120,15 @@ public static class CombatOutcomeProcessor
                     // character "dies". notify respawn
                     LordProfile p = LordRegistry.Instance.GetLordByName(character.UnitName);
                     FactionWarManager warManager = FactionsManager.Instance.GetWarManager(p.Faction);
-                    warManager.AddToPendingRespawns(p);
+                    if (warManager == null)
+                    {
+                        // faction must have been a bandit
+                    }
+                    else
+                    {
+                        warManager.AddToPendingRespawns(p);
+
+                    }
 
                     lords.Remove(character);
                 }
@@ -249,12 +257,13 @@ public static class CombatOutcomeProcessor
     {
         List<PartyController> losers = result.AttackersWin ? defenders : attackers;
         List<PartyController> winners = result.AttackersWin ? attackers : defenders;
-        List<CharacterInstance> losingLords = result.AttackersWin ? defendingLords : attackingLords;
 
         List<ItemStack> potentialLoot = GenerateLootFromPartyList(losers);
         int goldEarned = CalculateValueFromPartyList(losers);
 
         ApplyCombatResult(result, attackers, defenders, attackingLords, defendingLords);
+        List<CharacterInstance> losingLords = result.AttackersWin ? defendingLords : attackingLords;
+
 
         bool playerWon = (result.AttackersWin && isPlayerAttacking) || (!result.AttackersWin && !isPlayerAttacking);
 

@@ -20,7 +20,7 @@ MonoBehaviour:
   level: 1
   experience: 0
   experienceToNextLevel: 100
-  recruitmentCost: 0
+  recruitmentCost: 100
   upkeepCostPerWeek: 0
   upgradeCost: 0
   foodConsumptionPerDay: 1

@@ -103,14 +103,14 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInsta
         {
             if (recruit is SoldierInstance soldier)
             {
-                var card = Instantiate(prisonerPrefab, currentPrisonersParent);
+                var card = Instantiate(prisonerPrefab, prisonersToSellParent);
 
                 card.GetComponent<PartyMemberUI>().Setup(soldier, this);
 
             }
             else if (recruit is CharacterInstance character)
             {
-                CharacterUI card = Instantiate(characterPrefab, currentPrisonersParent);
+                CharacterUI card = Instantiate(characterPrefab, prisonersToSellParent);
                 card.Setup(character, this);
             }
 
