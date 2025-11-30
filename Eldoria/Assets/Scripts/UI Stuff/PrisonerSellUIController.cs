@@ -34,6 +34,16 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInsta
                 {
                     playerParty.ReleasePrisoner(prisoner);
                     Debug.Log("Selling Character!");
+                    LordProfile p = LordRegistry.Instance.GetLordByName(character.UnitName);
+                    FactionWarManager warManager = FactionsManager.Instance.GetWarManager(p.Faction);
+                    if (warManager == null)
+                    {
+                        // faction must have been a bandit
+                    }
+                    else
+                    {
+                        warManager.AddToPendingRespawns(p);
+                    }
                 }
             }
 

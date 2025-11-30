@@ -27,6 +27,10 @@ public class FactionWarManager : MonoBehaviour
     {
         TickManager.Instance.OnTick += OnTick;
     }
+    private void Start()
+    {
+        TickManager.Instance.OnWeekPassed += OnWeekPassed;
+    }
 
     private void OnDestroy()
     {
@@ -41,6 +45,15 @@ public class FactionWarManager : MonoBehaviour
         {
             tickCounter = 0;
             IssueStrategicOrders();
+        }
+    }
+
+    private void OnWeekPassed(int i)
+    {
+        // respawn dead lords
+        foreach (LordProfile lord in pendingRespawns)
+        {
+            GameManager.Instance.SpawnParty(lord);
         }
     }
 

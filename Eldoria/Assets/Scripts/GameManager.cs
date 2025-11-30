@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -68,6 +69,18 @@ public class GameManager : MonoBehaviour
     public void SpawnParty(LordProfile lordProfile)
     {
         Vector3 spawnPoint = TerritoryManager.Instance.GetSettlementsOf(lordProfile)[0].gameObject.transform.position;
+
+        // no territories
+        if (spawnPoint == null)
+        {
+            spawnPoint = TerritoryManager.Instance.GetSettlementsOfFaction(lordProfile.Faction).First().gameObject.transform.position;
+        }
+
+        // faction has no territories
+        if (spawnPoint == null)
+        {
+            return; // don't spawn i guess
+        }
 
         GameObject newParty = Instantiate(partyPrefab, spawnPoint, Quaternion.identity);
         PartyPresence partyPresence = newParty.GetComponent<PartyPresence>();
