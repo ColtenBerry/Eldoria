@@ -74,7 +74,7 @@ public class CombatMenuUIController : MenuController, IMenuWithSource, ICardHand
             confirmButton.onClick.RemoveAllListeners();
             confirmButton.onClick.AddListener(() =>
             {
-                CombatOutcomeProcessor.ProcessPlayerBattleResult(result, attackingPartyControllers, defendingPartyControllers, isPlayerAttacking, isSiegeBattle, fief);
+                CombatOutcomeProcessor.ProcessPlayerBattleResult(result, attackingPartyControllers, defendingPartyControllers, attackingLords, defendingLords, isPlayerAttacking, isSiegeBattle, fief);
 
             });
 

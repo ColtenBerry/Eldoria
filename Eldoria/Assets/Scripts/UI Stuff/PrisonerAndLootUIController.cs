@@ -49,7 +49,7 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
             // update player prisoners
             playerPartyController.ClearPrisoners();
 
-            foreach (SoldierInstance prisoner in currentPrisonerList)
+            foreach (UnitInstance prisoner in currentPrisonerList)
             {
                 playerPartyController.AddPrisoner(prisoner);
             }

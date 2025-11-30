@@ -72,6 +72,8 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInsta
         accumulatedCostText.text = "Gold: " + accumulatedCost.ToString();
     }
 
+
+    // TODO: repeated code
     private void PopulateGrids()
     {
         foreach (Transform child in currentPrisonersParent)
@@ -82,20 +84,38 @@ public class PrisonerSellUIController : MonoBehaviour, ICardHandler<SoldierInsta
             Destroy(recruit.gameObject);
         }
 
-        foreach (SoldierInstance recruit in curentPrisoners)
+        foreach (UnitInstance recruit in curentPrisoners)
         {
-            var card = Instantiate(prisonerPrefab, currentPrisonersParent);
+            if (recruit is SoldierInstance soldier)
+            {
+                var card = Instantiate(prisonerPrefab, currentPrisonersParent);
 
-            card.GetComponent<PartyMemberUI>().Setup(recruit, this);
+                card.GetComponent<PartyMemberUI>().Setup(soldier, this);
+
+            }
+            else if (recruit is CharacterInstance character)
+            {
+                CharacterUI card = Instantiate(characterPrefab, currentPrisonersParent);
+                card.Setup(character, this);
+            }
         }
-        foreach (SoldierInstance recruit in prisonersToSell)
+        foreach (UnitInstance recruit in prisonersToSell)
         {
-            var card = Instantiate(prisonerPrefab, prisonersToSellParent);
+            if (recruit is SoldierInstance soldier)
+            {
+                var card = Instantiate(prisonerPrefab, currentPrisonersParent);
 
-            card.GetComponent<PartyMemberUI>().Setup(recruit, this);
+                card.GetComponent<PartyMemberUI>().Setup(soldier, this);
+
+            }
+            else if (recruit is CharacterInstance character)
+            {
+                CharacterUI card = Instantiate(characterPrefab, currentPrisonersParent);
+                card.Setup(character, this);
+            }
+
+
         }
-
-
     }
 
 

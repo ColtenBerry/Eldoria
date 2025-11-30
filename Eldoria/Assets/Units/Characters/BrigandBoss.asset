@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: BrigandBoss
   m_EditorClassIdentifier: 
   unitName: Luke
-  powerStat: 5
   health: 30
   attack: 3
   defence: 2
@@ -21,9 +20,13 @@ MonoBehaviour:
   level: 1
   experience: 0
   experienceToNextLevel: 100
+  recruitmentCost: 0
+  upkeepCostPerWeek: 0
+  upgradeCost: 0
+  foodConsumptionPerDay: 1
+  sprite: {fileID: -6720614374537327684, guid: 812b0480040ea684d8e9368c412e2959, type: 3}
   strength: 1
   agility: 1
   intelligence: 1
   charisma: 1
   endurance: 1
-  faction: {fileID: 11400000, guid: d4a74ec008e1ed34192f5777acb8c380, type: 2}

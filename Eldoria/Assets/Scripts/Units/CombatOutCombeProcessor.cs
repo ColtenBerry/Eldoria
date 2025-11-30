@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Android.Gradle.Manifest;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public static class CombatOutcomeProcessor
 {
-    public static void ApplyCombatResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders)
+    public static void ApplyCombatResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders, List<CharacterInstance> attackingLords, List<CharacterInstance> defendingLords)
     {
         foreach (var party in attackers)
         {
@@ -13,8 +14,13 @@ public static class CombatOutcomeProcessor
                 .Where(u => party.PartyMembers.Any(p => p.ID == u.ID))
                 .ToList();
 
-            ApplyDamage(relevantSimulated, party, 0.5);
+            ApplyPartyDamage(relevantSimulated, party, 0.5);
         }
+
+        var relevantAttackingLords = result.AttackerUnits
+            .Where(u => attackingLords.Any(l => l.ID == u.ID))
+            .ToList();
+        ApplyLordDamage(relevantAttackingLords, attackingLords, 0.5);
 
         foreach (var party in defenders)
         {
@@ -22,8 +28,14 @@ public static class CombatOutcomeProcessor
                 .Where(u => party.PartyMembers.Any(p => p.ID == u.ID))
                 .ToList();
 
-            ApplyDamage(relevantSimulated, party, 0.5);
+            ApplyPartyDamage(relevantSimulated, party, 0.5);
         }
+
+        var relevantDefendingLords = result.DefenderUnits
+            .Where(u => defendingLords.Any(l => l.ID == u.ID))
+            .ToList();
+        ApplyLordDamage(relevantDefendingLords, defendingLords, 0.5);
+
 
         var defeatedDefenders = result.DefenderUnits.Where(u => u.Health <= 0).ToList();
         foreach (var party in attackers)
@@ -49,11 +61,11 @@ public static class CombatOutcomeProcessor
     }
 
 
-    private static void ApplyDamage(List<UnitInstance> simulatedUnits, PartyController party, double surviveChance)
+    private static void ApplyPartyDamage(List<UnitInstance> simulatedUnits, PartyController party, double surviveChance)
     {
         Debug.Log("Applying to Party IDs: " + string.Join(",", party.PartyMembers.Select(u => u.ID)));
 
-        List<SoldierInstance> toRemove = new();
+        List<UnitInstance> toRemove = new();
 
         foreach (var simulated in simulatedUnits)
         {
@@ -63,26 +75,86 @@ public static class CombatOutcomeProcessor
                 Debug.LogWarning($"Simulated unit ID {simulated.ID} not found. Party has: {string.Join(",", party.PartyMembers.Select(u => u.ID))}");
                 continue;
             }
+            ApplyUnitDamage(simulated, actual, toRemove, surviveChance);
 
-            actual.SetHealth(simulated.Health);
+        }
 
-            if (actual.Health == 0)
+        foreach (UnitInstance unit in toRemove)
+        {
+            if (unit is SoldierInstance soldier)
             {
-                if (DecideDeath(surviveChance))
+                party.RemoveUnit(soldier);
+            }
+            else if (unit is CharacterInstance character)
+            {
+                Debug.LogWarning("Something isn't working right. this should be for partymembers, not characters");
+                // decide fate here. 
+            }
+        }
+    }
+
+    private static void ApplyLordDamage(List<UnitInstance> simulatedUnits, List<CharacterInstance> lords, double surviveChance)
+    {
+        List<UnitInstance> toRemove = new();
+
+        foreach (var simulated in simulatedUnits)
+        {
+            var actual = lords.Find(l => l.ID == simulated.ID);
+            if (actual == null)
+            {
+                Debug.LogWarning($"Simulated lord ID {simulated.ID} not found among lords.");
+                continue;
+            }
+
+            ApplyUnitDamage(simulated, actual, toRemove, surviveChance);
+        }
+
+        foreach (UnitInstance unit in toRemove)
+        {
+            if (unit is CharacterInstance character)
+            {
+                // Decide fate here — maybe mark as dead, captured, or trigger a narrative event
+                bool b = DecideDeath(.5);
+                if (b)
                 {
-                    toRemove.Add(actual);
+                    // character "dies". notify respawn
+                    LordProfile p = LordRegistry.Instance.GetLordByName(character.UnitName);
+                    FactionWarManager warManager = FactionsManager.Instance.GetWarManager(p.Faction);
+                    warManager.AddToPendingRespawns(p);
+
+                    lords.Remove(character);
                 }
                 else
                 {
-                    actual.Heal(1);
+                    // add to prisoner list? 
+                    // do nothing since we are not removing from the lords list
                 }
+            }
+            else
+            {
+                Debug.LogWarning("something not working right. should be for lords");
+            }
+        }
+    }
+
+
+
+    private static void ApplyUnitDamage(UnitInstance simulated, UnitInstance actual, List<UnitInstance> toRemove, double surviveChance)
+    {
+        actual.SetHealth(simulated.Health);
+
+        if (actual.Health == 0)
+        {
+            if (DecideDeath(surviveChance))
+            {
+                toRemove.Add(actual);
+            }
+            else
+            {
+                actual.Heal(1);
             }
         }
 
-        foreach (var unit in toRemove)
-        {
-            party.RemoveUnit(unit);
-        }
     }
 
 
@@ -119,9 +191,9 @@ public static class CombatOutcomeProcessor
     }
 
 
-    public static void ProcessAutoResolveResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders, bool isSiegeBattle, Settlement fief)
+    public static void ProcessAutoResolveResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders, List<CharacterInstance> attackingLords, List<CharacterInstance> defendingLords, bool isSiegeBattle, Settlement fief)
     {
-        ApplyCombatResult(result, attackers, defenders);
+        ApplyCombatResult(result, attackers, defenders, attackingLords, defendingLords);
 
         bool attackersWin = result.AttackersWin;
 
@@ -173,15 +245,16 @@ public static class CombatOutcomeProcessor
 
     }
 
-    public static void ProcessPlayerBattleResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders, bool isPlayerAttacking, bool isSiegeBattle, Settlement fief)
+    public static void ProcessPlayerBattleResult(CombatResult result, List<PartyController> attackers, List<PartyController> defenders, List<CharacterInstance> attackingLords, List<CharacterInstance> defendingLords, bool isPlayerAttacking, bool isSiegeBattle, Settlement fief)
     {
         List<PartyController> losers = result.AttackersWin ? defenders : attackers;
         List<PartyController> winners = result.AttackersWin ? attackers : defenders;
+        List<CharacterInstance> losingLords = result.AttackersWin ? defendingLords : attackingLords;
 
         List<ItemStack> potentialLoot = GenerateLootFromPartyList(losers);
         int goldEarned = CalculateValueFromPartyList(losers);
 
-        ApplyCombatResult(result, attackers, defenders);
+        ApplyCombatResult(result, attackers, defenders, attackingLords, defendingLords);
 
         bool playerWon = (result.AttackersWin && isPlayerAttacking) || (!result.AttackersWin && !isPlayerAttacking);
 
@@ -190,6 +263,7 @@ public static class CombatOutcomeProcessor
             List<UnitInstance> prisoners = new();
 
             prisoners.AddRange(ReturnPrisoners(losers));
+            prisoners.AddRange(losingLords);
             PrisonerAndLootMenuContext ctx = new PrisonerAndLootMenuContext(prisoners, goldEarned, potentialLoot);
 
             UIManager.Instance.OpenSubMenu("prisoners", ctx);

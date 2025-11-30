@@ -44,7 +44,15 @@ public class FactionWarManager : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// Tell the faction war manager a party has been destroyed. not really necessary since we check that later anyways
+    /// </summary>
+    /// <param name="lord"></param>
     public void NotifyPartyDestroyed(LordProfile lord)
+    {
+    }
+    public void AddToPendingRespawns(LordProfile lord)
     {
         if (!pendingRespawns.Contains(lord))
         {
@@ -52,6 +60,7 @@ public class FactionWarManager : MonoBehaviour
             ClearOrder(lord);
             Debug.Log($"☠️ Lord {lord.Lord.UnitName}'s party destroyed. Marked for respawn.");
         }
+
     }
 
     public void NotifySettlementUnderSiege(Settlement settlement)

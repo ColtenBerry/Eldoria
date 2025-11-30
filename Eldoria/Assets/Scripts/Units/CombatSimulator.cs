@@ -33,11 +33,13 @@ public static class CombatSimulator
         if (isPlayerAttacking)
         {
             attackers.Insert(0, GameManager.Instance.player.GetComponent<PartyController>());
+            attackingLords.Insert(0, GameManager.Instance.PlayerProfile.Lord);
         }
 
         else
         {
             defenders.Insert(0, GameManager.Instance.player.GetComponent<PartyController>());
+            defendingLords.Insert(0, GameManager.Instance.PlayerProfile.Lord);
         }
 
 
@@ -78,8 +80,8 @@ public static class CombatSimulator
         List<CharacterInstance> defendingLords = nearbyPresences.Where(presence => presence.Lord.Faction == defendingFaction).Select(presence => presence.Lord.Lord).ToList();
 
         CombatResult result = SimulateBattle(attackers, defenders, attackingLords, defendingLords);
-        CombatOutcomeProcessor.ApplyCombatResult(result, attackers, defenders);
-        CombatOutcomeProcessor.ProcessAutoResolveResult(result, attackers, defenders, false, null);
+        CombatOutcomeProcessor.ApplyCombatResult(result, attackers, defenders, attackingLords, defendingLords);
+        CombatOutcomeProcessor.ProcessAutoResolveResult(result, attackers, defenders, attackingLords, defendingLords, false, null);
         return result;
     }
 
@@ -120,8 +122,8 @@ public static class CombatSimulator
         }
 
         CombatResult result = SimulateBattle(attackers, defenders, attackingLords, defendingLords);
-        CombatOutcomeProcessor.ApplyCombatResult(result, attackers, defenders);
-        CombatOutcomeProcessor.ProcessAutoResolveResult(result, attackers, defenders, true, targetFief.Settlement);
+        CombatOutcomeProcessor.ApplyCombatResult(result, attackers, defenders, attackingLords, defendingLords);
+        CombatOutcomeProcessor.ProcessAutoResolveResult(result, attackers, defenders, attackingLords, defendingLords, true, targetFief.Settlement);
         return result;
     }
 
@@ -160,11 +162,13 @@ public static class CombatSimulator
         if (isPlayerAttacking)
         {
             attackers.Insert(0, GameManager.Instance.player.GetComponent<PartyController>());
+            attackingLords.Insert(0, GameManager.Instance.PlayerProfile.Lord);
         }
 
         else
         {
             defenders.Insert(0, GameManager.Instance.player.GetComponent<PartyController>());
+            defendingLords.Insert(0, GameManager.Instance.PlayerProfile.Lord);
         }
 
         var enemyName = isPlayerAttacking ? defenders.FirstOrDefault()?.name ?? "Unknown" : attackers.FirstOrDefault()?.name ?? "Unknown";
@@ -224,7 +228,7 @@ public static class CombatSimulator
         // Clone attacker units and track origin
         foreach (PartyController party in attackers)
         {
-            var clones = party.PartyMembers.Select(u => (UnitInstance)u.Clone()).ToList();
+            var clones = party.PartyMembers.Select(u => u.Clone()).ToList();
             result.AttackerUnits.AddRange(clones);
             result.PartyUnitMap[party.PartyID] = clones;
         }
@@ -232,13 +236,30 @@ public static class CombatSimulator
         // Clone defender units and track origin
         foreach (PartyController party in defenders)
         {
-            var clones = party.PartyMembers.Select(u => (UnitInstance)u.Clone()).ToList();
+            var clones = party.PartyMembers.Select(u => u.Clone()).ToList();
             result.DefenderUnits.AddRange(clones);
             result.PartyUnitMap[party.PartyID] = clones;
         }
 
+        // clone lords and track origin
+        foreach (CharacterInstance character in attackingLords)
+        {
+            UnitInstance clone = character.Clone();
+            result.AttackerUnits.Add(clone);
+            Debug.Log($"Lord: {character.UnitName}");
+        }
+
+
+
+        foreach (CharacterInstance character in defendingLords)
+        {
+            UnitInstance clone = character.Clone();
+            result.DefenderUnits.Add(clone);
+            Debug.Log($"Lord: {character.UnitName}");
+        }
+
         int safetyCounter = 0;
-        while (result.AttackerUnits.Count > 0 && result.DefenderUnits.Count > 0 && safetyCounter++ < 1000)
+        while (result.AttackerUnits.Count > 0 && result.DefenderUnits.Count > 0 && safetyCounter++ < 8000)
             SimulateRound(result);
 
         // After simulation loop
@@ -248,34 +269,44 @@ public static class CombatSimulator
         var simulatedAttackers = result.AttackerUnits;
         var simulatedDefenders = result.DefenderUnits;
 
-        result.AttackerUnits = attackers
-    .SelectMany(party => party.PartyMembers)
-    .Select(original =>
-    {
-        var simulated = simulatedAttackers.FirstOrDefault(sim => sim.ID == original.ID);
-        if (simulated != null)
-            return simulated;
+        var allAttackers = attackers
+    .SelectMany(p => p.PartyMembers)
+    .Cast<UnitInstance>()
+    .Concat(attackingLords.Cast<UnitInstance>())
+    .ToList();
 
-        var clone = (SoldierInstance)original.Clone();
-        clone.SetHealth(0);
-        return clone;
-    })
-    .ToList(); // ✅ This fixes the CS0266 error
+        result.AttackerUnits = allAttackers
+            .Select(original =>
+            {
+                var simulated = simulatedAttackers.FirstOrDefault(sim => sim.ID == original.ID);
+                if (simulated != null)
+                    return simulated;
 
-        result.DefenderUnits = defenders
-            .SelectMany(party => party.PartyMembers)
+                var clone = original.Clone();
+                clone.SetHealth(0);
+                return clone;
+            })
+            .ToList();
+
+        // Combine party members and lords for defenders
+        var allDefenders = defenders
+    .SelectMany(p => p.PartyMembers)
+    .Cast<UnitInstance>()
+    .Concat(defendingLords.Cast<UnitInstance>())
+    .ToList();
+
+        result.DefenderUnits = allDefenders
             .Select(original =>
             {
                 var simulated = simulatedDefenders.FirstOrDefault(sim => sim.ID == original.ID);
                 if (simulated != null)
                     return simulated;
 
-                var clone = (SoldierInstance)original.Clone();
+                var clone = original.Clone();
                 clone.SetHealth(0);
                 return clone;
             })
-            .ToList(); // ✅ Same fix here
-
+            .ToList();
 
         return result;
     }
