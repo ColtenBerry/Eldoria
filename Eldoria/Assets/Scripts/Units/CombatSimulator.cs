@@ -19,11 +19,16 @@ public static class CombatSimulator
     .Where(controller => controller != null)
     .ToList();
 
+        List<CharacterInstance> attackingLords = nearbyPresences.Where(presence => presence.Lord.Faction == attackingFaction).Select(presence => presence.Lord.Lord).ToList();
+
         List<PartyController> defenders = nearbyPresences
             .Where(presence => presence.Lord.Faction == defendingFaction)
             .Select(presence => presence.GetComponent<PartyController>())
             .Where(controller => controller != null)
             .ToList();
+
+        List<CharacterInstance> defendingLords = nearbyPresences.Where(presence => presence.Lord.Faction == defendingFaction).Select(presence => presence.Lord.Lord).ToList();
+
 
         if (isPlayerAttacking)
         {
@@ -40,6 +45,8 @@ public static class CombatSimulator
         CombatMenuContext ctx = new CombatMenuContext(
             attackingParties: attackers,
             defendingParties: defenders,
+            attackingLords: attackingLords,
+            defendingLords: defendingLords,
             isPlayerAttacking: isPlayerAttacking,
             enemyName: enemyName
 
@@ -59,13 +66,18 @@ public static class CombatSimulator
             .Where(pc => pc != null)
             .ToList();
 
+        List<CharacterInstance> attackingLords = nearbyPresences.Where(presence => presence.Lord.Faction == attackingFaction).Select(presence => presence.Lord.Lord).ToList();
+
+
         List<PartyController> defenders = nearbyPresences
             .Where(p => p.Lord.Faction == defendingFaction)
             .Select(p => p.GetComponent<PartyController>())
             .Where(pc => pc != null)
             .ToList();
 
-        CombatResult result = SimulateBattle(attackers, defenders);
+        List<CharacterInstance> defendingLords = nearbyPresences.Where(presence => presence.Lord.Faction == defendingFaction).Select(presence => presence.Lord.Lord).ToList();
+
+        CombatResult result = SimulateBattle(attackers, defenders, attackingLords, defendingLords);
         CombatOutcomeProcessor.ApplyCombatResult(result, attackers, defenders);
         CombatOutcomeProcessor.ProcessAutoResolveResult(result, attackers, defenders, false, null);
         return result;
@@ -80,6 +92,8 @@ public static class CombatSimulator
             .Select(p => p.GetComponent<PartyController>())
             .Where(pc => pc != null)
             .ToList();
+
+        List<CharacterInstance> attackingLords = nearbyPresences.Where(presence => presence.Lord.Faction == attackingFaction).Select(presence => presence.Lord.Lord).ToList();
 
         List<PartyController> defenders = new();
 
@@ -96,13 +110,16 @@ public static class CombatSimulator
 
         defenders = defenderSet.ToList();
 
+        List<CharacterInstance> defendingLords = nearbyPresences.Where(presence => presence.Lord.Faction == defendingFaction).Select(presence => presence.Lord.Lord).ToList();
+
+
         PartyController garrison = targetFief.GetComponent<PartyController>();
         if (garrison != null)
         {
             defenders.Insert(0, garrison);
         }
 
-        CombatResult result = SimulateBattle(attackers, defenders);
+        CombatResult result = SimulateBattle(attackers, defenders, attackingLords, defendingLords);
         CombatOutcomeProcessor.ApplyCombatResult(result, attackers, defenders);
         CombatOutcomeProcessor.ProcessAutoResolveResult(result, attackers, defenders, true, targetFief.Settlement);
         return result;
@@ -119,6 +136,9 @@ public static class CombatSimulator
             .Select(p => p.GetComponent<PartyController>())
             .Where(pc => pc != null)
             .ToList();
+
+        List<CharacterInstance> attackingLords = nearbyPresences.Where(presence => presence.Lord.Faction == attackingFaction).Select(presence => presence.Lord.Lord).ToList();
+
         List<PartyController> defenders = new();
         var defenderSet = new HashSet<PartyController>();
 
@@ -130,6 +150,9 @@ public static class CombatSimulator
                 .Select(p => p.GetComponent<PartyController>())
                 .Where(pc => pc != null)
         );
+
+        List<CharacterInstance> defendingLords = nearbyPresences.Where(presence => presence.Lord.Faction == defendingFaction).Select(presence => presence.Lord.Lord).ToList();
+
 
         defenders = defenderSet.ToList();
 
@@ -156,6 +179,8 @@ public static class CombatSimulator
         CombatMenuContext ctx = new CombatMenuContext(
             attackingParties: attackers,
             defendingParties: defenders,
+            attackingLords: attackingLords,
+            defendingLords: defendingLords,
             isPlayerAttacking: isPlayerAttacking,
             enemyName: enemyName,
             isSiegeBattle: true,
@@ -187,27 +212,27 @@ public static class CombatSimulator
     /// <param name="party1"></param>
     /// <param name="party2"></param>
     /// <returns></returns>
-    public static CombatResult SimulateBattle(List<PartyController> attackers, List<PartyController> defenders)
+    public static CombatResult SimulateBattle(List<PartyController> attackers, List<PartyController> defenders, List<CharacterInstance> attackingLords, List<CharacterInstance> defendingLords)
     {
         var result = new CombatResult
         {
-            AttackerUnits = new List<SoldierInstance>(),
-            DefenderUnits = new List<SoldierInstance>(),
-            PartyUnitMap = new Dictionary<string, List<SoldierInstance>>()
+            AttackerUnits = new List<UnitInstance>(),
+            DefenderUnits = new List<UnitInstance>(),
+            PartyUnitMap = new Dictionary<string, List<UnitInstance>>()
         };
 
         // Clone attacker units and track origin
-        foreach (var party in attackers)
+        foreach (PartyController party in attackers)
         {
-            var clones = party.PartyMembers.Select(u => (SoldierInstance)u.Clone()).ToList();
+            var clones = party.PartyMembers.Select(u => (UnitInstance)u.Clone()).ToList();
             result.AttackerUnits.AddRange(clones);
             result.PartyUnitMap[party.PartyID] = clones;
         }
 
         // Clone defender units and track origin
-        foreach (var party in defenders)
+        foreach (PartyController party in defenders)
         {
-            var clones = party.PartyMembers.Select(u => (SoldierInstance)u.Clone()).ToList();
+            var clones = party.PartyMembers.Select(u => (UnitInstance)u.Clone()).ToList();
             result.DefenderUnits.AddRange(clones);
             result.PartyUnitMap[party.PartyID] = clones;
         }
@@ -346,9 +371,9 @@ public static class CombatSimulator
 
 public class CombatResult
 {
-    public List<SoldierInstance> AttackerUnits;
-    public List<SoldierInstance> DefenderUnits;
+    public List<UnitInstance> AttackerUnits;
+    public List<UnitInstance> DefenderUnits;
     public bool AttackersWin;
 
-    public Dictionary<string, List<SoldierInstance>> PartyUnitMap = new();
+    public Dictionary<string, List<UnitInstance>> PartyUnitMap = new();
 }

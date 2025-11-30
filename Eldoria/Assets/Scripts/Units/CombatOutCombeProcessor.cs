@@ -49,7 +49,7 @@ public static class CombatOutcomeProcessor
     }
 
 
-    private static void ApplyDamage(List<SoldierInstance> simulatedUnits, PartyController party, double surviveChance)
+    private static void ApplyDamage(List<UnitInstance> simulatedUnits, PartyController party, double surviveChance)
     {
         Debug.Log("Applying to Party IDs: " + string.Join(",", party.PartyMembers.Select(u => u.ID)));
 
@@ -93,7 +93,7 @@ public static class CombatOutcomeProcessor
     }
 
 
-    private static void RewardExperience(List<SoldierInstance> simulatedUnits, PartyController party, List<SoldierInstance> defeatedEnemies)
+    private static void RewardExperience(List<UnitInstance> simulatedUnits, PartyController party, List<UnitInstance> defeatedEnemies)
     {
         int totalXP = defeatedEnemies.Sum(enemy => CalculateXPFromUnit(enemy));
         var survivors = simulatedUnits.Where(u => u.Health > 0).ToList();
@@ -112,7 +112,7 @@ public static class CombatOutcomeProcessor
     }
 
 
-    private static int CalculateXPFromUnit(SoldierInstance enemy)
+    private static int CalculateXPFromUnit(UnitInstance enemy)
     {
         int statSum = enemy.Attack + enemy.Defence + enemy.Moral;
         return Mathf.Max(1, statSum / 10); // tweak divisor to scale difficulty
@@ -187,7 +187,9 @@ public static class CombatOutcomeProcessor
 
         if (playerWon)
         {
-            List<SoldierInstance> prisoners = ReturnPrisoners(losers);
+            List<UnitInstance> prisoners = new();
+
+            prisoners.AddRange(ReturnPrisoners(losers));
             PrisonerAndLootMenuContext ctx = new PrisonerAndLootMenuContext(prisoners, goldEarned, potentialLoot);
 
             UIManager.Instance.OpenSubMenu("prisoners", ctx);
