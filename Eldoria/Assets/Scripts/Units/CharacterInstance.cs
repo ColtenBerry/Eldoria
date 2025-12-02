@@ -57,6 +57,7 @@ public class CharacterInstance : UnitInstance
             attack = attack,
             defence = defence,
             moral = moral,
+            speed = speed,
             idString = idString
         };
     }

@@ -228,7 +228,7 @@ public abstract class BaseNPCStateMachine : MonoBehaviour
 
     protected void RequestMove(Vector3 target)
     {
-        movementController.MoveTowards(target);
+        movementController.MoveTowards(target, selfPresence.Speed);
     }
 
     protected bool IsCloseTo(Vector3 target, float threshold = 0.05f)

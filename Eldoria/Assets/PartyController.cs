@@ -79,9 +79,16 @@ public class PartyController : MonoBehaviour
             OnPrisonersUpdated?.Invoke();
     }
 
+    public void ClearPartyMembers()
+    {
+        partyMembers.Clear();
+        OnPartyUpdated?.Invoke();
+    }
+
     public void ClearPrisoners()
     {
         Prisoners.Clear();
+        OnPrisonersUpdated?.Invoke();
     }
 
     public int CalculateWeeklyUpkeep()
@@ -153,6 +160,31 @@ public class PartyController : MonoBehaviour
     private void HandleTick(int i)
     {
         HealUnitsOverTime(HEALRATE);
+    }
+
+    private void OnDestroy()
+    {
+        // free prisoners
+        foreach (UnitInstance unit in Prisoners)
+        {
+            if (unit is CharacterInstance character)
+            {
+                // free character
+                LordProfile p = LordRegistry.Instance.GetLordByName(character.UnitName);
+                FactionWarManager warManager = FactionsManager.Instance.GetWarManager(p.Faction);
+                if (warManager == null)
+                {
+                    // faction must have been a bandit
+                    Debug.Log("bandit was freed");
+                }
+                else
+                {
+                    warManager.AddToPendingRespawns(p);
+                }
+            }
+        }
+        // free the rest
+        Prisoners.Clear();
     }
 
 

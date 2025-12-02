@@ -24,6 +24,9 @@ public abstract class UnitInstance
     protected int defence;
     [SerializeField]
     protected int moral;
+
+    [SerializeField]
+    protected float speed;
     [SerializeField]
     protected int experienceToNextLevel;
     [SerializeField] protected bool canUpgrade;
@@ -38,6 +41,7 @@ public abstract class UnitInstance
     public int Attack => attack;
     public int Defence => defence;
     public int Moral => moral;
+    public float Speed => speed;
 
     public bool CanUpgrade => canUpgrade;
 
@@ -68,6 +72,7 @@ public abstract class UnitInstance
         defence = data.defence;
         moral = data.moral;
         canUpgrade = false;
+        speed = data.speed;
     }
 
     public abstract UnitInstance Clone();

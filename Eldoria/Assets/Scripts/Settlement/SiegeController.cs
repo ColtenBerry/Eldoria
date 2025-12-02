@@ -164,12 +164,12 @@ public class SiegeController : MonoBehaviour, IInteractable
         if (TerritoryManager.Instance.GetLordOf(settlement) == GameManager.Instance.PlayerProfile)
         {
             // allow upgrades TODO: make an upgrade menu
-            options.Add(new InteractionOption("Upgrade Defences", () =>
-            {
+            // options.Add(new InteractionOption("Upgrade Defences", () =>
+            // {
 
-                //FortifyCastle();
+            //     //FortifyCastle();
 
-            }));
+            // }));
 
             options.Add(new InteractionOption("Manage Garrison", () =>
             {

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.Android.Gradle.Manifest;
 using UnityEngine;
@@ -56,6 +57,27 @@ public class PrisonerAndLootUIController : MenuController, IMenuWithSource, ICar
 
             GameManager.Instance.PlayerProfile.AddGold(goldEarned);
 
+            // notify warmanager of any lords not captured
+            if (potentialPrisonerList.OfType<CharacterInstance>().Any())
+            {
+                var characterPrisoners = potentialPrisonerList
+    .OfType<CharacterInstance>()
+    .ToList();
+                foreach (CharacterInstance character in characterPrisoners)
+                {
+                    LordProfile p = LordRegistry.Instance.GetLordByName(character.UnitName);
+                    FactionWarManager warManager = FactionsManager.Instance.GetWarManager(p.Faction);
+                    if (warManager == null)
+                    {
+                        // faction must have been a bandit
+                        Debug.Log("bandit was defeated");
+                    }
+                    else
+                    {
+                        warManager.AddToPendingRespawns(p);
+                    }
+                }
+            }
 
             // close menu
             UIManager.Instance.CloseAllMenus();

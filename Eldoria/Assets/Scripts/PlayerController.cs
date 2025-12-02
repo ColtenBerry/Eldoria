@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private InventoryManager playerInventoryManager;
 
+    private PartyPresence partyPresence;
+
 
     // public float moveSpeed = 5f;
     private Vector2 targetPosition;
@@ -32,6 +34,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         movementController = GetComponent<MovementController>();
+        partyPresence = GetComponent<PartyPresence>();
     }
 
     void Update()
@@ -94,7 +97,7 @@ public class PlayerController : MonoBehaviour
 
     private void RequestMove(Vector3 targetPosition)
     {
-        movementController.MoveTowards(targetPosition);
+        movementController.MoveTowards(targetPosition, partyPresence.Speed);
     }
 }
 

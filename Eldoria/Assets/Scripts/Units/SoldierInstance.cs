@@ -21,7 +21,8 @@ public class SoldierInstance : UnitInstance
             attack = attack,
             defence = defence,
             moral = moral,
-            idString = idString
+            idString = idString,
+            speed = speed
         };
     }
 
@@ -48,6 +49,7 @@ public class SoldierInstance : UnitInstance
         // Optionally reset experience or keep it
         currentExperience = 0;
         canUpgrade = false;
+        speed = newData.speed;
     }
 
 }

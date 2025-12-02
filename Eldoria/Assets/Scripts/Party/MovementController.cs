@@ -2,10 +2,7 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
-    [SerializeField]
-    private float speed;
-
-    public void MoveTowards(Vector3 targetDirection)
+    public void MoveTowards(Vector3 targetDirection, float speed)
     {
         // Stop when close enough
         if (Vector2.Distance(transform.position, targetDirection) < 0.01f) return;

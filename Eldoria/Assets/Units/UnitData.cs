@@ -10,6 +10,9 @@ public class UnitData : ScriptableObject
     public int attack;
     public int defence;
     public int moral;
+
+    [Header("Campaign Stats")]
+    public float speed = 1.0f;
     //public int range;
     [Header("Progression")]
     public int level = 1;

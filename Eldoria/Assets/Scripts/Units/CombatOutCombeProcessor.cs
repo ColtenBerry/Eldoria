@@ -117,6 +117,8 @@ public static class CombatOutcomeProcessor
                 bool b = DecideDeath(.5);
                 if (b)
                 {
+
+                    // TODO: this code is repeated multiple times throughout the game. we should really centralize it
                     // character "dies". notify respawn
                     LordProfile p = LordRegistry.Instance.GetLordByName(character.UnitName);
                     FactionWarManager warManager = FactionsManager.Instance.GetWarManager(p.Faction);
@@ -209,6 +211,9 @@ public static class CombatOutcomeProcessor
         List<PartyController> losers = result.AttackersWin ? defenders : attackers;
         List<PartyController> winners = result.AttackersWin ? attackers : defenders;
 
+        List<CharacterInstance> losingLords = result.AttackersWin ? defendingLords : attackingLords;
+
+
 
         if (attackersWin)
         {
@@ -247,6 +252,12 @@ public static class CombatOutcomeProcessor
                 foreach (var party in attackers)
                     NotifyAndDestroyParty(party);
             }
+        }
+
+        //handle prisoners? 
+        foreach (CharacterInstance character in losingLords)
+        {
+            attackers.First().AddPrisoner(character);
         }
 
         // print the message

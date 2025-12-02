@@ -24,8 +24,8 @@ public class PartyTransferUIController : MonoBehaviour, IMenuWithSource, ICardHa
         confirmButton.onClick.AddListener(() =>
         {
             // Clear current members
-            otherParty.PartyMembers.Clear();
-            playerParty.PartyMembers.Clear();
+            otherParty.ClearPartyMembers();
+            playerParty.ClearPartyMembers();
 
             // Add new members based on potential results
             foreach (var member in otherPartyPotentialResult)
