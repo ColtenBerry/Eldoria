@@ -323,4 +323,26 @@ public class FactionWarManager : MonoBehaviour
             Debug.Log($"✅ {lord.Lord.UnitName} completed {order.Type} on {order.TargetObject}");
         }
     }
+
+    #region Diplomacy 
+    //This should one day be exported to a faction diplomacy manager. but it is too simplistic rn to warrant that
+    public void ConsiderPeace(Faction peaceRequester)
+    {
+        bool shouldPeace;
+        //consider
+        //...
+        shouldPeace = true;
+
+        // peace or not
+        if (shouldPeace)
+        {
+            FactionsManager.Instance.DeclarePeace(peaceRequester, owningFaction);
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    #endregion
 }

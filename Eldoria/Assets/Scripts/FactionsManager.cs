@@ -90,7 +90,27 @@ public class FactionsManager : MonoBehaviour
         allies[b].Remove(a);
         enemies[a].Add(b);
         enemies[b].Add(a);
+
+        UIManager.Instance.LogMessage(new WorldMessage($"{a.name} declares war on {b.name}"));
     }
+
+    public void DeclarePeace(Faction a, Faction b)
+    {
+        // Ensure both factions exist in the dictionaries
+        EnsureRelationKeys(a, b);
+
+        // Remove from allies if present
+        allies[a].Remove(b);
+        allies[b].Remove(a);
+
+        // Remove from enemies if present
+        enemies[a].Remove(b);
+        enemies[b].Remove(a);
+
+        UIManager.Instance.LogMessage(new WorldMessage($"{a.name} makes peace with {b.name}"));
+
+    }
+
 
     public void FormAlliance(Faction a, Faction b)
     {
