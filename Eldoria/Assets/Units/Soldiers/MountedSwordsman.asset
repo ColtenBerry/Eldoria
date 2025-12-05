@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bf6cf2f4151924681999b6b9d4b225, type: 3}
+  m_Name: MountedSwordsman
+  m_EditorClassIdentifier: 
+  unitName: Mounted Swordsman
+  health: 20
+  attack: 3
+  defence: 2
+  moral: 10
+  speed: 3
+  level: 1
+  experience: 0
+  experienceToNextLevel: 50
+  recruitmentCost: 250
+  upkeepCostPerWeek: 10
+  upgradeCost: 300
+  foodConsumptionPerDay: 1
+  sprite: {fileID: 6948402585382724860, guid: af838cf638aefc04c9dbeac1a460801b, type: 3}
+  upgradeOptions:
+  - {fileID: 11400000, guid: b7c99e8c1e7fc144d8519b50c2125db4, type: 2}

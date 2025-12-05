@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0bf6cf2f4151924681999b6b9d4b225, type: 3}
+  m_Name: Lancer
+  m_EditorClassIdentifier: 
+  unitName: Lancer
+  health: 20
+  attack: 8
+  defence: 3
+  moral: 10
+  speed: 3
+  level: 1
+  experience: 0
+  experienceToNextLevel: 50
+  recruitmentCost: 550
+  upkeepCostPerWeek: 15
+  upgradeCost: 600
+  foodConsumptionPerDay: 1
+  sprite: {fileID: -3964654142196417474, guid: 7d05983abd5decb4aa04bea2c4927094, type: 3}
+  upgradeOptions: []
