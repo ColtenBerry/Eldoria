@@ -17,6 +17,7 @@ MonoBehaviour:
   attack: 3
   defence: 1
   moral: 10
+  speed: 1
   level: 1
   experience: 0
   experienceToNextLevel: 100
@@ -27,3 +28,4 @@ MonoBehaviour:
   sprite: {fileID: 3641454295741865334, guid: cdeb8c4f19c23964290e9450fb6ddd1c, type: 3}
   upgradeOptions:
   - {fileID: 11400000, guid: e0751f8a9acbe1f45a2a192d81009a22, type: 2}
+  - {fileID: 11400000, guid: 114fb092147ed5e47bba9429085dd8ec, type: 2}

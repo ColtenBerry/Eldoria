@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Settlement))]
@@ -36,30 +37,39 @@ public class RecruitmentSource : MonoBehaviour, IInteractable
     public void CalculatePotentiallyRecruitableUnits()
     {
         recruitableUnits.Clear();
-        // generate unit list
 
-        // get prosperity
         int prosperity = GetComponent<Settlement>().GetProsperity();
+        int totalUnitsRecruitable = Mathf.Clamp(prosperity / 200, 2, 20);
+        int totalFunds = prosperity;
 
-        // get total # units
-        int totalUnitsRecruitable = prosperity / 200;
+        // Separate units into tiers
+        var lowTier = spawnableUnits.Where(u => u.recruitmentCost <= 200).ToList();
+        var midTier = spawnableUnits.Where(u => u.recruitmentCost > 200 && u.recruitmentCost <= 400).ToList();
+        var highTier = spawnableUnits.Where(u => u.recruitmentCost > 400).ToList();
 
-        if (totalUnitsRecruitable < 2) totalUnitsRecruitable = 2; // set min
-        if (totalUnitsRecruitable > 20) totalUnitsRecruitable = 20; // set max
+        // Fill majority with low-tier units
+        int lowCount = Mathf.RoundToInt(totalUnitsRecruitable * 0.6f);
+        int midCount = Mathf.RoundToInt(totalUnitsRecruitable * 0.2f);
+        int highCount = totalUnitsRecruitable - lowCount - midCount;
 
-        // generate random list
-        for (int i = 0; i < totalUnitsRecruitable; i++)
+        AddUnits(lowTier, lowCount, ref totalFunds);
+        AddUnits(midTier, midCount, ref totalFunds);
+        AddUnits(highTier, highCount, ref totalFunds);
+    }
+
+    private void AddUnits(List<SoldierData> pool, int count, ref int funds)
+    {
+        for (int i = 0; i < count; i++)
         {
-            // pick a unit at random
-            SoldierData randUnit = spawnableUnits[Random.Range(0, spawnableUnits.Count)];
+            if (pool.Count == 0) return;
 
-            // creat instance
-            SoldierInstance randUnitInstance = new SoldierInstance(randUnit);
-
-            // add unit to list
-            recruitableUnits.Add(randUnitInstance);
+            SoldierData unit = pool[Random.Range(0, pool.Count)];
+            if (funds >= unit.recruitmentCost)
+            {
+                recruitableUnits.Add(new SoldierInstance(unit));
+                funds -= unit.recruitmentCost;
+            }
         }
-
     }
 
     public void recruitUnit(SoldierInstance unit)

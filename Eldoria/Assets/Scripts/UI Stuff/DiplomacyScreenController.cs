@@ -19,8 +19,8 @@ public class DiplomacyScreenController : MonoBehaviour, ICardHandler<Faction>
 
     private List<Faction> factionsList = new List<Faction>();
     private List<FactionItemUI> factionItemUIs = new List<FactionItemUI>();
+    private int selectedIndex = 0;
 
-    private FactionItemUI selectedFactionItem;
     private Faction selectedFaction;
     private Faction playerFaction;
     private void OnEnable()
@@ -51,7 +51,7 @@ public class DiplomacyScreenController : MonoBehaviour, ICardHandler<Faction>
                 FactionsManager.Instance.DeclareWar(playerFaction, selectedFaction);
             }
             SetButtonText();
-            selectedFactionItem.RefreshVisuals();
+            //selectedFactionItem.RefreshVisuals(); // for some reason this doesn't work
 
             PopulateContent();
         });
@@ -86,8 +86,12 @@ public class DiplomacyScreenController : MonoBehaviour, ICardHandler<Faction>
         }
 
         //
-        if (factionsList.Count == 0) return;
-        SelectFaction(factionsList.First());
+        if (factionsList.Count < selectedIndex)
+        {
+            Debug.LogWarning("faction list count changed");
+            return;
+        }
+        SelectFaction(factionsList[selectedIndex]);
     }
 
     public void OnCardClicked(Faction data)
@@ -98,7 +102,8 @@ public class DiplomacyScreenController : MonoBehaviour, ICardHandler<Faction>
     private void SelectFaction(Faction faction)
     {
         selectedFaction = faction;
-        selectedFactionItem = factionItemUIs.Where(item => item.Faction == faction).FirstOrDefault();
+        //selectedFactionItem = factionItemUIs.Where(item => item.Faction == faction).FirstOrDefault();
+        selectedIndex = factionItemUIs.FindIndex(item => item.Faction == selectedFaction);
         // populate the fields
         int numCastles = TerritoryManager.Instance.GetSettlementsOfFaction(faction).Where(c => c is Castle).Count();
         // int numTowns = TerritoryManager.Instance.GetSettlementsOfFaction(data).Where(c => c is Town).Count()
@@ -110,7 +115,7 @@ public class DiplomacyScreenController : MonoBehaviour, ICardHandler<Faction>
         lordsText.text = $"Lords: {numLords}";
 
         SetButtonText();
-        selectedFactionItem.RefreshVisuals();
+        //selectedFactionItem.RefreshVisuals();
     }
 
     private void SetButtonText()
